@@ -1,0 +1,2 @@
+C:\Users\awiss\Documents\MCUXpressoIDE_11.4.1_6260\workspace\OvalMate\LPC55S16_Project_main_dev\utilities/fsl_debug_console.h:152:24:DbgConsole_Init	24	static
+../board/board.c:24:6:BOARD_InitDebugConsole	16	static

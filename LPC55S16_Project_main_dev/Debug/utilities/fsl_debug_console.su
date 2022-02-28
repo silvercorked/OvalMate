@@ -1,0 +1,10 @@
+C:\Users\awiss\Documents\MCUXpressoIDE_11.4.1_6260\workspace\OvalMate\LPC55S16_Project_main_dev\drivers/fsl_common_arm.h:568:24:DisableGlobalIRQ	16	static
+C:\Users\awiss\Documents\MCUXpressoIDE_11.4.1_6260\workspace\OvalMate\LPC55S16_Project_main_dev\drivers/fsl_common_arm.h:595:20:EnableGlobalIRQ	24	static
+../utilities/fsl_debug_console.c:294:13:DbgConsole_SerialManagerTxCallback	32	static
+../utilities/fsl_debug_console.c:345:13:DbgConsole_SerialManagerRxCallback	24	static
+../utilities/fsl_debug_console.c:371:10:DbgConsole_ReadOneCharacter	24	static
+../utilities/fsl_debug_console.c:442:5:DbgConsole_SendData	40	static
+../utilities/fsl_debug_console.c:509:5:DbgConsole_SendDataReliable	40	static
+../utilities/fsl_debug_console.c:589:5:DbgConsole_ReadLine	24	static
+../utilities/fsl_debug_console.c:655:5:DbgConsole_ReadCharacter	24	static
+../utilities/fsl_debug_console.c:959:40:DbgConsole_Flush	4	static

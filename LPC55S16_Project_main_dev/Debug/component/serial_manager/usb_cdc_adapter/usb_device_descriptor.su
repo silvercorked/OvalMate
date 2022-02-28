@@ -1,0 +1,4 @@
+../component/serial_manager/usb_cdc_adapter/usb_device_descriptor.c:290:14:USB_DeviceGetDeviceDescriptor	16	static
+../component/serial_manager/usb_cdc_adapter/usb_device_descriptor.c:308:14:USB_DeviceGetConfigurationDescriptor	16	static
+../component/serial_manager/usb_cdc_adapter/usb_device_descriptor.c:330:14:USB_DeviceGetStringDescriptor	24	static
+../component/serial_manager/usb_cdc_adapter/usb_device_descriptor.c:382:14:USB_DeviceSetSpeed	32	static

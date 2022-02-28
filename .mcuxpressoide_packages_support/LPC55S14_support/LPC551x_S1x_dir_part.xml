@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chips chipVendor="NXP"
+       family="LPC551x_S1x"
+       vendorURL="http://www.nxp.com"
+       chipURL="">
+   <chip name="LPC55S14"
+         displayName="LPC55S14"
+         xml_file="LPC55S14_internal.xml"
+         chipURL=""/>
+</chips>
