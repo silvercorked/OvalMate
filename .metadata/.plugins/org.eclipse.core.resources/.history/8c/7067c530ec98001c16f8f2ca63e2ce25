@@ -1,5 +1,0 @@
-
-
-// CTIMER INCLUDES
-#include <stdbool.h>
-#include "fsl_ctimer.h"

@@ -1,6 +1,0 @@
-
-
-// GPIO include
-#include "fsl_gpio.h"
-
-
