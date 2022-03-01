@@ -1,0 +1,30 @@
+/**
+ * Title: OvalMate_sevenSegmentLED_module_DevBoard
+ * Version: 0.0.1
+ * Filename: LPC55S16_Project_main_dev.c
+ * Authors: Alex Wissing
+ * Purpose of Program: Manage 7-segment LEDs
+ * How Program is Run on Target System:
+ * Date Started: 2/28/2022
+ * Update History:
+ *
+ */
+
+// includes
+#include "pin_mux.h"
+#include "board.h"
+#include "fsl_debug_console.h"
+#include "fsl_gpio.h"
+#include <stdbool.h>
+
+// prototypes
+void set7Seg(
+		bool legA,
+		bool legB,
+		bool legC,
+		bool legD,
+		bool legE,
+		bool legF,
+		bool legG
+);
+void initialize7SegLegs(void);

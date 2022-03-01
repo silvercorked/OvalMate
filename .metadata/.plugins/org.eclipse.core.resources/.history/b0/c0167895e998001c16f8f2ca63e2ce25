@@ -1,0 +1,22 @@
+/**
+ * Title: OvalMate_sevenSegmentLED_module_DevBoard
+ * Version: 0.0.1
+ * Filename: LPC55S16_Project_main_dev.c
+ * Authors: Alex Wissing
+ * Purpose of Program: Manage 7-segment LEDs
+ * How Program is Run on Target System:
+ * Date Started: 2/28/2022
+ * Update History:
+ *
+ */
+
+
+
+// ADC Global Variables
+#if (defined(DEMO_LPADC_USE_HIGH_RESOLUTION) && DEMO_LPADC_USE_HIGH_RESOLUTION)
+const uint32_t g_LpadcFullRange   = 65536U;
+const uint32_t g_LpadcResultShift = 0U;
+#else
+const uint32_t g_LpadcFullRange   = 4096U;
+const uint32_t g_LpadcResultShift = 3U;
+#endif /* DEMO_LPADC_USE_HIGH_RESOLUTION */

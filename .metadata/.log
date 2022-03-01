@@ -11022,3 +11022,251 @@ Can't kill process
 java.lang.Exception: Can't kill process
 	at org.eclipse.cdt.dsf.mi.service.command.AbstractMIControl$RxThread.processMIOutput(AbstractMIControl.java:1014)
 	at org.eclipse.cdt.dsf.mi.service.command.AbstractMIControl$RxThread.run(AbstractMIControl.java:843)
+
+!ENTRY org.eclipse.debug.ui 4 120 2022-02-28 17:23:45.211
+!MESSAGE Error logged from Debug UI: 
+!STACK 0
+java.lang.InterruptedException
+	at java.base/java.util.concurrent.FutureTask.awaitDone(Unknown Source)
+	at java.base/java.util.concurrent.FutureTask.get(Unknown Source)
+	at org.eclipse.debug.internal.ui.stringsubstitution.SelectedResourceManager.runInUIThreadWithTimeout(SelectedResourceManager.java:262)
+	at org.eclipse.debug.internal.ui.stringsubstitution.SelectedResourceManager.getFromUI(SelectedResourceManager.java:240)
+	at org.eclipse.debug.internal.ui.stringsubstitution.SelectedResourceManager.getActiveWindow(SelectedResourceManager.java:231)
+	at org.eclipse.debug.ui.DebugUITools.getDebugContext(DebugUITools.java:247)
+	at org.eclipse.cdt.debug.internal.ui.editors.DelegatingDebugTextHover.getDelegate(DelegatingDebugTextHover.java:99)
+	at org.eclipse.cdt.debug.internal.ui.editors.DelegatingDebugTextHover.getHoverInfo2(DelegatingDebugTextHover.java:68)
+	at org.eclipse.cdt.internal.ui.text.c.hover.BestMatchHover.getHoverInfo2(BestMatchHover.java:149)
+	at org.eclipse.cdt.internal.ui.text.c.hover.CEditorTextHoverProxy.getHoverInfo2(CEditorTextHoverProxy.java:85)
+	at org.eclipse.jface.text.TextViewerHoverManager$1.run(TextViewerHoverManager.java:155)
+
+!ENTRY com.crt.log 1 0 2022-02-28 19:35:52.317
+!MESSAGE Trying to connect to redlink server on port 3025.
+
+!ENTRY com.nxp.mcuxpresso.core.debug.support.linkserver 1 0 2022-02-28 19:35:52.831
+!MESSAGE RedlinkServer telnet session connected on port 3025->61853 @ 127.0.0.1
+
+!ENTRY com.nxp.mcuxpresso.core.debug 1 0 2022-02-28 19:35:57.549
+!MESSAGE Telnet session connected on port 3330->61857 @ 127.0.0.1
+
+!ENTRY com.crt.log 1 0 2022-02-28 19:35:58.776
+!MESSAGE Genric ROM base address found in xml file: e00fe000
+
+!ENTRY com.crt.log 1 0 2022-02-28 19:35:59.068
+!MESSAGE Successfully identified 0x9 class component  Address e0040000 CID1 = 144 PID0 = 33 PID1 = 189 PID2 = 11 PID3 = 0 DEVARCH = 0 Revision = 0
+
+!ENTRY com.crt.log 1 0 2022-02-28 19:35:59.383
+!MESSAGE Successfully identified 0x9 class component  Address e000e000 CID1 = 144 PID0 = 33 PID1 = 189 PID2 = 11 PID3 = 0 DEVARCH = 1198533124 Revision = 0
+
+!ENTRY com.crt.log 1 0 2022-02-28 19:35:59.493
+!MESSAGE Successfully identified 0x9 class component  Address e0001000 CID1 = 144 PID0 = 33 PID1 = 189 PID2 = 11 PID3 = 0 DEVARCH = 1198529026 Revision = 0
+
+!ENTRY com.crt.log 1 0 2022-02-28 19:35:59.603
+!MESSAGE Successfully identified 0x9 class component  Address e0002000 CID1 = 144 PID0 = 33 PID1 = 189 PID2 = 11 PID3 = 0 DEVARCH = 1198529027 Revision = 0
+
+!ENTRY com.crt.log 1 0 2022-02-28 19:35:59.713
+!MESSAGE Successfully identified 0x9 class component  Address e0000000 CID1 = 144 PID0 = 33 PID1 = 189 PID2 = 11 PID3 = 0 DEVARCH = 1198529025 Revision = 0
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-02-28 19:36:52.885
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.ImmediateRequestMonitor@31f41fcc): Status ERROR: org.eclipse.cdt.dsf.gdb code=10003 Invalid context type. null' resulted in an error.
+!SUBENTRY 1 org.eclipse.cdt.dsf.gdb 4 10003 2022-02-28 19:36:52.885
+!MESSAGE Invalid context type.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-02-28 19:36:53.488
+!MESSAGE Request for monitor: 'RequestMonitor (com.nxp.mcuxpresso.core.debug.services.heapstack.NXPHeapStackVariableVMNode$7@94db7f8): Status ERROR: org.eclipse.cdt.dsf.gdb code=10002 Container context not found null' resulted in an error.
+!SUBENTRY 1 org.eclipse.cdt.dsf.gdb 4 10002 2022-02-28 19:36:53.488
+!MESSAGE Container context not found
+
+!ENTRY com.crt.log 1 0 2022-02-28 19:37:01.739
+!MESSAGE Trying to connect to redlink server on port 3025.
+
+!ENTRY com.nxp.mcuxpresso.core.debug.support.linkserver 1 0 2022-02-28 19:37:02.244
+!MESSAGE RedlinkServer telnet session connected on port 3025->61863 @ 127.0.0.1
+
+!ENTRY com.nxp.mcuxpresso.core.debug 1 0 2022-02-28 19:37:06.962
+!MESSAGE Telnet session connected on port 3330->61867 @ 127.0.0.1
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-02-28 19:37:07.541
+!MESSAGE Request for monitor: 'RequestMonitor (com.nxp.mcuxpresso.core.debug.services.heapstack.NXPHeapStackVariableVMNode$7@691d5839): Status ERROR: org.eclipse.cdt.dsf.gdb code=10002 Execution context not found null' resulted in an error.
+!SUBENTRY 1 org.eclipse.cdt.dsf.gdb 4 10002 2022-02-28 19:37:07.541
+!MESSAGE Execution context not found
+
+!ENTRY org.eclipse.cdt.dsf.gdb 4 0 2022-02-28 19:37:07.671
+!MESSAGE Endianness was never initialized for gdb[46].proc[42000].threadGroup[i1]
+
+!ENTRY com.crt.log 1 0 2022-02-28 19:37:07.957
+!MESSAGE Genric ROM base address found in xml file: e00fe000
+
+!ENTRY com.crt.log 1 0 2022-02-28 19:37:08.252
+!MESSAGE Successfully identified 0x9 class component  Address e0040000 CID1 = 144 PID0 = 33 PID1 = 189 PID2 = 11 PID3 = 0 DEVARCH = 0 Revision = 0
+
+!ENTRY com.crt.log 1 0 2022-02-28 19:37:08.562
+!MESSAGE Successfully identified 0x9 class component  Address e000e000 CID1 = 144 PID0 = 33 PID1 = 189 PID2 = 11 PID3 = 0 DEVARCH = 1198533124 Revision = 0
+
+!ENTRY com.crt.log 1 0 2022-02-28 19:37:08.674
+!MESSAGE Successfully identified 0x9 class component  Address e0001000 CID1 = 144 PID0 = 33 PID1 = 189 PID2 = 11 PID3 = 0 DEVARCH = 1198529026 Revision = 0
+
+!ENTRY com.crt.log 1 0 2022-02-28 19:37:08.785
+!MESSAGE Successfully identified 0x9 class component  Address e0002000 CID1 = 144 PID0 = 33 PID1 = 189 PID2 = 11 PID3 = 0 DEVARCH = 1198529027 Revision = 0
+
+!ENTRY com.crt.log 1 0 2022-02-28 19:37:08.894
+!MESSAGE Successfully identified 0x9 class component  Address e0000000 CID1 = 144 PID0 = 33 PID1 = 189 PID2 = 11 PID3 = 0 DEVARCH = 1198529025 Revision = 0
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-02-28 19:38:07.993
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.ImmediateRequestMonitor@201e4617): Status ERROR: org.eclipse.cdt.dsf.gdb code=10003 Invalid context type. null' resulted in an error.
+!SUBENTRY 1 org.eclipse.cdt.dsf.gdb 4 10003 2022-02-28 19:38:07.993
+!MESSAGE Invalid context type.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-02-28 19:38:08.848
+!MESSAGE Request for monitor: 'RequestMonitor (com.nxp.mcuxpresso.core.debug.services.heapstack.NXPHeapStackVariableVMNode$7@6e8194cd): Status ERROR: org.eclipse.cdt.dsf.gdb code=10002 Container context not found null' resulted in an error.
+!SUBENTRY 1 org.eclipse.cdt.dsf.gdb 4 10002 2022-02-28 19:38:08.848
+!MESSAGE Container context not found
+
+!ENTRY com.crt.log 1 0 2022-02-28 19:38:18.596
+!MESSAGE Trying to connect to redlink server on port 3025.
+
+!ENTRY com.nxp.mcuxpresso.core.debug.support.linkserver 1 0 2022-02-28 19:38:19.112
+!MESSAGE RedlinkServer telnet session connected on port 3025->61873 @ 127.0.0.1
+
+!ENTRY com.nxp.mcuxpresso.core.debug 1 0 2022-02-28 19:38:23.758
+!MESSAGE Telnet session connected on port 3330->61877 @ 127.0.0.1
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-02-28 19:38:24.291
+!MESSAGE Request for monitor: 'RequestMonitor (com.nxp.mcuxpresso.core.debug.services.heapstack.NXPHeapStackVariableVMNode$7@682a5b63): Status ERROR: org.eclipse.cdt.dsf.gdb code=10002 Execution context not found null' resulted in an error.
+!SUBENTRY 1 org.eclipse.cdt.dsf.gdb 4 10002 2022-02-28 19:38:24.291
+!MESSAGE Execution context not found
+
+!ENTRY org.eclipse.cdt.dsf.gdb 4 0 2022-02-28 19:38:24.517
+!MESSAGE Endianness was never initialized for gdb[47].proc[42000].threadGroup[i1]
+
+!ENTRY com.crt.log 1 0 2022-02-28 19:38:24.826
+!MESSAGE Genric ROM base address found in xml file: e00fe000
+
+!ENTRY com.crt.log 1 0 2022-02-28 19:38:25.114
+!MESSAGE Successfully identified 0x9 class component  Address e0040000 CID1 = 144 PID0 = 33 PID1 = 189 PID2 = 11 PID3 = 0 DEVARCH = 0 Revision = 0
+
+!ENTRY com.crt.log 1 0 2022-02-28 19:38:25.445
+!MESSAGE Successfully identified 0x9 class component  Address e000e000 CID1 = 144 PID0 = 33 PID1 = 189 PID2 = 11 PID3 = 0 DEVARCH = 1198533124 Revision = 0
+
+!ENTRY com.crt.log 1 0 2022-02-28 19:38:25.556
+!MESSAGE Successfully identified 0x9 class component  Address e0001000 CID1 = 144 PID0 = 33 PID1 = 189 PID2 = 11 PID3 = 0 DEVARCH = 1198529026 Revision = 0
+
+!ENTRY com.crt.log 1 0 2022-02-28 19:38:25.666
+!MESSAGE Successfully identified 0x9 class component  Address e0002000 CID1 = 144 PID0 = 33 PID1 = 189 PID2 = 11 PID3 = 0 DEVARCH = 1198529027 Revision = 0
+
+!ENTRY com.crt.log 1 0 2022-02-28 19:38:25.775
+!MESSAGE Successfully identified 0x9 class component  Address e0000000 CID1 = 144 PID0 = 33 PID1 = 189 PID2 = 11 PID3 = 0 DEVARCH = 1198529025 Revision = 0
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-02-28 19:38:55.933
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.ImmediateRequestMonitor@25d52055): Status ERROR: org.eclipse.cdt.dsf.gdb code=10003 Invalid context type. null' resulted in an error.
+!SUBENTRY 1 org.eclipse.cdt.dsf.gdb 4 10003 2022-02-28 19:38:55.933
+!MESSAGE Invalid context type.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-02-28 19:38:56.547
+!MESSAGE Request for monitor: 'RequestMonitor (com.nxp.mcuxpresso.core.debug.services.heapstack.NXPHeapStackVariableVMNode$7@69448437): Status ERROR: org.eclipse.cdt.dsf.gdb code=10002 Container context not found null' resulted in an error.
+!SUBENTRY 1 org.eclipse.cdt.dsf.gdb 4 10002 2022-02-28 19:38:56.547
+!MESSAGE Container context not found
+
+!ENTRY com.crt.log 1 0 2022-02-28 19:39:29.703
+!MESSAGE Trying to connect to redlink server on port 3025.
+
+!ENTRY com.nxp.mcuxpresso.core.debug.support.linkserver 1 0 2022-02-28 19:39:30.216
+!MESSAGE RedlinkServer telnet session connected on port 3025->61884 @ 127.0.0.1
+
+!ENTRY com.nxp.mcuxpresso.core.debug 1 0 2022-02-28 19:39:34.818
+!MESSAGE Telnet session connected on port 3330->61889 @ 127.0.0.1
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-02-28 19:39:35.363
+!MESSAGE Request for monitor: 'RequestMonitor (com.nxp.mcuxpresso.core.debug.services.heapstack.NXPHeapStackVariableVMNode$7@c8359b3): Status ERROR: org.eclipse.cdt.dsf.gdb code=10002 Execution context not found null' resulted in an error.
+!SUBENTRY 1 org.eclipse.cdt.dsf.gdb 4 10002 2022-02-28 19:39:35.363
+!MESSAGE Execution context not found
+
+!ENTRY org.eclipse.cdt.dsf.gdb 4 0 2022-02-28 19:39:35.489
+!MESSAGE Endianness was never initialized for gdb[48].proc[42000].threadGroup[i1]
+
+!ENTRY com.crt.log 1 0 2022-02-28 19:39:35.788
+!MESSAGE Genric ROM base address found in xml file: e00fe000
+
+!ENTRY com.crt.log 1 0 2022-02-28 19:39:36.082
+!MESSAGE Successfully identified 0x9 class component  Address e0040000 CID1 = 144 PID0 = 33 PID1 = 189 PID2 = 11 PID3 = 0 DEVARCH = 0 Revision = 0
+
+!ENTRY com.crt.log 1 0 2022-02-28 19:39:36.444
+!MESSAGE Successfully identified 0x9 class component  Address e000e000 CID1 = 144 PID0 = 33 PID1 = 189 PID2 = 11 PID3 = 0 DEVARCH = 1198533124 Revision = 0
+
+!ENTRY com.crt.log 1 0 2022-02-28 19:39:36.554
+!MESSAGE Successfully identified 0x9 class component  Address e0001000 CID1 = 144 PID0 = 33 PID1 = 189 PID2 = 11 PID3 = 0 DEVARCH = 1198529026 Revision = 0
+
+!ENTRY com.crt.log 1 0 2022-02-28 19:39:36.661
+!MESSAGE Successfully identified 0x9 class component  Address e0002000 CID1 = 144 PID0 = 33 PID1 = 189 PID2 = 11 PID3 = 0 DEVARCH = 1198529027 Revision = 0
+
+!ENTRY com.crt.log 1 0 2022-02-28 19:39:36.771
+!MESSAGE Successfully identified 0x9 class component  Address e0000000 CID1 = 144 PID0 = 33 PID1 = 189 PID2 = 11 PID3 = 0 DEVARCH = 1198529025 Revision = 0
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-02-28 19:40:15.221
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.ImmediateRequestMonitor@376ec04f): Status ERROR: org.eclipse.cdt.dsf.gdb code=10003 Invalid context type. null' resulted in an error.
+!SUBENTRY 1 org.eclipse.cdt.dsf.gdb 4 10003 2022-02-28 19:40:15.221
+!MESSAGE Invalid context type.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-02-28 19:40:16.080
+!MESSAGE Request for monitor: 'RequestMonitor (com.nxp.mcuxpresso.core.debug.services.heapstack.NXPHeapStackVariableVMNode$7@7adf2173): Status ERROR: org.eclipse.cdt.dsf.gdb code=10002 Container context not found null' resulted in an error.
+!SUBENTRY 1 org.eclipse.cdt.dsf.gdb 4 10002 2022-02-28 19:40:16.080
+!MESSAGE Container context not found
+
+!ENTRY com.crt.log 1 0 2022-02-28 19:42:27.737
+!MESSAGE Trying to connect to redlink server on port 3025.
+
+!ENTRY com.nxp.mcuxpresso.core.debug.support.linkserver 1 0 2022-02-28 19:42:28.252
+!MESSAGE RedlinkServer telnet session connected on port 3025->61901 @ 127.0.0.1
+
+!ENTRY com.nxp.mcuxpresso.core.debug 1 0 2022-02-28 19:42:33.062
+!MESSAGE Telnet session connected on port 3330->61905 @ 127.0.0.1
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-02-28 19:42:33.698
+!MESSAGE Request for monitor: 'RequestMonitor (com.nxp.mcuxpresso.core.debug.services.heapstack.NXPHeapStackVariableVMNode$7@67a6a383): Status ERROR: org.eclipse.cdt.dsf.gdb code=10002 Execution context not found null' resulted in an error.
+!SUBENTRY 1 org.eclipse.cdt.dsf.gdb 4 10002 2022-02-28 19:42:33.698
+!MESSAGE Execution context not found
+
+!ENTRY org.eclipse.cdt.dsf.gdb 4 0 2022-02-28 19:42:33.914
+!MESSAGE Endianness was never initialized for gdb[49].proc[42000].threadGroup[i1]
+
+!ENTRY com.crt.log 1 0 2022-02-28 19:42:34.184
+!MESSAGE Genric ROM base address found in xml file: e00fe000
+
+!ENTRY com.crt.log 1 0 2022-02-28 19:42:34.476
+!MESSAGE Successfully identified 0x9 class component  Address e0040000 CID1 = 144 PID0 = 33 PID1 = 189 PID2 = 11 PID3 = 0 DEVARCH = 0 Revision = 0
+
+!ENTRY com.crt.log 1 0 2022-02-28 19:42:34.792
+!MESSAGE Successfully identified 0x9 class component  Address e000e000 CID1 = 144 PID0 = 33 PID1 = 189 PID2 = 11 PID3 = 0 DEVARCH = 1198533124 Revision = 0
+
+!ENTRY com.crt.log 1 0 2022-02-28 19:42:34.903
+!MESSAGE Successfully identified 0x9 class component  Address e0001000 CID1 = 144 PID0 = 33 PID1 = 189 PID2 = 11 PID3 = 0 DEVARCH = 1198529026 Revision = 0
+
+!ENTRY com.crt.log 1 0 2022-02-28 19:42:35.013
+!MESSAGE Successfully identified 0x9 class component  Address e0002000 CID1 = 144 PID0 = 33 PID1 = 189 PID2 = 11 PID3 = 0 DEVARCH = 1198529027 Revision = 0
+
+!ENTRY com.crt.log 1 0 2022-02-28 19:42:35.122
+!MESSAGE Successfully identified 0x9 class component  Address e0000000 CID1 = 144 PID0 = 33 PID1 = 189 PID2 = 11 PID3 = 0 DEVARCH = 1198529025 Revision = 0
+
+!ENTRY org.eclipse.cdt.dsf.gdb 4 10004 2022-02-28 19:44:49.631
+!MESSAGE Failed to execute MI command:
+-data-list-register-values x 13
+Error message from debugger back end:
+Invalid thread id: 1
+!STACK 0
+java.lang.Exception: Invalid thread id: 1
+	at org.eclipse.cdt.dsf.mi.service.command.AbstractMIControl$RxThread.processMIOutput(AbstractMIControl.java:1014)
+	at org.eclipse.cdt.dsf.mi.service.command.AbstractMIControl$RxThread.run(AbstractMIControl.java:843)
+
+!ENTRY org.eclipse.cdt.dsf.gdb 4 10004 2022-02-28 19:44:49.774
+!MESSAGE Failed to execute MI command:
+-data-list-register-values x 13
+Error message from debugger back end:
+Invalid thread id: 1
+!STACK 0
+java.lang.Exception: Invalid thread id: 1
+	at org.eclipse.cdt.dsf.mi.service.command.AbstractMIControl$RxThread.processMIOutput(AbstractMIControl.java:1014)
+	at org.eclipse.cdt.dsf.mi.service.command.AbstractMIControl$RxThread.run(AbstractMIControl.java:843)
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-02-28 19:44:49.832
+!MESSAGE Request for monitor: 'RequestMonitor (com.nxp.mcuxpresso.core.debug.services.heapstack.NXPHeapStackVariableVMNode$7@c4e3c57): Status ERROR: org.eclipse.cdt.dsf.gdb code=10002 Container context not found null' resulted in an error.
+!SUBENTRY 1 org.eclipse.cdt.dsf.gdb 4 10002 2022-02-28 19:44:49.832
+!MESSAGE Container context not found

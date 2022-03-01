@@ -1,0 +1,52 @@
+/**
+ * Title: OvalMate_sevenSegmentLED_module_DevBoard
+ * Version: 0.0.1
+ * Filename: LPC55S16_Project_main_dev.c
+ * Authors: Alex Wissing
+ * Purpose of Program: Manage 7-segment LEDs
+ * How Program is Run on Target System:
+ * Date Started: 2/28/2022
+ * Update History:
+ *
+ */
+
+// PWM INCLUDES
+#include "fsl_sctimer.h"
+
+// Stepper PWM Global Definitions
+#define SCTIMER_CLK_FREQ        CLOCK_GetFreq(kCLOCK_BusClk)
+#define X_SCTIMER_OUT			kSCTIMER_Out_0
+#define Y_SCTIMER_OUT			kSCTIMER_Out_1
+#define SETUP_STEPPER_X			0
+#define SETUP_STEPPER_Y			1
+#define SETUP_STEPPER_BOTH		2
+// End Stepper PWM Global Definitions
+
+// Stepper PWM Global Variables
+sctimer_config_t sctimerInfo;
+sctimer_pwm_signal_param_t pwmParam;
+uint32_t event;
+uint32_t sctimerClock;
+uint32_t totalJobStepsX; // total steps in X for current task
+uint32_t totalJobStepsY;
+uint32_t jobStepCountX; // current count of steps
+uint32_t jobStepCountY;
+bool directionX;
+bool directionY;
+uint32_t pwmEventNumberX;
+uint32_t pwmEventNumberY;
+// End Stepper PWM Global Variables
+
+// Stepper PWM Prototypes
+void startStepperPWM(void);
+status_t setupStepperPWM(int which);
+void initializeStepperPWM(void);
+status_t SCTIMER_SetupPwm16BitMode(
+	SCT_Type *base,
+	const sctimer_pwm_signal_param_t *pwmParams,
+	uint32_t pwmFreq_Hz,
+	uint32_t srcClock_Hz,
+	sctimer_counter_t whichCounter,
+	uint32_t *event
+);
+// End Stepper PWM Prototypes

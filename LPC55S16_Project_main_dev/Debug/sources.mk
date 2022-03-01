@@ -29,6 +29,11 @@ component/uart \
 device \
 drivers \
 source \
+source/modules/buttons \
+source/modules/irSensor \
+source/modules/servo \
+source/modules/sevenSegmentLED \
+source/modules/steppers \
 startup \
 usb/device/class/audio \
 usb/device/class/ccid \

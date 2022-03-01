@@ -1,0 +1,62 @@
+/**
+ * Title: OvalMate_sevenSegmentLED_module_DevBoard
+ * Version: 0.0.1
+ * Filename: LPC55S16_Project_main_dev.c
+ * Authors: Alex Wissing
+ * Purpose of Program: Manage 7-segment LEDs
+ * How Program is Run on Target System:
+ * Date Started: 2/28/2022
+ * Update History:
+ *
+ */
+
+// Includes
+#include "fsl_sctimer.h"
+// End Includes
+
+// Definitions
+#define SCTIMER_CLK_FREQ        CLOCK_GetFreq(kCLOCK_BusClk)
+#define X_SCTIMER_OUT			kSCTIMER_Out_0
+#define Y_SCTIMER_OUT			kSCTIMER_Out_1
+#define SETUP_STEPPER_X			0
+#define SETUP_STEPPER_Y			1
+#define SETUP_STEPPER_BOTH		2
+// End Definitions
+
+typedef struct __stepper_job {
+	uint32_t goalSteps;
+	uint32_t currSteps;
+} stepperJob;
+
+typedef struct __stepper_motor {
+	sctimer_pwm_signal_param_t pwmParam;
+	bool direction;
+	uint32_t pwmEventPeriod; // when a period finishes
+	uint32_t pwmEventPulse; // when the duty cycle completes
+	stepperJob currentJob;
+	uint32_t netSteps; // before deactivating, this must be divisible by 16
+	// as we've been micro-stepping this whole time
+} stepperMotor;
+
+// Variables
+sctimer_config_t sctimerInfo;
+uint32_t sctimerClock;
+uint32_t totalJobStepsX; // total steps in X for current task
+uint32_t totalJobStepsY;
+uint32_t jobStepCountX; // current count of steps
+uint32_t jobStepCountY;
+// End Variables
+
+// Prototypes
+void startStepperPWM(void);
+status_t setupStepperPWM(int which);
+void initializeStepperPWM(void);
+status_t SCTIMER_SetupPwm16BitMode(
+	SCT_Type *base,
+	const sctimer_pwm_signal_param_t *pwmParams,
+	uint32_t pwmFreq_Hz,
+	uint32_t srcClock_Hz,
+	sctimer_counter_t whichCounter,
+	uint32_t *event
+);
+// End Prototypes

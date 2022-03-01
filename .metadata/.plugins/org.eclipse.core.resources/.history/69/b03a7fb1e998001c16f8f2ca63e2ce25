@@ -1,0 +1,54 @@
+/**
+ * Title: OvalMate_sevenSegmentLED_module_DevBoard
+ * Version: 0.0.1
+ * Filename: LPC55S16_Project_main_dev.c
+ * Authors: Alex Wissing
+ * Purpose of Program: Manage 7-segment LEDs
+ * How Program is Run on Target System:
+ * Date Started: 2/28/2022
+ * Update History:
+ *
+ */
+
+
+
+// ADC Variables
+#if (defined(DEMO_LPADC_USE_HIGH_RESOLUTION) && DEMO_LPADC_USE_HIGH_RESOLUTION)
+const uint32_t g_LpadcFullRange   = 65536U;
+const uint32_t g_LpadcResultShift = 0U;
+#else
+const uint32_t g_LpadcFullRange   = 4096U;
+const uint32_t g_LpadcResultShift = 3U;
+#endif /* DEMO_LPADC_USE_HIGH_RESOLUTION */
+
+int getADCValue() {
+	PRINTF("ADC Full Range: %d\r\n", g_LpadcFullRange);
+#if defined(FSL_FEATURE_LPADC_HAS_CMDL_CSCALE) && FSL_FEATURE_LPADC_HAS_CMDL_CSCALE
+	if (kLPADC_SampleFullScale == mLpadcCommandConfigStruct.sampleScaleMode)
+	{
+		PRINTF("Full channel scale (Factor of 1).\r\n");
+	}
+	else if (kLPADC_SamplePartScale == mLpadcCommandConfigStruct.sampleScaleMode)
+	{
+		PRINTF("Divided input voltage signal. (Factor of 30/64).\r\n");
+	}
+#endif
+
+	PRINTF("Please press any key to get user channel's ADC value.\r\n");
+	while (1)
+	{
+		GETCHAR();
+		LPADC_DoSoftwareTrigger(DEMO_LPADC_BASE, 1U); /* 1U is trigger0 mask. */
+#if (defined(FSL_FEATURE_LPADC_FIFO_COUNT) && (FSL_FEATURE_LPADC_FIFO_COUNT == 2U))
+		while (!LPADC_GetConvResult(DEMO_LPADC_BASE, &mLpadcResultConfigStruct, 0U))
+#else
+		while (!LPADC_GetConvResult(DEMO_LPADC_BASE, &mLpadcResultConfigStruct))
+#endif /* FSL_FEATURE_LPADC_FIFO_COUNT */
+		{
+		}
+
+		PRINTF("ADC value: %d\r\n", ((mLpadcResultConfigStruct.convValue) >> g_LpadcResultShift));
+		return ((mLpadcResultConfigStruct.convValue) >> g_LpadcResultShift);
+	}
+}
+

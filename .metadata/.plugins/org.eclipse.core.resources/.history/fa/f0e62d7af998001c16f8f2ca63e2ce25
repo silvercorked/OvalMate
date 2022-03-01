@@ -1,0 +1,89 @@
+/**
+ * Title: OvalMate_sevenSegmentLED_module_DevBoard
+ * Version: 0.0.1
+ * Filename: LPC55S16_Project_main_dev.c
+ * Authors: Alex Wissing
+ * Purpose of Program: Manage 7-segment LEDs
+ * How Program is Run on Target System:
+ * Date Started: 2/28/2022
+ * Update History:
+ *
+ */
+
+// Includes
+#include "fsl_sctimer.h"
+// End Includes
+
+// Definitions
+#define SCTIMER_CLK_FREQ        CLOCK_GetFreq(kCLOCK_BusClk)
+#define X_SCTIMER_OUT			kSCTIMER_Out_0
+#define Y_SCTIMER_OUT			kSCTIMER_Out_1
+// End Definitions
+
+typedef struct __stepper_job {
+	uint32_t goalSteps;
+	uint32_t currSteps;
+} stepperJob;
+
+typedef struct __stepper_motor {
+	sctimer_pwm_signal_param_t pwmParam;
+	bool direction;
+	uint32_t pwmEventPeriod; // when a period finishes
+	uint32_t pwmEventPulse; // when the duty cycle completes
+	stepperJob currentJob;
+	sctimer_counter_t timer;
+	void* periodCallback;
+	int32_t netSteps; // before deactivating, this must be divisible by 16
+	// as we've been micro-stepping this whole time
+} stepperMotor;
+
+// Variables
+sctimer_config_t sctimerInfo;
+uint32_t sctimerClock;
+stepperMotor motorX = {
+	.direction = 0,					// bool
+	.netSteps = 0,					// keep track of net steps, so (steps in 0 dir) - (steps in 1 dir)
+	.pwmEventPeriod = 0xFFFFFFFF,	// invalid event number = uninitialized
+	.pwmEventPulse = 0xFFFFFFFE,	// invalid event number = uninitialized
+	.pwmParam = {
+		.output = X_SCTIMER_OUT,
+		.level = kSCTIMER_HighTrue,
+		.dutyCyclePercent = 50
+	},
+	.timer = kSCTIMER_Counter_L,
+	.currentJob = {}
+};
+stepperMotor motorY = {
+	.direction = 0,
+	.netSteps = 0,
+	.pwmEventPeriod = 0xFFFFFFFD,	// invalid event number = uninitialized
+	.pwmEventPulse = 0xFFFFFFFC,	// invalid event number = uninitialized
+	.pwmParam = {
+		.output = Y_SCTIMER_OUT,
+		.level = kSCTIMER_HighTrue,
+		.dutyCyclePercent = 50
+	},
+	.timer = kSCTIMER_Counter_H,
+	.currentJob = {}
+};
+// End Variables
+
+// Prototypes
+void initializeStepperPWM(void);
+status_t setupStepperPWM(
+	stepperMotor motor,
+	uint32_t stepsToAssign
+);
+status_t setupPwm16BitMode(
+	SCT_Type *base,
+	const sctimer_pwm_signal_param_t *pwmParams,
+	uint32_t pwmFreq_Hz,
+	uint32_t srcClock_Hz,
+	sctimer_counter_t whichCounter,
+	uint32_t *event
+);
+void startStepperPWM(sctimer_counter_t whichCounter);
+void stopStepperPWM(sctimer_counter_t whichCounter);
+void stepCompleteMotorXCallback(void);
+void stepCompleteMotorYCallback(void);
+// End Prototypes

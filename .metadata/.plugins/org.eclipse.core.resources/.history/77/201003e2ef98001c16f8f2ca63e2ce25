@@ -1,0 +1,67 @@
+/**
+ * Title: OvalMate_sevenSegmentLED_module_DevBoard
+ * Version: 0.0.1
+ * Filename: LPC55S16_Project_main_dev.c
+ * Authors: Alex Wissing
+ * Purpose of Program: Manage 7-segment LEDs
+ * How Program is Run on Target System:
+ * Date Started: 2/28/2022
+ * Update History:
+ *
+ */
+
+#include <modules/steppers/steppers.h>
+
+void initializeStepperPWM() {
+	sctimerClock = SCTIMER_CLK_FREQ;
+
+	/* Print a note to terminal */
+	//PRINTF("\r\nSCTimer example to output 2 center-aligned PWM signals @ %d Hz\r\n", sctimerClock);
+	//PRINTF("\r\nProbe the signal using an oscilloscope\r\n");
+
+	SCTIMER_GetDefaultConfig(&sctimerInfo);
+
+	/* Initialize SCTimer module */
+	SCTIMER_Init(SCT0, &sctimerInfo);
+}
+
+status_t setupStepperPWM(int which, uint32_t stepsX, bool dirX, uint32_t stepsY, bool dirY) {
+
+	/* Configure first PWM with frequency 2kHZ from first output */
+	if (which == 0 || which == 2) {
+		pwmParam.output           = X_SCTIMER_OUT;
+		pwmParam.level            = kSCTIMER_HighTrue;
+		pwmParam.dutyCyclePercent = 50;
+		if (SCTIMER_SetupPwm(SCT0, &pwmParam, kSCTIMER_CenterAlignedPwm, 2000U, sctimerClock, &pwmEventNumberX) == kStatus_Fail)
+		{
+			return kStatus_Fail;
+		}
+	    /* Enable interrupt flag for event associated with out 4, we use the interrupt to update dutycycle */
+	    //SCTIMER_EnableInterrupts(SCT0, (1 << pwmEventNumberX));
+	    /* Receive notification when event is triggered */
+	    //SCTIMER_SetCallback(SCT0, SCTIMER_LED_HANDLER, pwmEventNumberX);
+	}
+
+	/* Configure second PWM with different duty cycle but same frequency as before */
+	if (which == 1 || which == 2) {
+		pwmParam.output           = Y_SCTIMER_OUT;
+		pwmParam.level            = kSCTIMER_HighTrue;
+		pwmParam.dutyCyclePercent = 50;
+		if (SCTIMER_SetupPwm(SCT0, &pwmParam, kSCTIMER_CenterAlignedPwm, 2000U, sctimerClock, &pwmEventNumberY) == kStatus_Fail)
+		{
+			return kStatus_Fail;
+		}
+	    /* Enable interrupt flag for event associated with out 4, we use the interrupt to update dutycycle */
+	    //SCTIMER_EnableInterrupts(SCT0, (1 << pwmEventNumberY));
+	    /* Receive notification when event is triggered */
+	    //SCTIMER_SetCallback(SCT0, SCTIMER_LED_HANDLER, pwmEventNumberY);
+	}
+    /* Enable at the NVIC */
+    //EnableIRQ(SCT0_IRQn);
+	return kStatus_Success;
+}
+
+void startStepperPWM() {
+    /* Start the 32-bit unify timer */
+    SCTIMER_StartTimer(SCT0, kSCTIMER_Counter_U);
+}

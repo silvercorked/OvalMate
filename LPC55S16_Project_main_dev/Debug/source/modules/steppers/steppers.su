@@ -1,0 +1,17 @@
+C:\Users\awiss\Documents\MCUXpressoIDE_11.4.1_6260\workspace\OvalMate\LPC55S16_Project_main_dev\CMSIS/core_cm33.h:2127:22:__NVIC_EnableIRQ	16	static
+C:\Users\awiss\Documents\MCUXpressoIDE_11.4.1_6260\workspace\OvalMate\LPC55S16_Project_main_dev\drivers/fsl_common_arm.h:488:24:EnableIRQ	24	static
+C:\Users\awiss\Documents\MCUXpressoIDE_11.4.1_6260\workspace\OvalMate\LPC55S16_Project_main_dev\drivers/fsl_sctimer.h:415:20:SCTIMER_EnableInterrupts	16	static
+C:\Users\awiss\Documents\MCUXpressoIDE_11.4.1_6260\workspace\OvalMate\LPC55S16_Project_main_dev\drivers/fsl_sctimer.h:427:20:SCTIMER_DisableInterrupts	16	static
+C:\Users\awiss\Documents\MCUXpressoIDE_11.4.1_6260\workspace\OvalMate\LPC55S16_Project_main_dev\drivers/fsl_sctimer.h:503:20:SCTIMER_StartTimer	16	static
+C:\Users\awiss\Documents\MCUXpressoIDE_11.4.1_6260\workspace\OvalMate\LPC55S16_Project_main_dev\drivers/fsl_sctimer.h:545:20:SCTIMER_StopTimer	16	static
+C:\Users\awiss\Documents\MCUXpressoIDE_11.4.1_6260\workspace\OvalMate\LPC55S16_Project_main_dev\drivers/fsl_sctimer.h:893:20:SCTIMER_SetupOutputSetAction	24	static
+C:\Users\awiss\Documents\MCUXpressoIDE_11.4.1_6260\workspace\OvalMate\LPC55S16_Project_main_dev\drivers/fsl_sctimer.h:909:20:SCTIMER_SetupOutputClearAction	24	static
+C:\Users\awiss\Documents\MCUXpressoIDE_11.4.1_6260\workspace\OvalMate\LPC55S16_Project_main_dev\drivers/fsl_sctimer.h:937:20:SCTIMER_SetupCounterLimitAction	24	static
+C:\Users\awiss\Documents\MCUXpressoIDE_11.4.1_6260\workspace\OvalMate\LPC55S16_Project_main_dev\drivers/fsl_sctimer.h:1214:20:SCTIMER_ClearEventInState	24	static
+../source/modules/steppers/steppers.c:51:6:stepCompleteMotorXCallback	8	static
+../source/modules/steppers/steppers.c:58:6:stepCompleteMotorYCallback	8	static
+../source/modules/steppers/steppers.c:65:6:initializeStepperPWM	8	static
+../source/modules/steppers/steppers.c:83:10:setupStepperPWM	32	static
+../source/modules/steppers/steppers.c:111:6:startStepperPWM	16	static
+../source/modules/steppers/steppers.c:115:6:stopStepperPWM	16	static
+../source/modules/steppers/steppers.c:134:10:setupPwm16BitMode	96	static

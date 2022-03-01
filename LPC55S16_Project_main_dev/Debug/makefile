@@ -24,6 +24,11 @@ RM := rm -rf
 -include usb/device/class/audio/subdir.mk
 -include usb/device/class/subdir.mk
 -include startup/subdir.mk
+-include source/modules/steppers/subdir.mk
+-include source/modules/sevenSegmentLED/subdir.mk
+-include source/modules/servo/subdir.mk
+-include source/modules/irSensor/subdir.mk
+-include source/modules/buttons/subdir.mk
 -include source/subdir.mk
 -include drivers/subdir.mk
 -include device/subdir.mk

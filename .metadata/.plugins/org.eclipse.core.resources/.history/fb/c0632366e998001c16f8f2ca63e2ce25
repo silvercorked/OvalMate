@@ -1,0 +1,4 @@
+
+
+// ADC INCLUDES
+#include "fsl_lpadc.h"
