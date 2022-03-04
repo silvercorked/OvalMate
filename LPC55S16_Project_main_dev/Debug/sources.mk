@@ -31,9 +31,11 @@ drivers \
 source \
 source/modules/buttons \
 source/modules/irSensor \
+source/modules/mainInclude \
 source/modules/servo \
 source/modules/sevenSegmentLED \
 source/modules/steppers \
+source/modules/utils \
 startup \
 usb/device/class/audio \
 usb/device/class/ccid \

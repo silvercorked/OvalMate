@@ -19,28 +19,18 @@
  *	- 2/28/2022:
  *		Moved sctimer, ctimer, 7seg, bump interrupts, and ADC into modules and included them in this main file.
  *		Changed sctimer strategy to use 16-bit mode timers. This gives each timer their own frequency counter, but frequency can't be too low (~1000Hz is too slow, ie can't load the clock with a counter val that fits in 16-bits)
+ *	- 3/3/2022:
+ *		Removed inputs in favor of singlular include witht helper funcs. Modified code for additional test data.
+ *		Getting hard faults when using the SCT_H 16-bit high timer. Low timer works fine.
  */
 
-// CORE INCLUDES
-#include <stdio.h>
-#include "board.h"
-// #include "clock_config.h" // not used atm, but commonly used
-#include "fsl_debug_console.h"
-// ;#include "LPC55S16.h" // somehow not used rn
-#include "peripherals.h"
-#include "pin_mux.h"
-
-// MODULE INCLUDES
-#include "modules/sevenSegmentLED/sevenSegmentLED.h" // 7 segment display
-#include "modules/irSensor/irSensor.h" // irSensor via ADC
-#include "modules/servo/servo.h" // servo via CTIMER
-#include "modules/buttons/buttons.h" // button interrupts via pin_mux
-#include "modules/steppers/steppers.h" // stepper via SCTIMER 2 in 16-bit mode
+// MAIN INCLUDE
+#include "modules/mainInclude/mainInclude.h"
 
 void delay(void)
 {
     volatile uint32_t i = 0U;
-    for (i = 0U; i < 20000000U; ++i)
+    for (i = 0U; i < 90000U; ++i) // 20000000U for servo
     {
         __asm("NOP"); /* delay */
     }
@@ -62,39 +52,62 @@ int main(void) {
 
 	PRINTF("Hello World\n");
 
+	// init
 	initialize7SegLegs();
 	assignPinsToInterrupts();
 	initializeADC();
 	initializeStepperPWM();
-	setupStepperPWM(motorX, 360);
-	setupStepperPWM(motorY, 360);
-	startStepperPWM(motorX.timer);
-	startStepperPWM(motorY.timer);
 	initializeServoPWM();
+	configure(); // from MainInclude. This sets the base for all function pointers
+	// end init
+
+	// give motors job w/ step param
+	//setupStepperPWM(&motorX, 20);
+	//setupStepperPWM(&motorY, 360); // causes semihost hardfault
+	//startStepperPWM(motorX.timer);
+	//startStepperPWM(motorY.timer);
+
+	// drive servo to default position
 	setupServoPWM();
 	startServoPWM();
 
+	// set 7 seg
 	set7Seg(0, 0, 1, 0, 1, 0, 1);
 
+	driveStepperPWMBlock(sMotorX, 210, 1500);
+	delay();
+	driveStepperPWMBlock(sMotorX, 50, 2000);
+	//delay();
+	//driveStepperPWMBlock(sMotorX, 20, 1500);
+
+	delay();
+
+	//driveStepperPWMBlock(sMotorBoth, 20, 1000);
+	//driveStepperPWMBlock(sMotorBoth, 50, 2000);
+	//driveStepperPWMBlock(sMotorBoth, 20, 1000);
+
+
 	/* Force the counter to be placed into memory. */
-	volatile static int i = 0 ;
-	/* Enter an infinite loop, just incrementing a counter. */
-	while(1) {
-		i++ ;
-		/* 'Dummy' NOP to allow source level single stepping of
-			tight while() loop */
-		delay();
-		if (i % 2 == 1) {
-			updateServoPWMDutyCycle(PENDOWN);
-			PRINTF("\r\nPENDOWN");
-			set7Seg(0, 0, 1, 0, 1, 0, 1);
-		}
-		else {
-			updateServoPWMDutyCycle(PENUP);
-			PRINTF("\r\nPENUP");
-			set7Seg(1, 1, 0, 1, 0, 1, 0);
-		}
-		__asm volatile ("nop");
-	}
+//	volatile static int i = 0 ;
+//	/* Enter an infinite loop, just incrementing a counter. */
+//	while(1) {
+//		i++ ;
+//		/* 'Dummy' NOP to allow source level single stepping of
+//			tight while() loop */
+//		delay();
+//		if (i % 2 == 1) {
+//			setupStepperPWM(&motorX, 20);
+//			startStepperPWM(motorX.timer);
+//			updateServoPWMDutyCycle(PENDOWN);
+//			PRINTF("\r\nPENDOWN");
+//			set7Seg(0, 0, 1, 0, 1, 0, 1);
+//		}
+//		else {
+//			updateServoPWMDutyCycle(PENUP);
+//			PRINTF("\r\nPENUP");
+//			set7Seg(1, 1, 0, 1, 0, 1, 0);
+//		}
+//		__asm volatile ("nop");
+//	}
 	return 0;
 }

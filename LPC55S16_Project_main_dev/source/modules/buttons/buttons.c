@@ -1,16 +1,23 @@
 /**
- * Title: OvalMate_sevenSegmentLED_module_DevBoard
+ * Title: OvalMate_buttons_module_DevBoard
  * Version: 0.0.1
  * Filename: LPC55S16_Project_main_dev.c
  * Authors: Alex Wissing
- * Purpose of Program: Manage 7-segment LEDs
+ * Purpose of Program: Initialize button interrupts
  * How Program is Run on Target System:
  * Date Started: 2/28/2022
  * Update History:
- *
+ *	- 3/3/2022:
+ *		Added settable function callbacks for button interrupts
  */
 
 #include "buttons.h"
+
+void (*emergencyBumpCallback)(pint_pin_int_t, uint32_t);
+void (*rightBumpCallback)(pint_pin_int_t, uint32_t);
+void (*leftBumpCallback)(pint_pin_int_t, uint32_t);
+void (*upBumpCallback)(pint_pin_int_t, uint32_t);
+void (*downBumpCallback)(pint_pin_int_t, uint32_t);
 
 void assignPinsToInterrupts() {
 	/* Connect trigger sources to PINT */
@@ -62,7 +69,8 @@ void assignPinsToInterrupts() {
  */
 void buttonEmergencyCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
 {
-	//PRINTF("\f\r\nPINT Pin Interrupt %d event detected. EMERGENCY SWITCH", pintr);
+	if (emergencyBumpCallback != NULL)
+		emergencyBumpCallback(pintr, pmatch_status);
 }
 
 /*!
@@ -70,7 +78,8 @@ void buttonEmergencyCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
  */
 void bumpRightCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
 {
-	//PRINTF("\f\r\nPINT Pin Interrupt %d event detected. Right", pintr);
+	if (rightBumpCallback != NULL)
+		rightBumpCallback(pintr, pmatch_status);
 }
 
 /*!
@@ -78,7 +87,8 @@ void bumpRightCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
  */
 void bumpLeftCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
 {
-	//PRINTF("\f\r\nPINT Pin Interrupt %d event detected. Left", pintr);
+	if (leftBumpCallback != NULL)
+		leftBumpCallback(pintr, pmatch_status);
 }
 
 /*!
@@ -86,7 +96,8 @@ void bumpLeftCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
  */
 void bumpUpCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
 {
-	//PRINTF("\f\r\nPINT Pin Interrupt %d event detected. Up", pintr);
+	if (upBumpCallback != NULL)
+		upBumpCallback(pintr, pmatch_status);
 }
 
 /*!
@@ -94,5 +105,6 @@ void bumpUpCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
  */
 void bumpDownCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
 {
-	//PRINTF("\f\r\nPINT Pin Interrupt %d event detected. Down", pintr);
+	if (downBumpCallback != NULL)
+		downBumpCallback(pintr, pmatch_status);
 }
