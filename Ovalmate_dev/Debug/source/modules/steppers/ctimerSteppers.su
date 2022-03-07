@@ -1,0 +1,13 @@
+C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\drivers/fsl_ctimer.h:497:20:CTIMER_StartTimer	16	static
+C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\drivers/fsl_ctimer.h:507:20:CTIMER_StopTimer	16	static
+../source/modules/steppers/ctimerSteppers.c:43:6:initializeStepperPWM	8	static
+../source/modules/steppers/ctimerSteppers.c:68:6:setupStepperPWM	48	static
+../source/modules/steppers/ctimerSteppers.c:93:6:startStepperPWM	16	static
+../source/modules/steppers/ctimerSteppers.c:98:6:stopStepperPWM	16	static
+../source/modules/steppers/ctimerSteppers.c:103:10:CTIMER_setPWMPeriodValue	24	static
+../source/modules/steppers/ctimerSteppers.c:112:6:ctimerXCallback	16	static
+../source/modules/steppers/ctimerSteppers.c:115:6:ctimerYCallback	16	static
+../source/modules/steppers/ctimerSteppers.c:118:6:ctimerGeneralCallback	24	static
+../source/modules/steppers/ctimerSteppers.c:129:6:blockUntilMotorJobComplete	16	static
+../source/modules/steppers/ctimerSteppers.c:138:22:getMotor	16	static
+../source/modules/steppers/ctimerSteppers.c:144:15:whichMotor	16	static

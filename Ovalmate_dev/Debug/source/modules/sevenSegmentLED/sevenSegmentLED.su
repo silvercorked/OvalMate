@@ -1,0 +1,3 @@
+C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\drivers/fsl_gpio.h:153:20:GPIO_PinWrite	24	static
+../source/modules/sevenSegmentLED/sevenSegmentLED.c:30:6:set7Seg	24	static
+../source/modules/sevenSegmentLED/sevenSegmentLED.c:40:6:initialize7SegLegs	8	static

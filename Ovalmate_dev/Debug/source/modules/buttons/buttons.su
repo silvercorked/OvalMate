@@ -1,0 +1,6 @@
+../source/modules/buttons/buttons.c:22:6:assignPinsToInterrupts	8	static
+../source/modules/buttons/buttons.c:70:6:buttonEmergencyCallback	16	static
+../source/modules/buttons/buttons.c:79:6:bumpRightCallback	16	static
+../source/modules/buttons/buttons.c:88:6:bumpLeftCallback	16	static
+../source/modules/buttons/buttons.c:97:6:bumpUpCallback	16	static
+../source/modules/buttons/buttons.c:106:6:bumpDownCallback	16	static

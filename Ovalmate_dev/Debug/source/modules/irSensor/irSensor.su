@@ -1,0 +1,3 @@
+C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\drivers/fsl_lpadc.h:821:20:LPADC_DoSoftwareTrigger	16	static
+../source/modules/irSensor/irSensor.c:30:5:getADCValue	8	static
+../source/modules/irSensor/irSensor.c:60:6:initializeADC	8	static
