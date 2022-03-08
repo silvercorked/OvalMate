@@ -116,7 +116,6 @@ BOARD_InitDEBUG_UARTPins:
   - {pin_num: '72', peripheral: GPIO, signal: 'PIO0, 14', pin_signal: PIO0_14/FC1_RTS_SCL_SSEL1/UTICK_CAP1/CT_INP1/SCT_GPI1/FC1_TXD_SCL_MISO_WS/PLU_IN1/SECURE_GPIO0_14}
   - {pin_num: '56', peripheral: GPIO, signal: 'PIO0, 18', pin_signal: PIO0_18/FC4_CTS_SDA_SSEL0/CTIMER1_MAT0/SCT0_OUT1/PLU_IN3/SECURE_GPIO0_18/ACMP0_C}
   - {pin_num: '27', peripheral: CTIMER3, signal: 'MATCH, 2', pin_signal: PIO0_27/FC2_TXD_SCL_MISO_WS/CTIMER3_MAT2/SCT0_OUT6/FC7_RXD_SDA_MOSI_DATA/PLU_OUT0/SECURE_GPIO0_27}
-  - {pin_num: '81', peripheral: SCT0, signal: 'OUT, 0', pin_signal: PIO0_2/FC3_TXD_SCL_MISO_WS/CT_INP1/SCT0_OUT0/SCT_GPI2/SECURE_GPIO0_2}
   - {pin_num: '1', peripheral: GPIO, signal: 'PIO1, 4', pin_signal: PIO1_4/FC0_SCK/CTIMER2_MAT1/SCT0_OUT0/FREQME_GPIO_CLK_A}
   - {pin_num: '2', peripheral: GPIO, signal: 'PIO1, 13', pin_signal: PIO1_13/FC6_RXD_SDA_MOSI_DATA/CT_INP6/USB0_OVERCURRENTN/USB0_FRAME}
   - {pin_num: '3', peripheral: GPIO, signal: 'PIO1, 24', pin_signal: PIO1_24/FC2_RXD_SDA_MOSI_DATA/SCT0_OUT1/FC3_SSEL3/PLU_OUT6}
@@ -135,7 +134,8 @@ BOARD_InitDEBUG_UARTPins:
   - {pin_num: '60', peripheral: GPIO, signal: 'PIO0, 26', pin_signal: PIO0_26/FC2_RXD_SDA_MOSI_DATA/CLKOUT/CT_INP14/SCT0_OUT5/USB0_IDVALUE/FC0_SCK/HS_SPI_MOSI/SECURE_GPIO0_26}
   - {pin_num: '66', peripheral: GPIO, signal: 'PIO0, 28', pin_signal: PIO0_28/FC0_SCK/CT_INP11/SCT0_OUT7/USB0_OVERCURRENTN/PLU_OUT1/SECURE_GPIO0_28}
   - {pin_num: '94', peripheral: FLEXCOMM0, signal: TXD_SCL_MISO_WS, pin_signal: PIO0_30/FC0_TXD_SCL_MISO_WS/CTIMER0_MAT0/SCT0_OUT9/SECURE_GPIO0_30}
-  - {pin_num: '83', peripheral: CTIMER0, signal: 'MATCH, 1', pin_signal: PIO0_3/FC3_RXD_SDA_MOSI_DATA/CTIMER0_MAT1/SCT0_OUT1/SCT_GPI3/SECURE_GPIO0_3}
+  - {pin_num: '83', peripheral: GPIO, signal: 'PIO0, 3', pin_signal: PIO0_3/FC3_RXD_SDA_MOSI_DATA/CTIMER0_MAT1/SCT0_OUT1/SCT_GPI3/SECURE_GPIO0_3}
+  - {pin_num: '81', peripheral: GPIO, signal: 'PIO0, 2', pin_signal: PIO0_2/FC3_TXD_SCL_MISO_WS/CT_INP1/SCT0_OUT0/SCT_GPI2/SECURE_GPIO0_2}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 /* clang-format on */
@@ -306,8 +306,8 @@ void BOARD_InitDEBUG_UARTPins(void)
                          (~(IOCON_PIO_FUNC_MASK | IOCON_PIO_DIGIMODE_MASK)))
 
                         /* Selects pin function.
-                         * : PORT02 (pin 81) is configured as SCT0_OUT0. */
-                        | IOCON_PIO_FUNC(PIO0_2_FUNC_ALT3)
+                         * : PORT02 (pin 81) is configured as PIO0_2. */
+                        | IOCON_PIO_FUNC(PIO0_2_FUNC_ALT0)
 
                         /* Select Digital mode.
                          * : Enable Digital mode.
@@ -384,8 +384,8 @@ void BOARD_InitDEBUG_UARTPins(void)
                          (~(IOCON_PIO_FUNC_MASK | IOCON_PIO_DIGIMODE_MASK)))
 
                         /* Selects pin function.
-                         * : PORT03 (pin 83) is configured as CTIMER0_MAT1. */
-                        | IOCON_PIO_FUNC(PIO0_3_FUNC_ALT2)
+                         * : PORT03 (pin 83) is configured as PIO0_3. */
+                        | IOCON_PIO_FUNC(PIO0_3_FUNC_ALT0)
 
                         /* Select Digital mode.
                          * : Enable Digital mode.

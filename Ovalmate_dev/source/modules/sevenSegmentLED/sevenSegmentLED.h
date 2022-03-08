@@ -16,13 +16,6 @@
 #include <stdbool.h>
 // End Includes
 
-// Structs
-typedef struct __pin_information {
-	int pin;
-	int port;
-} pinInformation;
-// End Structs
-
 // Extern Variables
 // Variables
 extern pinInformation legA;

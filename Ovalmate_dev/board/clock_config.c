@@ -222,12 +222,11 @@ name: BOARD_BootClockPLL150M
 called_from_default_init: true
 outputs:
 - {id: ASYNCADC_clock.outFreq, value: 48 MHz}
-- {id: CTIMER0_clock.outFreq, value: 1 MHz}
+- {id: CTIMER0_clock.outFreq, value: 150 MHz}
 - {id: CTIMER3_clock.outFreq, value: 1 MHz}
 - {id: FRO_12MHz_clock.outFreq, value: 12 MHz}
 - {id: FRO_1MHz_clock.outFreq, value: 1 MHz}
 - {id: FXCOM0_clock.outFreq, value: 12 MHz}
-- {id: SCT_clock.outFreq, value: 1 MHz}
 - {id: System_clock.outFreq, value: 150 MHz}
 - {id: USB0_clock.outFreq, value: 48 MHz}
 settings:
@@ -240,11 +239,12 @@ settings:
 - {id: SYSCON.ADCCLKDIV.scale, value: '2', locked: true}
 - {id: SYSCON.ADCCLKSEL.sel, value: ANACTRL.fro_hf_clk}
 - {id: SYSCON.CLK32KCLKSEL.sel, value: SYSCON.FRO1MDIV}
-- {id: SYSCON.CTIMERCLKSEL0.sel, value: SYSCON.fro_1m}
+- {id: SYSCON.CTIMERCLKSEL0.sel, value: SYSCON.MAINCLKSELB}
 - {id: SYSCON.CTIMERCLKSEL3.sel, value: SYSCON.fro_1m}
 - {id: SYSCON.FCCLKSEL0.sel, value: ANACTRL.fro_12m_clk}
 - {id: SYSCON.FRO1MDIV.scale, value: '25', locked: true}
 - {id: SYSCON.MAINCLKSELB.sel, value: SYSCON.PLL0_BYPASS}
+- {id: SYSCON.OSTIMERCLKSEL.sel, value: SYSCON.MAINCLKSELB}
 - {id: SYSCON.PLL0CLKSEL.sel, value: ANACTRL.fro_12m_clk}
 - {id: SYSCON.PLL0M_MULT.scale, value: '150', locked: true}
 - {id: SYSCON.PLL0N_DIV.scale, value: '6', locked: true}
@@ -253,7 +253,6 @@ settings:
 - {id: SYSCON.PLL1N_DIV.scale, value: '1', locked: true}
 - {id: SYSCON.PLL1_PDEC.scale, value: '30', locked: true}
 - {id: SYSCON.SCTCLKDIV.scale, value: '150', locked: true}
-- {id: SYSCON.SCTCLKSEL.sel, value: SYSCON.PLL0_BYPASS}
 - {id: SYSCON.USB0CLKDIV.scale, value: '2', locked: true}
 - {id: SYSCON.USB0CLKSEL.sel, value: ANACTRL.fro_hf_clk}
 - {id: SYSCON_CLOCK_CTRL_FRO1MHZ_CLK_ENA_CFG, value: Enabled}
@@ -312,17 +311,15 @@ void BOARD_BootClockPLL150M(void)
     CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, 2U, false);         /*!< Set ADCCLKDIV divider to value 2 */
     CLOCK_SetClkDiv(kCLOCK_DivUsb0Clk, 0U, true);               /*!< Reset USB0CLKDIV divider counter and halt it */
     CLOCK_SetClkDiv(kCLOCK_DivUsb0Clk, 2U, false);         /*!< Set USB0CLKDIV divider to value 2 */
-    CLOCK_SetClkDiv(kCLOCK_DivSctClk, 0U, true);               /*!< Reset SCTCLKDIV divider counter and halt it */
-    CLOCK_SetClkDiv(kCLOCK_DivSctClk, 150U, false);         /*!< Set SCTCLKDIV divider to value 150 */
 
     /*!< Set up clock selectors - Attach clocks to the peripheries */
     CLOCK_AttachClk(kPLL0_to_MAIN_CLK);                 /*!< Switch MAIN_CLK to PLL0 */
     CLOCK_AttachClk(kFRO_HF_to_ADC_CLK);                 /*!< Switch ADC_CLK to FRO_HF */
     CLOCK_AttachClk(kFRO_HF_to_USB0_CLK);                 /*!< Switch USB0_CLK to FRO_HF */
     CLOCK_AttachClk(kFRO12M_to_FLEXCOMM0);                 /*!< Switch FLEXCOMM0 to FRO12M */
-    CLOCK_AttachClk(kPLL0_to_SCT_CLK);                 /*!< Switch SCT_CLK to PLL0 */
-    CLOCK_AttachClk(kFRO1M_to_CTIMER0);                 /*!< Switch CTIMER0 to FRO1M */
+    CLOCK_AttachClk(kMAIN_CLK_to_CTIMER0);                 /*!< Switch CTIMER0 to MAIN_CLK */
     CLOCK_AttachClk(kFRO1M_to_CTIMER3);                 /*!< Switch CTIMER3 to FRO1M */
+    CLOCK_AttachClk(kMAIN_CLK_to_OSTIMER);                 /*!< Switch OSTIMER to MAIN_CLK */
 
     /*!< Set SystemCoreClock variable. */
     SystemCoreClock = BOARD_BOOTCLOCKPLL150M_CORE_CLOCK;
