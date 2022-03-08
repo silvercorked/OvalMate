@@ -1,6 +1,2 @@
-../source/modules/mainInclude/mainInclude.c:18:10:configure	4	static
-../source/modules/mainInclude/mainInclude.c:30:6:buttonCallback_stopMotors	16	static
-../source/modules/mainInclude/mainInclude.c:39:6:motorCallback_scheduleNextJob	16	static
-../source/modules/mainInclude/mainInclude.c:54:6:motorCallback_printCurrSteps	16	static
-../source/modules/mainInclude/mainInclude.c:58:6:stopMotorIfJobComplete	16	static
-../source/modules/mainInclude/mainInclude.c:65:6:driveStepperPWM	32	static
+../source/modules/mainInclude/mainInclude.c:17:10:configure	8	static
+../source/modules/mainInclude/mainInclude.c:31:6:buttonCallback_stopMotors	16	static

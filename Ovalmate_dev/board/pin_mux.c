@@ -44,7 +44,7 @@ pin_labels:
 - {pin_num: '27', pin_signal: PIO0_27/FC2_TXD_SCL_MISO_WS/CTIMER3_MAT2/SCT0_OUT6/FC7_RXD_SDA_MOSI_DATA/PLU_OUT0/SECURE_GPIO0_27, label: '(extra GPIO, Servo PWM Output)
     J8[4]/J12[14]/ARD_MIK_FC2_USART_TXD'}
 - {pin_num: '66', pin_signal: PIO0_28/FC0_SCK/CT_INP11/SCT0_OUT7/USB0_OVERCURRENTN/PLU_OUT1/SECURE_GPIO0_28, label: '(extra GPIO) U5[1]/FS_USB0_OCP#'}
-- {pin_num: '92', pin_signal: PIO0_29/FC0_RXD_SDA_MOSI_DATA/CTIMER2_MAT3/SCT0_OUT8/CMP0_OUT/PLU_OUT2/SECURE_GPIO0_29, label: '(extra GPIO, Stepper X Output) U11[14]/U22[14]/FC0_USART_RXD',
+- {pin_num: '92', pin_signal: PIO0_29/FC0_RXD_SDA_MOSI_DATA/CTIMER2_MAT3/SCT0_OUT8/CMP0_OUT/PLU_OUT2/SECURE_GPIO0_29, label: '(extra GPIO) U11[14]/U22[14]/FC0_USART_RXD',
   identifier: DEBUG_UART_RX}
 - {pin_num: '94', pin_signal: PIO0_30/FC0_TXD_SCL_MISO_WS/CTIMER0_MAT0/SCT0_OUT9/SECURE_GPIO0_30, label: '(extra GPIO, bootloading) U11[13]/U22[13]/FC0_USART_TXD',
   identifier: DEBUG_UART_TX}
@@ -135,7 +135,6 @@ BOARD_InitDEBUG_UARTPins:
   - {pin_num: '60', peripheral: GPIO, signal: 'PIO0, 26', pin_signal: PIO0_26/FC2_RXD_SDA_MOSI_DATA/CLKOUT/CT_INP14/SCT0_OUT5/USB0_IDVALUE/FC0_SCK/HS_SPI_MOSI/SECURE_GPIO0_26}
   - {pin_num: '66', peripheral: GPIO, signal: 'PIO0, 28', pin_signal: PIO0_28/FC0_SCK/CT_INP11/SCT0_OUT7/USB0_OVERCURRENTN/PLU_OUT1/SECURE_GPIO0_28}
   - {pin_num: '94', peripheral: FLEXCOMM0, signal: TXD_SCL_MISO_WS, pin_signal: PIO0_30/FC0_TXD_SCL_MISO_WS/CTIMER0_MAT0/SCT0_OUT9/SECURE_GPIO0_30}
-  - {pin_num: '92', peripheral: CTIMER2, signal: 'MATCH, 3', pin_signal: PIO0_29/FC0_RXD_SDA_MOSI_DATA/CTIMER2_MAT3/SCT0_OUT8/CMP0_OUT/PLU_OUT2/SECURE_GPIO0_29, identifier: ''}
   - {pin_num: '83', peripheral: CTIMER0, signal: 'MATCH, 1', pin_signal: PIO0_3/FC3_RXD_SDA_MOSI_DATA/CTIMER0_MAT1/SCT0_OUT1/SCT_GPI3/SECURE_GPIO0_3}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
@@ -379,19 +378,6 @@ void BOARD_InitDEBUG_UARTPins(void)
                           * : Enable Digital mode.
                           * Digital input is enabled. */
                          | IOCON_PIO_DIGIMODE(PIO0_28_DIGIMODE_DIGITAL));
-
-    IOCON->PIO[0][29] = ((IOCON->PIO[0][29] &
-                          /* Mask bits to zero which are setting */
-                          (~(IOCON_PIO_FUNC_MASK | IOCON_PIO_DIGIMODE_MASK)))
-
-                         /* Selects pin function.
-                          * : PORT029 (pin 92) is configured as CTIMER2_MAT3. */
-                         | IOCON_PIO_FUNC(PIO0_29_FUNC_ALT3)
-
-                         /* Select Digital mode.
-                          * : Enable Digital mode.
-                          * Digital input is enabled. */
-                         | IOCON_PIO_DIGIMODE(PIO0_29_DIGIMODE_DIGITAL));
 
     IOCON->PIO[0][3] = ((IOCON->PIO[0][3] &
                          /* Mask bits to zero which are setting */

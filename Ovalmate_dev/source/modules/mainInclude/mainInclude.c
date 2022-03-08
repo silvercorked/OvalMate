@@ -13,7 +13,6 @@
 
 #include "mainInclude.h"
 
-uint32_t motorCallback_scheduleNextJob_steps = 50;
 
 status_t configure() {
 	emergencyBumpCallback = buttonCallback_stopMotors;
@@ -22,7 +21,9 @@ status_t configure() {
 	upBumpCallback = buttonCallback_stopMotors;
 	downBumpCallback = buttonCallback_stopMotors;
 
-	//addMotorCallback(sMotorBoth, stopMotorIfJobComplete);
+	initializeSteppers();
+
+	//addMotorCallback(MOTORBOTH, stopMotorIfJobComplete);
 
 	return kStatus_Success;
 }
@@ -32,16 +33,16 @@ void buttonCallback_stopMotors(pint_pin_int_t pintr, uint32_t pmatch_status) {
 		(uint32_t) pintr,
 		pmatch_status
 	);
-	stopStepperPWM(motorX_p);
-	stopStepperPWM(motorY_p);
+	stopStepperPWM(MOTORX);
+	stopStepperPWM(MOTORY);
 }
 
-void motorCallback_scheduleNextJob(stepperMotor_ctimer* motorP) {
-	PRINTF("\r\nExecuting motorCallback_scheduleNextJob with params motor = %c, nextJobSteps = %d",
+//void motorCallback_scheduleNextJob(stepperMotor_t* motorP) {
+//	PRINTF("\r\nExecuting motorCallback_scheduleNextJob with params motor = %c, nextJobSteps = %d",
 		//motorToWhichMotor(*motorP),
-		motorCallback_scheduleNextJob_steps
-	);
-	motorCallback_printCurrSteps(motorP);
+		//motorCallback_scheduleNextJob_steps
+//	);
+//	motorCallback_printCurrSteps(motorP);
 	//if (motorStopped && motorCallback_scheduleNextJob_steps != 0) {
 	//	setupStepperPWM(&motor, motorCallback_scheduleNextJob_steps);
 	//	startStepperPWM(motor.timer);
@@ -49,36 +50,17 @@ void motorCallback_scheduleNextJob(stepperMotor_ctimer* motorP) {
 	//	if (motorCallback_scheduleNextJob_steps < 10)
 	//		stopStepperPWM(motor.timer);
 	//}
-}
-
-void motorCallback_printCurrSteps(stepperMotor_ctimer* motor) {
-	PRINTF("\r\ncurr steps: %d, goalSteps: %d", motor->currentJob.currSteps, motor->currentJob.goalSteps);
-}
-
-void stopMotorIfJobComplete(stepperMotor_ctimer *motor) {
-	motor->netSteps += motor->direction == 0 ? 1 : -1;
-	motor->currentJob.currSteps++;
-	if (motor->currentJob.currSteps == motor->currentJob.goalSteps)
-		stopStepperPWM(motor);
-}
-
-void driveStepperPWM(which_motor_t which, uint32_t steps, uint32_t freq, bool blocking) {
-	if (which == MOTORBOTH) {
-		setupStepperPWM(MOTORX, steps, freq);
-		setupStepperPWM(MOTORY, steps, freq);
-		startStepperPWM(motorX_p);
-		startStepperPWM(motorY_p);
-		if (blocking)
-			blockUntilMotorJobComplete(which);
-	}
-	else {
-		stepperMotor_ctimer* m = getMotor(which);
-		setupStepperPWM(which, steps, freq);
-		startStepperPWM(m);
-		if (blocking)
-			blockUntilMotorJobComplete(which);
-	}
-
-}
-
-
+//}
+//
+//void motorCallback_printCurrSteps(stepperMotor_t* motor) {
+//	PRINTF("\r\ncurr steps: %d, goalSteps: %d", motor->currentJob.currSteps, motor->currentJob.goalSteps);
+//}
+//
+//void stopMotorIfJobComplete(stepperMotor_t* motor) {
+//	motor->netSteps += motor->direction == 0 ? 1 : -1;
+//	motor->currentJob.currSteps++;
+//	if (motor->currentJob.currSteps == motor->currentJob.goalSteps)
+//		stopStepperPWM(getWhich(motor));
+//}
+//
+//

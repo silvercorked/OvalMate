@@ -1,0 +1,9 @@
+C:\Users\Alex\Documents\MCUXpressoIDE_11.5.0_7232\workspace\OvalMate\Ovalmate_dev\drivers/fsl_ctimer.h:497:20:CTIMER_StartTimer	16	static
+C:\Users\Alex\Documents\MCUXpressoIDE_11.5.0_7232\workspace\OvalMate\Ovalmate_dev\drivers/fsl_ctimer.h:507:20:CTIMER_StopTimer	16	static
+../source/modules/steppers/ctimerStepperY.c:24:6:STEPPERY_initializeStepperPWM	8	static
+../source/modules/steppers/ctimerStepperY.c:40:6:STEPPERY_setupStepperPWM	32	static
+../source/modules/steppers/ctimerStepperY.c:56:6:STEPPERY_startStepperPWM	8	static
+../source/modules/steppers/ctimerStepperY.c:61:6:STEPPERY_stopStepperPWM	8	static
+../source/modules/steppers/ctimerStepperY.c:66:10:CTIMER_setPWMPeriodValue	16	static
+../source/modules/steppers/ctimerStepperY.c:75:6:STEPPERY_blockUntilMotorJobComplete	4	static
+../source/modules/steppers/ctimerStepperY.c:79:24:getMotorY	4	static

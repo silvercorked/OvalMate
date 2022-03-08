@@ -223,8 +223,6 @@ called_from_default_init: true
 outputs:
 - {id: ASYNCADC_clock.outFreq, value: 48 MHz}
 - {id: CTIMER0_clock.outFreq, value: 1 MHz}
-- {id: CTIMER1_clock.outFreq, value: 1 MHz}
-- {id: CTIMER2_clock.outFreq, value: 1 MHz}
 - {id: CTIMER3_clock.outFreq, value: 1 MHz}
 - {id: FRO_12MHz_clock.outFreq, value: 12 MHz}
 - {id: FRO_1MHz_clock.outFreq, value: 1 MHz}
@@ -243,8 +241,6 @@ settings:
 - {id: SYSCON.ADCCLKSEL.sel, value: ANACTRL.fro_hf_clk}
 - {id: SYSCON.CLK32KCLKSEL.sel, value: SYSCON.FRO1MDIV}
 - {id: SYSCON.CTIMERCLKSEL0.sel, value: SYSCON.fro_1m}
-- {id: SYSCON.CTIMERCLKSEL1.sel, value: SYSCON.fro_1m}
-- {id: SYSCON.CTIMERCLKSEL2.sel, value: SYSCON.fro_1m}
 - {id: SYSCON.CTIMERCLKSEL3.sel, value: SYSCON.fro_1m}
 - {id: SYSCON.FCCLKSEL0.sel, value: ANACTRL.fro_12m_clk}
 - {id: SYSCON.FRO1MDIV.scale, value: '25', locked: true}
@@ -326,8 +322,6 @@ void BOARD_BootClockPLL150M(void)
     CLOCK_AttachClk(kFRO12M_to_FLEXCOMM0);                 /*!< Switch FLEXCOMM0 to FRO12M */
     CLOCK_AttachClk(kPLL0_to_SCT_CLK);                 /*!< Switch SCT_CLK to PLL0 */
     CLOCK_AttachClk(kFRO1M_to_CTIMER0);                 /*!< Switch CTIMER0 to FRO1M */
-    CLOCK_AttachClk(kFRO1M_to_CTIMER1);                 /*!< Switch CTIMER1 to FRO1M */
-    CLOCK_AttachClk(kFRO1M_to_CTIMER2);                 /*!< Switch CTIMER2 to FRO1M */
     CLOCK_AttachClk(kFRO1M_to_CTIMER3);                 /*!< Switch CTIMER3 to FRO1M */
 
     /*!< Set SystemCoreClock variable. */
