@@ -10,7 +10,6 @@
  * Included files
  **********************************************************************************************************************/
 #include "fsl_common.h"
-#include "usb_device_composite.h"
 
 #if defined(__cplusplus)
 extern "C" {

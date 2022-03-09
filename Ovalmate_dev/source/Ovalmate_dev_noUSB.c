@@ -32,7 +32,7 @@
 void delay(void)
 {
     volatile uint32_t i = 0U;
-    for (i = 0U; i < 9000000U; ++i) // 20000000U for servo
+    for (i = 0U; i < 20000000U; ++i) // 20000000U for servo
     {
         __asm("NOP"); /* delay */
     }
@@ -55,11 +55,6 @@ int main(void) {
 	PRINTF("Hello World\n");
 
 	// init
-	initialize7SegLegs();
-	assignPinsToInterrupts();
-	initializeADC();
-	//initializeStepperPWM();
-	initializeServoPWM();
 	configure(); // from MainInclude. This sets the base for all function pointers
 	// end init
 
@@ -72,6 +67,16 @@ int main(void) {
 	// drive servo to default position
 	setupServoPWM();
 	startServoPWM();
+
+	while (1) {
+		setHome(stepperX_p);
+		setHome(stepperY_p);
+		moveTo(stepperX_p, 40000);
+		moveTo(stepperY_p, 50000);
+		while (stepperX_p->status.running || stepperY_p->status.running);
+		delay();
+		delay();
+	}
 
 	// set 7 seg
 
@@ -100,12 +105,12 @@ int main(void) {
 //		USB_DeviceTasks(); // handles usb behavior
 //	}
 
-	delay();
+	//delay();
 	//driveStepperPWMBlock(sMotorX, 50, 2000);
 	//delay();
 	//driveStepperPWMBlock(sMotorX, 20, 1500);
 
-	delay();
+	//delay();
 
 	//driveStepperPWMBlock(sMotorBoth, 20, 1000);
 	//driveStepperPWMBlock(sMotorBoth, 50, 2000);

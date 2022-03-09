@@ -1,14 +1,6 @@
-C:\Users\Alex\Documents\MCUXpressoIDE_11.5.0_7232\workspace\OvalMate\Ovalmate_dev\drivers/fsl_common_arm.h:579:24:DisableGlobalIRQ	16	static
-C:\Users\Alex\Documents\MCUXpressoIDE_11.5.0_7232\workspace\OvalMate\Ovalmate_dev\drivers/fsl_common_arm.h:606:20:EnableGlobalIRQ	24	static
-../component/serial_manager/fsl_component_serial_port_uart.c:104:32:Serial_UartEnableReceiving	16	static
-../component/serial_manager/fsl_component_serial_port_uart.c:131:13:Serial_UartCallback	40	static
-../component/serial_manager/fsl_component_serial_port_uart.c:187:25:Serial_UartInit	32	static
+../component/serial_manager/fsl_component_serial_port_uart.c:187:25:Serial_UartInit	24	static
 ../component/serial_manager/fsl_component_serial_port_uart.c:237:25:Serial_UartDeinit	24	static
-../component/serial_manager/fsl_component_serial_port_uart.c:264:25:Serial_UartWrite	32	static
-../component/serial_manager/fsl_component_serial_port_uart.c:309:25:Serial_UartRead	24	static
-../component/serial_manager/fsl_component_serial_port_uart.c:350:25:Serial_UartCancelWrite	40	static
-../component/serial_manager/fsl_component_serial_port_uart.c:383:25:Serial_UartInstallTxCallback	32	static
-../component/serial_manager/fsl_component_serial_port_uart.c:399:25:Serial_UartInstallRxCallback	32	static
-../component/serial_manager/fsl_component_serial_port_uart.c:415:6:Serial_UartIsrFunction	24	static
+../component/serial_manager/fsl_component_serial_port_uart.c:319:25:Serial_UartWrite	32	static
+../component/serial_manager/fsl_component_serial_port_uart.c:333:25:Serial_UartRead	32	static
 ../component/serial_manager/fsl_component_serial_port_uart.c:427:25:Serial_UartEnterLowpower	24	static
 ../component/serial_manager/fsl_component_serial_port_uart.c:443:25:Serial_UartExitLowpower	32	static

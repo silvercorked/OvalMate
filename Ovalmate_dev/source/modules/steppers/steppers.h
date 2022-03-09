@@ -25,6 +25,9 @@
 #include "fsl_ctimer.h"
 #include <stdbool.h>
 
+//#include <stdio.h>
+//#include "fsl_debug_console.h"  // this gives access to PRINTF for debugging
+
 #ifndef STEPPERS_H
 #define STEPPERS_H
 
@@ -34,15 +37,20 @@
 #define CTIMER0_MATCH0_CHANNEL	kCTIMER_Match_0
 #define CTIMER1_MATCH0_CHANNEL	kCTIMER_Match_0
 
-#define CTIMER0_CLK_FREQ		CLOCK_GetCTimerClkFreq(0U)	// both of these are, by default, 12MHz clocks.
-#define CTIMER1_CLK_FREQ		CLOCK_GetCTimerClkFreq(1U)	// this is cause 12 divides cleanly more often than 10 => more whole number step counts
+#define CTIMER0_CLK_FREQ		12000000U	// both of these are, by default, 12MHz clocks.
+#define CTIMER1_CLK_FREQ		12000000U	// this is cause 12 divides cleanly more often than 10 => more whole number step counts
+
+// CLOCK_GetCTimerClkFreq(0U) should get CTIMER0's clock freq, but reports PLL0 is outputting 0Hz
+// manually setting clock freq of 12MHz
 
 #define MAXSTEPPERFREQ			3000U
 #define STARTSTEPPERFREQ		1000U
-#define MAXSTEPPERSTEPS0		(CTIMER0_CLK_FREQ / MAXSTEPPERFREQ)		//  4000 steps
-#define STARTSTEPPERSTEPS0		(CTIMER0_CLK_FREQ / STARTSTEPPERFREQ)	// 12000 steps
-#define MAXSTEPPERSTEPS1		(CTIMER1_CLK_FREQ / MAXSTEPPERFREQ)
-#define STARTSTEPPERSTEPS1		(CTIMER1_CLK_FREQ / STARTSTEPPERFREQ)
+#define MAXSTEPPERSTEPS0		(CTIMER0_CLK_FREQ / (MAXSTEPPERFREQ * 2))	//  4000 steps
+#define STARTSTEPPERSTEPS0		(CTIMER0_CLK_FREQ / (STARTSTEPPERFREQ * 2))	// 12000 steps
+#define MAXSTEPPERSTEPS1		(CTIMER1_CLK_FREQ / (MAXSTEPPERFREQ * 2))
+#define STARTSTEPPERSTEPS1		(CTIMER1_CLK_FREQ / (STARTSTEPPERFREQ * 2))
+#define DIFFSTARTTOMAX0			STARTSTEPPERSTEPS0 - MAXSTEPPERSTEPS0
+#define DIFFSTARTTOMAX1			STARTSTEPPERSTEPS1 - MAXSTEPPERSTEPS1
 // End Definitions
 
 // Structs
@@ -70,6 +78,8 @@ typedef struct {
 	uint32_t accelerating;		// number of steps with acceleration (beginning of steps)
 	uint32_t steady;			// number of steps at max speed (middle of steps
 	uint32_t slowing;			// number of steps decelerating (end of steps)
+	float accelValue;			// the rate of acceleration (increase in match value per period)
+	float roundedAccel;			// when applying accel to increase match value, the excess decimal should be help (using in accelerating and slowing)
 } stepperMotorPhaseSteps_s;
 #endif
 #ifndef STEPPERMOTOR_S
@@ -78,7 +88,7 @@ typedef struct {
 	CTIMER_Type* timer_p;
 	pinInformation_s* pinInfo_p;
 	stepperMotorPhaseSteps_s* phaseSteps_p;
-	ctimer_callback_t* matchCallback;	// function ** but only points to 1 functions. CTIMER_RegisterCallBack expects array (ie void**) because it can take multiple interrupts, but we want all to go to this function.
+	ctimer_callback_t matchCallback;	// function ** but only points to 1 functions. CTIMER_RegisterCallBack expects array (ie void**) because it can take multiple interrupts, but we want all to go to this function.
 	ctimer_match_t	output;
 	ctimer_match_config_t matchConfig;	// also small and we'll need it often
 	stepperMotorStatus_s status;			// not a pointer for faster access cause it's small and we need it often
@@ -89,10 +99,6 @@ typedef struct {
 // End Structs
 
 // Extern Variables
-pinInformation_s stepperX_pinInfo;
-pinInformation_s stepperY_pinInfo;
-stepperMotor_s stepperX;
-stepperMotor_s stepperY;
 extern stepperMotor_s* stepperX_p;
 extern stepperMotor_s* stepperY_p;
 // End Extern Variables

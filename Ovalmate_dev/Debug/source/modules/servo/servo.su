@@ -1,6 +1,6 @@
-C:\Users\Alex\Documents\MCUXpressoIDE_11.5.0_7232\workspace\OvalMate\Ovalmate_dev\drivers/fsl_ctimer.h:283:20:CTIMER_UpdatePwmPulsePeriod	24	static
-C:\Users\Alex\Documents\MCUXpressoIDE_11.5.0_7232\workspace\OvalMate\Ovalmate_dev\drivers/fsl_ctimer.h:497:20:CTIMER_StartTimer	16	static
-C:\Users\Alex\Documents\MCUXpressoIDE_11.5.0_7232\workspace\OvalMate\Ovalmate_dev\drivers/fsl_ctimer.h:507:20:CTIMER_StopTimer	16	static
+C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev_noUSB\drivers/fsl_ctimer.h:283:20:CTIMER_UpdatePwmPulsePeriod	24	static
+C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev_noUSB\drivers/fsl_ctimer.h:497:20:CTIMER_StartTimer	16	static
+C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev_noUSB\drivers/fsl_ctimer.h:507:20:CTIMER_StopTimer	16	static
 ../source/modules/servo/servo.c:24:6:initializeServoPWM	8	static
 ../source/modules/servo/servo.c:40:6:setupServoPWM	16	static
 ../source/modules/servo/servo.c:52:6:updateServoPWMDutyCycle	16	static

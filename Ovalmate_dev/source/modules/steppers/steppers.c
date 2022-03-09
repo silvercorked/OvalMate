@@ -43,7 +43,7 @@ stepperMotor_s stepperX = {
 	.timer_p = CTIMER0_X,
 	.pinInfo_p = &stepperX_pinInfo,
 	.phaseSteps_p = &stepperX_phaseSteps,
-	.matchCallback = &stepperXTimerCallback,
+	.matchCallback = stepperXTimerCallback,
 	.output = CTIMER0_MATCH0_CHANNEL,
 	.matchConfig = { },
 	.status = { }, // defaults are false
@@ -54,7 +54,7 @@ stepperMotor_s stepperY = {
 	.timer_p = CTIMER1_Y,
 	.pinInfo_p = &stepperY_pinInfo,
 	.phaseSteps_p = &stepperY_phaseSteps,
-	.matchCallback = &stepperYTimerCallback,
+	.matchCallback = stepperYTimerCallback,
 	.output = CTIMER1_MATCH0_CHANNEL,
 	.matchConfig = { },
 	.status = { }
@@ -92,7 +92,7 @@ status_t setupStepperMotor(stepperMotor_s* motor_p, uint32_t steps) {
 	motor_p->matchConfig.outPinInitState    = false;					// don't care, don't actually use output, just interrupt
 	motor_p->matchConfig.enableInterrupt    = true;					// since we use the interrupt, we want it on
 
-	CTIMER_RegisterCallBack(motor_p->timer_p, motor_p->matchCallback, kCTIMER_SingleCallback);
+	CTIMER_RegisterCallBack(motor_p->timer_p, &(motor_p->matchCallback), kCTIMER_SingleCallback);
 	CTIMER_SetupMatch(motor_p->timer_p, motor_p->output, &(motor_p->matchConfig));
 
 	setMotorStepsPerPhase(motor_p->phaseSteps_p, steps);	// presets all info about journey
@@ -121,6 +121,11 @@ status_t moveTo(stepperMotor_s* motor_p, uint32_t target) {
 }
 
 status_t setMotorStepsPerPhase(stepperMotorPhaseSteps_s* phaseSteps_p, uint32_t steps) {
+	phaseSteps_p->accelValue = 0.0f;
+	phaseSteps_p->accelerating = 0;
+	phaseSteps_p->steady = 0;
+	phaseSteps_p->slowing = 0;
+	phaseSteps_p->startSpeed = 0;	// clear phaseSteps
 	if (steps <= 100)
 		phaseSteps_p->startSpeed = steps;	// all steps are no accel at start speed
 	else if (steps <= 1600) { // one full revolution
@@ -128,12 +133,16 @@ status_t setMotorStepsPerPhase(stepperMotorPhaseSteps_s* phaseSteps_p, uint32_t 
 		phaseSteps_p->slowing = phaseSteps_p->accelerating;		// 1/4 decel
 		steps -= phaseSteps_p->accelerating << 1;				// left shift once == multiply by 2 in 1 clock
 		phaseSteps_p->steady = steps;							// rest at max speed
+
+		phaseSteps_p->accelValue = ((float) DIFFSTARTTOMAX0) / ((float) phaseSteps_p->accelerating);
 	}
 	else {
 		phaseSteps_p->accelerating = steps / 10;						// 1/10 accel
 		phaseSteps_p->slowing = phaseSteps_p->accelerating;				// 1/10 decel
 		steps -= phaseSteps_p->accelerating + phaseSteps_p->slowing;	// addition faster when not by power of 2
 		phaseSteps_p->steady = steps;									// rest at max speed
+
+		phaseSteps_p->accelValue = ((float) DIFFSTARTTOMAX0) / ((float) phaseSteps_p->accelerating);
 	}
 	return kStatus_Success;
 }
@@ -183,46 +192,63 @@ void stepperYTimerCallback(uint32_t flags) {
  */
 void stepperGeneralTimerCallback(uint32_t flags, stepperMotor_s* motor_p) {
 	// handle based on bools, send output, update bools
-	stepperMotorStatus_s status = motor_p->status;
-	stepperMotorPhaseSteps_s phaseSteps = *(motor_p->phaseSteps_p);
-
-	if (status.accelerating) {
+	//static uint32_t count = 0;
+	//count++;
+	if (motor_p->status.accelerating) {
 		motor_p->position += motor_p->direction ? 1 : -1;
-		phaseSteps.accelerating--;
-		if (phaseSteps.accelerating == 0) {
-			status.accelerating = false;
-			if (phaseSteps.steady != 0)
-				status.steady = true;
-			else if (phaseSteps.slowing != 0)
-				status.slowing = true;
+		motor_p->phaseSteps_p->accelerating--;
+		motor_p->phaseSteps_p->roundedAccel += motor_p->phaseSteps_p->accelValue;
+		if (motor_p->phaseSteps_p->roundedAccel > 1) { // needed for accel rates < 1 and to handle decimal accel rates
+			motor_p->matchConfig.matchValue -= (uint32_t) motor_p->phaseSteps_p->roundedAccel;
+			motor_p->phaseSteps_p->roundedAccel -= (uint32_t) motor_p->phaseSteps_p->roundedAccel; // remove amount applied
+		}
+		//PRINTF("\r\n\r\n status.accel: %d, status.steady: %d, status.running: %d", status.accelerating, status.steady, status.running);
+		//PRINTF("\r\n phase.accel: %d, phase.steady: %d, phase.slowing: %d", phaseSteps.accelerating, phaseSteps.steady, phaseSteps.slowing);
+		//PRINTF("\r\n accumulativeAccel: %2.2f, phaseSteps.accelVal: %.4f", accumulativeAccel, phaseSteps.accelValue);
+		if (motor_p->phaseSteps_p->accelerating == 0) {
+			//PRINTF("\r\n\r\n hit ZERO!!!! \r\n\r\n");
+			motor_p->status.accelerating = false;
+			if (motor_p->phaseSteps_p->steady != 0)
+				motor_p->status.steady = true;
+			else if (motor_p->phaseSteps_p->slowing != 0)
+				motor_p->status.slowing = true;
+			else
+				stopMotor(motor_p);
+		}
+		CTIMER_SetupMatch(motor_p->timer_p, motor_p->output, &(motor_p->matchConfig));
+	}
+	else if (motor_p->status.steady) {
+		motor_p->position += motor_p->direction ? 1 : -1;
+		motor_p->phaseSteps_p->steady--;
+		if (motor_p->phaseSteps_p->steady == 0) {
+			motor_p->status.steady = false;
+			if (motor_p->phaseSteps_p->slowing != 0)
+				motor_p->status.slowing = true;
 			else
 				stopMotor(motor_p);
 		}
 	}
-	else if (status.steady) {
+	else if (motor_p->status.slowing) {
 		motor_p->position += motor_p->direction ? 1 : -1;
-		phaseSteps.steady--;
-		if (phaseSteps.steady == 0) {
-			status.steady = false;
-			if (phaseSteps.slowing != 0)
-				status.slowing = true;
-			else
-				stopMotor(motor_p);
+		motor_p->phaseSteps_p->slowing--;
+		motor_p->phaseSteps_p->roundedAccel += motor_p->phaseSteps_p->accelValue;
+		if (motor_p->phaseSteps_p->roundedAccel > 1) { // needed for accel rates < 1 and to handle decimal accel rates
+			motor_p->matchConfig.matchValue += (uint32_t) motor_p->phaseSteps_p->roundedAccel;
+			motor_p->phaseSteps_p->roundedAccel -= (uint32_t) motor_p->phaseSteps_p->roundedAccel; // remove amount applied
 		}
-	}
-	else if (status.slowing) {
-		motor_p->position += motor_p->direction ? 1 : -1;
-		phaseSteps.slowing--;
-		if (phaseSteps.steady == 0) {
-			status.steady = false;
+		if (motor_p->phaseSteps_p->slowing == 0) {
+			motor_p->status.slowing = false;
 			stopMotor(motor_p);
+			//PRINTF("step Count : %d", count);
+			//count = 0;
 		}
+		CTIMER_SetupMatch(motor_p->timer_p, motor_p->output, &(motor_p->matchConfig));
 	}
-	else if (status.startSpeed) { // lowest freq requirements so can be last in conditionals w/ least consequence
+	else if (motor_p->status.startSpeed) { // lowest freq requirements so can be last in conditionals w/ least consequence
 		motor_p->position += motor_p->direction ? 1 : -1;
-		phaseSteps.startSpeed--;
-		if (phaseSteps.startSpeed == 0) {
-			status.startSpeed = false;
+		motor_p->phaseSteps_p->startSpeed--;
+		if (motor_p->phaseSteps_p->startSpeed == 0) {
+			motor_p->status.startSpeed = false;
 			stopMotor(motor_p);
 		}
 	}

@@ -15,6 +15,14 @@
 
 
 status_t configure() {
+
+	initialize7SegLegs();
+	assignPinsToInterrupts();
+	initializeADC();
+	initializeStepperOutputPins();
+	initializeStepperMotors();
+	initializeServoPWM();
+
 	emergencyBumpCallback = buttonCallback_stopMotors;
 	rightBumpCallback = buttonCallback_stopMotors;
 	leftBumpCallback = buttonCallback_stopMotors;
@@ -33,6 +41,8 @@ void buttonCallback_stopMotors(pint_pin_int_t pintr, uint32_t pmatch_status) {
 		(uint32_t) pintr,
 		pmatch_status
 	);
+	stopMotor(stepperX_p);
+	stopMotor(stepperY_p);
 	//stopStepperPWM(MOTORX);
 	//stopStepperPWM(MOTORY);
 }
