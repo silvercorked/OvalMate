@@ -14,13 +14,13 @@
 #include "sevenSegmentLED.h"
 
 // Variables
-pinInformation legA = { .port = 0, .pin = 4 }; // demo green led port 1 pin 7
-pinInformation legB = { .port = 0, .pin = 5 };
-pinInformation legC = { .port = 0, .pin = 6 };
-pinInformation legD = { .port = 0, .pin = 8 };
-pinInformation legE = { .port = 0, .pin = 13 };
-pinInformation legF = { .port = 0, .pin = 14 };
-pinInformation legG = { .port = 0, .pin = 18 };
+pinInformation_s legA = { .port = 0, .pin = 4 }; // demo green led port 1 pin 7
+pinInformation_s legB = { .port = 0, .pin = 5 };
+pinInformation_s legC = { .port = 0, .pin = 6 };
+pinInformation_s legD = { .port = 0, .pin = 8 };
+pinInformation_s legE = { .port = 0, .pin = 13 };
+pinInformation_s legF = { .port = 0, .pin = 14 };
+pinInformation_s legG = { .port = 0, .pin = 18 };
 	// leg a w/ logic low = 1.6v, logic high = 3.3v (this doesn't activate the LED).
 	// leg b w/ logic low = 0v, logic high = 1.6v (this does activate the LED).
 gpio_pin_config_t sevenSegConfig = { .pinDirection = kGPIO_DigitalOutput, .outputLogic = 0};

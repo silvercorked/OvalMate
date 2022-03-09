@@ -58,7 +58,7 @@ int main(void) {
 	initialize7SegLegs();
 	assignPinsToInterrupts();
 	initializeADC();
-	initializeStepperPWM();
+	//initializeStepperPWM();
 	initializeServoPWM();
 	configure(); // from MainInclude. This sets the base for all function pointers
 	// end init
@@ -75,28 +75,30 @@ int main(void) {
 
 	// set 7 seg
 
-	volatile uint32_t i = 0;
-	while (1) {
-		delay();
-		i++;
-		if (i % 2 == 1) {
-			set7Seg(0, 0, 1, 0, 1, 0, 1);
-			driveStepperPWMNonBlocking(MOTORX, 5000, 100000);
-			updateServoPWMDutyCycle(PENUP);
-		}
-		else {
-			set7Seg(1, 1, 0, 1, 0, 1, 0);
-			driveStepperPWMBlocking(MOTORX, 5000, 100000);
-			updateServoPWMDutyCycle(PENDOWN);
-		}
-		delay();
-		int a = getADCValue();
-		PRINTF("adc val: %d", a);
-	}
-	delay();
-	driveStepperPWMNonBlocking(MOTORBOTH, 5, 5);
-	PRINTF("printing while driving motors");
-	while(1);
+//	volatile uint32_t i = 0;
+//	while (1) {
+//		delay();
+//		i++;
+//		if (i % 2 == 1) {
+//			set7Seg(0, 0, 1, 0, 1, 0, 1);
+//			driveStepperPWMNonBlocking(MOTORX, 5000, 100000);
+//			updateServoPWMDutyCycle(PENUP);
+//		}
+//		else {
+//			set7Seg(1, 1, 0, 1, 0, 1, 0);
+//			driveStepperPWMBlocking(MOTORX, 5000, 100000);
+//			updateServoPWMDutyCycle(PENDOWN);
+//		}
+//		delay();
+//		int a = getADCValue();
+//		PRINTF("adc val: %d", a);
+//	}
+//	delay();
+//	driveStepperPWMNonBlocking(MOTORBOTH, 5, 5);
+//	PRINTF("printing while driving motors");
+//	while(1) {
+//		USB_DeviceTasks(); // handles usb behavior
+//	}
 
 	delay();
 	//driveStepperPWMBlock(sMotorX, 50, 2000);

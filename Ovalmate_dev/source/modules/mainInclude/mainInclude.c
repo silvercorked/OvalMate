@@ -21,7 +21,7 @@ status_t configure() {
 	upBumpCallback = buttonCallback_stopMotors;
 	downBumpCallback = buttonCallback_stopMotors;
 
-	initializeSteppers();
+	//initializeSteppers();
 
 	//addMotorCallback(MOTORBOTH, stopMotorIfJobComplete);
 
@@ -33,8 +33,8 @@ void buttonCallback_stopMotors(pint_pin_int_t pintr, uint32_t pmatch_status) {
 		(uint32_t) pintr,
 		pmatch_status
 	);
-	stopStepperPWM(MOTORX);
-	stopStepperPWM(MOTORY);
+	//stopStepperPWM(MOTORX);
+	//stopStepperPWM(MOTORY);
 }
 
 //void motorCallback_scheduleNextJob(stepperMotor_t* motorP) {

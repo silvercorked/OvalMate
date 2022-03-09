@@ -19,12 +19,13 @@ component/lists \
 component/osa \
 component/pwm \
 component/serial_manager \
-component/serial_manager/usb_cdc_adapter \
 component/timer \
 component/uart \
 device \
 drivers \
 source \
+source/generated \
+source/modules/USB \
 source/modules/buttons \
 source/modules/irSensor \
 source/modules/mainInclude \

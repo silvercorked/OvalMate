@@ -4,5 +4,5 @@
 
 USER_OBJS :=
 
-LIBS :=
+LIBS := -lfro_calib_hardabi -lfro_calib_softabi
 

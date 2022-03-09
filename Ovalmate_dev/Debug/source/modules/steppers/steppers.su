@@ -1,0 +1,17 @@
+C:\Users\Alex\Documents\MCUXpressoIDE_11.5.0_7232\workspace\OvalMate\Ovalmate_dev\drivers/fsl_gpio.h:153:20:GPIO_PinWrite	24	static
+C:\Users\Alex\Documents\MCUXpressoIDE_11.5.0_7232\workspace\OvalMate\Ovalmate_dev\drivers/fsl_ctimer.h:497:20:CTIMER_StartTimer	16	static
+C:\Users\Alex\Documents\MCUXpressoIDE_11.5.0_7232\workspace\OvalMate\Ovalmate_dev\drivers/fsl_ctimer.h:507:20:CTIMER_StopTimer	16	static
+../source/modules/steppers/steppers.c:69:6:initializeStepperOutputPins	8	static
+../source/modules/steppers/steppers.c:73:6:writeStepperOutputPin	16	static
+../source/modules/steppers/steppers.c:77:6:initializeStepperMotors	16	static
+../source/modules/steppers/steppers.c:84:10:setupStepperMotor	16	static
+../source/modules/steppers/steppers.c:102:6:driveStepperSteps	16	static
+../source/modules/steppers/steppers.c:107:10:moveSteps	16	static
+../source/modules/steppers/steppers.c:118:10:moveTo	24	static
+../source/modules/steppers/steppers.c:123:10:setMotorStepsPerPhase	16	static
+../source/modules/steppers/steppers.c:143:6:startMotor	16	static
+../source/modules/steppers/steppers.c:151:6:stopMotor	16	static
+../source/modules/steppers/steppers.c:160:6:setHome	16	static
+../source/modules/steppers/steppers.c:164:6:stepperXTimerCallback	16	static
+../source/modules/steppers/steppers.c:172:6:stepperYTimerCallback	16	static
+../source/modules/steppers/steppers.c:184:6:stepperGeneralTimerCallback	48	static

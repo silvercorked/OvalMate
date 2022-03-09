@@ -222,15 +222,16 @@ name: BOARD_BootClockPLL150M
 called_from_default_init: true
 outputs:
 - {id: ASYNCADC_clock.outFreq, value: 48 MHz}
-- {id: CTIMER0_clock.outFreq, value: 150 MHz}
+- {id: CTIMER0_clock.outFreq, value: 12 MHz}
+- {id: CTIMER1_clock.outFreq, value: 12 MHz}
 - {id: CTIMER3_clock.outFreq, value: 1 MHz}
+- {id: CTIMER4_clock.outFreq, value: 96 MHz}
 - {id: FRO_12MHz_clock.outFreq, value: 12 MHz}
 - {id: FRO_1MHz_clock.outFreq, value: 1 MHz}
 - {id: FXCOM0_clock.outFreq, value: 12 MHz}
 - {id: System_clock.outFreq, value: 150 MHz}
 - {id: USB0_clock.outFreq, value: 48 MHz}
 settings:
-- {id: PLL0_Mode, value: Normal}
 - {id: PLL1_Mode, value: Normal}
 - {id: ADCCLKDIV_HALT, value: Enable}
 - {id: ANALOG_CONTROL_FRO192M_CTRL_ENDI_FRO_96M_CFG, value: Enable}
@@ -239,23 +240,29 @@ settings:
 - {id: SYSCON.ADCCLKDIV.scale, value: '2', locked: true}
 - {id: SYSCON.ADCCLKSEL.sel, value: ANACTRL.fro_hf_clk}
 - {id: SYSCON.CLK32KCLKSEL.sel, value: SYSCON.FRO1MDIV}
-- {id: SYSCON.CTIMERCLKSEL0.sel, value: SYSCON.MAINCLKSELB}
+- {id: SYSCON.CTIMERCLKSEL0.sel, value: SYSCON.PLL0_BYPASS}
+- {id: SYSCON.CTIMERCLKSEL1.sel, value: SYSCON.PLL0_BYPASS}
 - {id: SYSCON.CTIMERCLKSEL3.sel, value: SYSCON.fro_1m}
+- {id: SYSCON.CTIMERCLKSEL4.sel, value: ANACTRL.fro_hf_clk}
 - {id: SYSCON.FCCLKSEL0.sel, value: ANACTRL.fro_12m_clk}
 - {id: SYSCON.FRO1MDIV.scale, value: '25', locked: true}
-- {id: SYSCON.MAINCLKSELB.sel, value: SYSCON.PLL0_BYPASS}
+- {id: SYSCON.MAINCLKSELB.sel, value: SYSCON.PLL1_BYPASS}
 - {id: SYSCON.OSTIMERCLKSEL.sel, value: SYSCON.MAINCLKSELB}
 - {id: SYSCON.PLL0CLKSEL.sel, value: ANACTRL.fro_12m_clk}
-- {id: SYSCON.PLL0M_MULT.scale, value: '150', locked: true}
-- {id: SYSCON.PLL0N_DIV.scale, value: '6', locked: true}
+- {id: SYSCON.PLL0M_MULT.scale, value: '1', locked: true}
+- {id: SYSCON.PLL0N_DIV.scale, value: '1', locked: true}
+- {id: SYSCON.PLL0_BYPASS.sel, value: SYSCON.PLL0CLKSEL}
 - {id: SYSCON.PLL0_PDEC.scale, value: '2', locked: true}
-- {id: SYSCON.PLL1M_MULT.scale, value: '1', locked: true}
-- {id: SYSCON.PLL1N_DIV.scale, value: '1', locked: true}
-- {id: SYSCON.PLL1_PDEC.scale, value: '30', locked: true}
+- {id: SYSCON.PLL1CLKSEL.sel, value: ANACTRL.fro_12m_clk}
+- {id: SYSCON.PLL1M_MULT.scale, value: '150', locked: true}
+- {id: SYSCON.PLL1N_DIV.scale, value: '6', locked: true}
+- {id: SYSCON.PLL1_PDEC.scale, value: '2', locked: true}
 - {id: SYSCON.SCTCLKDIV.scale, value: '150', locked: true}
 - {id: SYSCON.USB0CLKDIV.scale, value: '2', locked: true}
 - {id: SYSCON.USB0CLKSEL.sel, value: ANACTRL.fro_hf_clk}
 - {id: SYSCON_CLOCK_CTRL_FRO1MHZ_CLK_ENA_CFG, value: Enabled}
+- {id: SYSCON_PLL0CTRL_BYPASSPOSTDIV2_CFG, value: Bypassed}
+- {id: SYSCON_PLL0CTRL_BYPASSPREDIV_CFG, value: Enabled}
 - {id: USB0CLKDIV_HALT, value: Enable}
 sources:
 - {id: ANACTRL.fro_hf.outFreq, value: 96 MHz}
@@ -286,19 +293,22 @@ void BOARD_BootClockPLL150M(void)
     POWER_SetVoltageForFreq(150000000U);                  /*!< Set voltage for the one of the fastest clock outputs: System clock output */
     CLOCK_SetFLASHAccessCyclesForFreq(150000000U);          /*!< Set FLASH wait states for core */
 
-    /*!< Set up PLL */
+    /*!< PLL0 is in power_down mode */
     CLOCK_AttachClk(kFRO12M_to_PLL0);                    /*!< Switch PLL0CLKSEL to FRO12M */
-    POWER_DisablePD(kPDRUNCFG_PD_PLL0);                  /* Ensure PLL is on  */
-    POWER_DisablePD(kPDRUNCFG_PD_PLL0_SSCG);
-    const pll_setup_t pll0Setup = {
-        .pllctrl = SYSCON_PLL0CTRL_CLKEN_MASK | SYSCON_PLL0CTRL_SELI(53U) | SYSCON_PLL0CTRL_SELP(31U),
-        .pllndec = SYSCON_PLL0NDEC_NDIV(6U),
-        .pllpdec = SYSCON_PLL0PDEC_PDIV(1U),
-        .pllsscg = {0x0U,(SYSCON_PLL0SSCG1_MDIV_EXT(150U) | SYSCON_PLL0SSCG1_SEL_EXT_MASK)},
+    SYSCON->PLL0CTRL |= SYSCON_PLL0CTRL_CLKEN_MASK | SYSCON_PLL0CTRL_BYPASSPLL_MASK;    /*!< PLL0 input clock is sent directly to the PLL output */
+
+    /*!< Set up PLL1 */
+    CLOCK_AttachClk(kFRO12M_to_PLL1);                    /*!< Switch PLL1CLKSEL to FRO12M */
+    POWER_DisablePD(kPDRUNCFG_PD_PLL1);                  /* Ensure PLL is on  */
+    const pll_setup_t pll1Setup = {
+        .pllctrl = SYSCON_PLL1CTRL_CLKEN_MASK | SYSCON_PLL1CTRL_SELI(53U) | SYSCON_PLL1CTRL_SELP(31U),
+        .pllndec = SYSCON_PLL1NDEC_NDIV(6U),
+        .pllpdec = SYSCON_PLL1PDEC_PDIV(1U),
+        .pllmdec = SYSCON_PLL1MDEC_MDIV(150U),
         .pllRate = 150000000U,
         .flags =  PLL_SETUPFLAG_WAITLOCK
     };
-    CLOCK_SetPLL0Freq(&pll0Setup);                       /*!< Configure PLL0 to the desired values */
+    CLOCK_SetPLL1Freq(&pll1Setup);                        /*!< Configure PLL1 to the desired values */
 
     /*!< Set up dividers */
     CLOCK_SetClkDiv(kCLOCK_DivAhbClk, 1U, false);         /*!< Set AHBCLKDIV divider to value 1 */
@@ -313,12 +323,14 @@ void BOARD_BootClockPLL150M(void)
     CLOCK_SetClkDiv(kCLOCK_DivUsb0Clk, 2U, false);         /*!< Set USB0CLKDIV divider to value 2 */
 
     /*!< Set up clock selectors - Attach clocks to the peripheries */
-    CLOCK_AttachClk(kPLL0_to_MAIN_CLK);                 /*!< Switch MAIN_CLK to PLL0 */
+    CLOCK_AttachClk(kPLL1_to_MAIN_CLK);                 /*!< Switch MAIN_CLK to PLL1 */
     CLOCK_AttachClk(kFRO_HF_to_ADC_CLK);                 /*!< Switch ADC_CLK to FRO_HF */
     CLOCK_AttachClk(kFRO_HF_to_USB0_CLK);                 /*!< Switch USB0_CLK to FRO_HF */
     CLOCK_AttachClk(kFRO12M_to_FLEXCOMM0);                 /*!< Switch FLEXCOMM0 to FRO12M */
-    CLOCK_AttachClk(kMAIN_CLK_to_CTIMER0);                 /*!< Switch CTIMER0 to MAIN_CLK */
+    CLOCK_AttachClk(kPLL0_to_CTIMER0);                 /*!< Switch CTIMER0 to PLL0 */
+    CLOCK_AttachClk(kPLL0_to_CTIMER1);                 /*!< Switch CTIMER1 to PLL0 */
     CLOCK_AttachClk(kFRO1M_to_CTIMER3);                 /*!< Switch CTIMER3 to FRO1M */
+    CLOCK_AttachClk(kFRO_HF_to_CTIMER4);                 /*!< Switch CTIMER4 to FRO_HF */
     CLOCK_AttachClk(kMAIN_CLK_to_OSTIMER);                 /*!< Switch OSTIMER to MAIN_CLK */
 
     /*!< Set SystemCoreClock variable. */

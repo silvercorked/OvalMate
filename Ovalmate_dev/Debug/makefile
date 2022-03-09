@@ -21,12 +21,13 @@ RM := rm -rf
 -include source/modules/mainInclude/subdir.mk
 -include source/modules/irSensor/subdir.mk
 -include source/modules/buttons/subdir.mk
+-include source/modules/USB/subdir.mk
+-include source/generated/subdir.mk
 -include source/subdir.mk
 -include drivers/subdir.mk
 -include device/subdir.mk
 -include component/uart/subdir.mk
 -include component/timer/subdir.mk
--include component/serial_manager/usb_cdc_adapter/subdir.mk
 -include component/serial_manager/subdir.mk
 -include component/pwm/subdir.mk
 -include component/osa/subdir.mk

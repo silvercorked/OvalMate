@@ -1,2 +1,3 @@
-../board/peripherals.c:75:6:BOARD_InitPeripherals	4	static
-../board/peripherals.c:83:6:BOARD_InitBootPeripherals	8	static
+../board/peripherals.c:150:13:USB0_init	8	static
+../board/peripherals.c:157:6:BOARD_InitPeripherals	8	static
+../board/peripherals.c:166:6:BOARD_InitBootPeripherals	8	static

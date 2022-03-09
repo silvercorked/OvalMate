@@ -91,6 +91,12 @@ void BOARD_InitBootPins(void);
 #define PIO0_1_FUNC_ALT0 0x00u
 /*!
  * @brief Select Digital mode.: Enable Digital mode. Digital input is enabled. */
+#define PIO0_22_DIGIMODE_DIGITAL 0x01u
+/*!
+ * @brief Selects pin function.: Alternative connection 7. */
+#define PIO0_22_FUNC_ALT7 0x07u
+/*!
+ * @brief Select Digital mode.: Enable Digital mode. Digital input is enabled. */
 #define PIO0_24_DIGIMODE_DIGITAL 0x01u
 /*!
  * @brief Selects pin function.: Alternative connection 0. */
@@ -349,6 +355,10 @@ void BOARD_InitBootPins(void);
                                                                     /* @} */
 
 /*! @name FC0_TXD_SCL_MISO_WS (number 94), (extra GPIO, bootloading) U11[13]/U22[13]/FC0_USART_TXD
+  @{ */
+/* @} */
+
+/*! @name USB0_VBUS (number 78), USB0_VBUS
   @{ */
 /* @} */
 

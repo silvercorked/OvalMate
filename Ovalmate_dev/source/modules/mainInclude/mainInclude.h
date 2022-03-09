@@ -41,5 +41,5 @@ void buttonCallback_stopMotors(pint_pin_int_t, uint32_t);	// buttonCallbacks are
 //void motorCallback_scheduleNextJob(stepperMotor_t*);		// motorCallbacks are of this form
 //void motorCallback_printCurrSteps(stepperMotor_t*);
 //void stopMotorIfJobComplete(stepperMotor_t*);
-void driveStepperPWM(whichMotor, uint32_t, uint32_t, bool);
+//void driveStepperPWM(whichMotor, uint32_t, uint32_t, bool);
 // End Prototypes
