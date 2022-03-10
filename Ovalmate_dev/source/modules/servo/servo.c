@@ -9,6 +9,8 @@
  * Update History:
  *	- 2/28/2022
  *		Moved this into separate "modules"
+ *	- 3/4/2022:
+ *		Setup servo to be driven by a ctimer directly.
  */
 
 #include "servo.h"

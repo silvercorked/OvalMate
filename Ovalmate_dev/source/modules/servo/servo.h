@@ -8,7 +8,14 @@
  * Date Started: 2/28/2022
  *	- 2/28/2022
  *		Moved this into separate "modules"
+ *	- 3/4/2022:
+ *		Setup servo to be driven by a ctimer directly.
+ *	- 3/9/2022:
+ *		Added definition safeguards to avoid duplicate declarations
  */
+
+#ifndef SERVO_H
+#define SERVO_H
 
 // Includes
 #include <stdbool.h>
@@ -53,3 +60,5 @@ status_t CTIMER_updatePWMPulsePeriodValue(uint8_t dutyCyclePercent);
 void updateServoPWMDutyCycle(uint8_t dutyCycle);
 void initializeServoPWM(void);
 // End Prototypes
+
+#endif

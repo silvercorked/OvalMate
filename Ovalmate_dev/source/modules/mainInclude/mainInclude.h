@@ -8,9 +8,17 @@
  * Date Started: 3/2/2022
  * Update History:
  *	- 3/3/2022:
- *		Setup helper functions using multilpe features from different modules
+ *		Setup helper functions using multiple features from different modules
  *		Created macro functions for motor driving needs
+ *	- 3/6/2022:
+ *		Removed some helper functions as systems are changing soon. These extra functions require functions that may not be defined
+ *		once changes go through. Commenting out for now
+ *	- 3/9/2022:
+ *		Added definition safeguard to avoid duplicate declarations
  */
+
+#ifndef MAININCLUDE_H
+#define MAININCLUDE_H
 
 // Core Includes
 #include <stdio.h>
@@ -26,7 +34,9 @@
 #include "modules/irSensor/irSensor.h" // irSensor via ADC
 #include "modules/servo/servo.h" // servo via CTIMER
 #include "modules/buttons/buttons.h" // button interrupts via pin_mux
+// ^ consumes pin interrupts 0-4
 #include "modules/steppers/steppers.h" // stepper via SCTIMER 2 in 16-bit mode
+// ^ consumes pin interrupts 5 & 6
 // End Module Includes
 
 // all variables used will start with the function callback's name in which they are used
@@ -43,3 +53,5 @@ void buttonCallback_stopMotors(pint_pin_int_t, uint32_t);	// buttonCallbacks are
 //void stopMotorIfJobComplete(stepperMotor_t*);
 //void driveStepperPWM(whichMotor, uint32_t, uint32_t, bool);
 // End Prototypes
+
+#endif

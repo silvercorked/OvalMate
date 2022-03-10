@@ -19,17 +19,25 @@
  *		Added conversion functions for swapping between the whichMotor_t type and the motor pointers.
  *		Fixed a bug in SetupStepperPMW where currentJob was not assigned correctly.
  *		Added conditional timer configurations in setupPwm16BitMode in hopes of resolving hardfaults.
+ *	- 3/8/2022:
+ *		Rewrote much of the steppers module in order to facilitate a new method of interacting with these timers. Progress towards this
+ *		can be seen through the git commits
+ *	- 3/9/2022:
+ *		Went to lab to confirm and finalize stepper motor behavior. Acceleration looks good and moveTo and moveSteps are really useful from a
+ *		coordinate perspective.
  */
+
+#ifndef STEPPERS_H
+#define STEPPERS_H
 
 #include "fsl_gpio.h"
 #include "fsl_ctimer.h"
 #include <stdbool.h>
+#include "fsl_pint.h"
+#include "fsl_inputmux.h"
 
-//#include <stdio.h>
-//#include "fsl_debug_console.h"  // this gives access to PRINTF for debugging
-
-#ifndef STEPPERS_H
-#define STEPPERS_H
+#include <stdio.h>
+#include "fsl_debug_console.h"  // this gives access to PRINTF for debugging
 
 // Definitions
 #define CTIMER0_X				CTIMER0
@@ -51,7 +59,25 @@
 #define STARTSTEPPERSTEPS1		(CTIMER1_CLK_FREQ / (STARTSTEPPERFREQ * 2))
 #define DIFFSTARTTOMAX0			STARTSTEPPERSTEPS0 - MAXSTEPPERSTEPS0
 #define DIFFSTARTTOMAX1			STARTSTEPPERSTEPS1 - MAXSTEPPERSTEPS1
+
+#define PINT_PIN_INT5_SRC			kINPUTMUX_GpioPort1Pin13ToPintsel // stepperX fault interrupt inputmux val
+#define PINT_PIN_INT6_SRC			kINPUTMUX_GpioPort1Pin7ToPintsel  // stepperY fault interrupt inputmux val
 // End Definitions
+
+// Enums
+#ifndef STEPPERMOTORPININFORMATIONARROFFSET
+#define STEPPERMOTORPININFORMATIONARROFFSET
+typedef enum {
+	PWMOUT = 0U,
+	DIRECITON,
+	ENABLE,
+	RESET,
+	SLEEP,
+	HOME,
+	FAULT
+} stepperMotorPinInformationArrayOffset;
+#endif
+// End Enums
 
 // Structs
 #ifndef PININFORMATION_S
@@ -86,7 +112,7 @@ typedef struct {
 #define STEPPERMOTOR_S
 typedef struct {
 	CTIMER_Type* timer_p;
-	pinInformation_s* pinInfo_p;
+	pinInformation_s* pinInfo_arr_p[7];
 	stepperMotorPhaseSteps_s* phaseSteps_p;
 	ctimer_callback_t matchCallback;	// function ** but only points to 1 functions. CTIMER_RegisterCallBack expects array (ie void**) because it can take multiple interrupts, but we want all to go to this function.
 	ctimer_match_t	output;
@@ -104,23 +130,29 @@ extern stepperMotor_s* stepperY_p;
 // End Extern Variables
 
 // Prototypes
-void initializeStepperOutputPins();					// setup stepper motor output pins as GPIO ouputs
-void writeStepperOutputPin(pinInformation_s* pInfo, bool highLow);
+void initializeStepperPins();					// setup stepper motor output pins as GPIO ouputs
+void initializeStepperMotors();					// must be called once before any ctimer interactions
 
-void initializeStepperMotors();											// must be called once before any ctimer interactions
 status_t setupStepperMotor(stepperMotor_s*, uint32_t);					// steps
 void driveStepperSteps(stepperMotor_s* motor_p, uint32_t steps);
 status_t moveSteps(stepperMotor_s* motor_p, int32_t steps);
 status_t moveTo(stepperMotor_s* motor_p, uint32_t target);
-status_t setMotorStepsPerPhase(stepperMotorPhaseSteps_s*, uint32_t);	// assigns step values to stepperMotorPhaseSteps pointer
 void startMotor(stepperMotor_s*);
 void stopMotor(stepperMotor_s*);
+
+status_t setMotorStepsPerPhase(stepperMotorPhaseSteps_s*, uint32_t);	// assigns step values to stepperMotorPhaseSteps pointer
 
 void setHome(stepperMotor_s* motor_p);
 
 void stepperXTimerCallback(uint32_t);				// flags
 void stepperYTimerCallback(uint32_t);				// flags
 void stepperGeneralTimerCallback(uint32_t, stepperMotor_s*);
+
+void stepperXFault(pint_pin_int_t pintr, uint32_t pmatch_status);
+void stepperYFault(pint_pin_int_t pintr, uint32_t pmatch_status);
+
+void STEPPERS_writeOutputPin(pinInformation_s*, bool);
+bool STEPPERS_readInputPin(pinInformation_s*);
 // End Prototypes
 
 #endif

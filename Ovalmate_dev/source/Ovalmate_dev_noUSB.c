@@ -22,6 +22,8 @@
  *	- 3/3/2022:
  *		Removed inputs in favor of singlular include witht helper funcs. Modified code for additional test data.
  *		Getting hard faults when using the SCT_H 16-bit high timer. Low timer works fine.
+ *	- 3/9/2022:
+ *		Modifed example code in main to test ctimer based stepper motor functions.
  */
 
 // MAIN INCLUDE

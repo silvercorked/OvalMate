@@ -9,6 +9,8 @@
  * Update History:
  *	- 2/28/2022
  *		Moved this into separate "modules"
+ *	- 3/7/2022:
+ *		Added definition safeguards around major declarations to avoid duplicate declarations and imports
  */
 
 #ifndef SEVENSEGMENT_H

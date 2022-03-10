@@ -9,7 +9,12 @@
  * Update History:
  *	- 3/3/2022:
  *		Added variables for assignable function callbacks for button interrupts
+ *	- 3/8/2022:
+ *		Added definition safeguards to avoid duplicate declarations
  */
+
+#ifndef BUTTONS_H
+#define BUTTONS_H
 
 // Includes
 #include "fsl_pint.h"
@@ -40,3 +45,5 @@ void bumpUpCallback(pint_pin_int_t pintr, uint32_t pmatch_status);
 void bumpDownCallback(pint_pin_int_t pintr, uint32_t pmatch_status);
 void assignPinsToInterrupts(void);
 // End Prototypes
+
+#endif

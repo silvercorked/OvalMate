@@ -43,7 +43,7 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
-BUILD_ARTIFACT_NAME := Ovalmate_dev_noUSB
+BUILD_ARTIFACT_NAME := Ovalmate_dev
 BUILD_ARTIFACT_EXTENSION := axf
 BUILD_ARTIFACT_PREFIX :=
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
@@ -55,24 +55,24 @@ all:
 	+@$(MAKE) --no-print-directory main-build && $(MAKE) --no-print-directory post-build
 
 # Main-build Target
-main-build: Ovalmate_dev_noUSB.axf
+main-build: Ovalmate_dev.axf
 
 # Tool invocations
-Ovalmate_dev_noUSB.axf: $(OBJS) $(USER_OBJS) makefile objects.mk $(OPTIONAL_TOOL_DEPS)
+Ovalmate_dev.axf: $(OBJS) $(USER_OBJS) makefile objects.mk $(OPTIONAL_TOOL_DEPS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: MCU Linker'
-	arm-none-eabi-gcc -nostdlib -Xlinker -Map="Ovalmate_dev_noUSB.map" -Xlinker --gc-sections -Xlinker -print-memory-usage -Xlinker --sort-section=alignment -Xlinker --cref -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -T Ovalmate_dev_noUSB_Debug.ld -o "Ovalmate_dev_noUSB.axf" $(OBJS) $(USER_OBJS) $(LIBS)
+	arm-none-eabi-gcc -nostdlib -Xlinker -Map="Ovalmate_dev.map" -Xlinker --gc-sections -Xlinker -print-memory-usage -Xlinker --sort-section=alignment -Xlinker --cref -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -T Ovalmate_dev_noUSB_Debug.ld -o "Ovalmate_dev.axf" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(EXECUTABLES)$(OBJS)$(C_DEPS) Ovalmate_dev_noUSB.axf
+	-$(RM) $(EXECUTABLES)$(OBJS)$(C_DEPS) Ovalmate_dev.axf
 	-@echo ' '
 
 post-build:
 	-@echo 'Performing post-build steps'
-	-arm-none-eabi-size "Ovalmate_dev_noUSB.axf"; # arm-none-eabi-objcopy -v -O binary "Ovalmate_dev_noUSB.axf" "Ovalmate_dev_noUSB.bin" ; # checksum -p LPC55S16 -d "Ovalmate_dev_noUSB.bin";
+	-arm-none-eabi-size "Ovalmate_dev.axf"; # arm-none-eabi-objcopy -v -O binary "Ovalmate_dev.axf" "Ovalmate_dev.bin" ; # checksum -p LPC55S16 -d "Ovalmate_dev.bin";
 	-@echo ' '
 
 .PHONY: all clean dependents post-build

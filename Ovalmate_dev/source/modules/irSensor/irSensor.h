@@ -9,7 +9,14 @@
  * Update History:
  *	- 2/28/2022
  *		Moved this into separate "modules"
+ *	- 3/7/2022:
+ *		Changed ADC pin. ADC0_8 is the negative side of channel 0 of the ADC. It won't work, but it's positive terminal can.
+ *	- 3/8/2022:
+ *		Added definition safeguards to avoid extra imports or duplicate declarations
  */
+
+#ifndef IRSENSOR_H
+#define IRSENSOR_H
 
 // Includes
 #include "fsl_lpadc.h"
@@ -38,3 +45,5 @@ extern lpadc_conv_result_t mLpadcResultConfigStruct;
 int getADCValue(void);
 void initializeADC(void);
 // End Prototypes
+
+#endif

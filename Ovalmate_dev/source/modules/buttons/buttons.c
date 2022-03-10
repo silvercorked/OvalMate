@@ -33,29 +33,32 @@ void assignPinsToInterrupts() {
 	//PRINTF("\f\r\nPINT Pin interrupt example\r\n");
 
 	/* Initialize PINT */
+	#ifndef PINTINITIALIZED
+	#define	PINTINITIALIZED
 	PINT_Init(PINT);
+	#endif
 
 	/* Setup Pin Interrupt 0 for rising edge */
 	PINT_PinInterruptConfig(PINT, kPINT_PinInt0, kPINT_PinIntEnableRiseEdge, buttonEmergencyCallback);
 	/* Enable callbacks for PINT0 by Index */
 	PINT_EnableCallbackByIndex(PINT, kPINT_PinInt0);
 
-	/* Setup Pin Interrupt 1 for falling edge */
+	/* Setup Pin Interrupt 1 for rising edge */
 	PINT_PinInterruptConfig(PINT, kPINT_PinInt1, kPINT_PinIntEnableRiseEdge, bumpRightCallback);
 	/* Enable callbacks for PINT1 by Index */
 	PINT_EnableCallbackByIndex(PINT, kPINT_PinInt1);
 
-	/* Setup Pin Interrupt 2 for falling edge */
+	/* Setup Pin Interrupt 2 for rising edge */
 	PINT_PinInterruptConfig(PINT, kPINT_PinInt2, kPINT_PinIntEnableRiseEdge, bumpLeftCallback);
 	/* Enable callbacks for PINT2 by Index */
 	PINT_EnableCallbackByIndex(PINT, kPINT_PinInt2);
 
-	/* Setup Pin Interrupt 3 for falling edge */
+	/* Setup Pin Interrupt 3 for rising edge */
 	PINT_PinInterruptConfig(PINT, kPINT_PinInt3, kPINT_PinIntEnableRiseEdge, bumpDownCallback);
 	/* Enable callbacks for PINT3 by Index */
 	PINT_EnableCallbackByIndex(PINT, kPINT_PinInt3);
 
-	/* Setup Pin Interrupt 4 for falling edge */
+	/* Setup Pin Interrupt 4 for rising edge */
 	PINT_PinInterruptConfig(PINT, kPINT_PinInt4, kPINT_PinIntEnableRiseEdge, bumpUpCallback);
 	/* Enable callbacks for PINT4 by Index */
 	PINT_EnableCallbackByIndex(PINT, kPINT_PinInt4);

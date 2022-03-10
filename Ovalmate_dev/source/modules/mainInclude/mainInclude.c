@@ -9,6 +9,11 @@
  * Update History:
  *	- 3/3/2022:
  *		Setup basic configuration and created several helper functions that combine behaviors from different modules
+ *	- 3/6/2022:
+ *		Removed some helper functions as systems are changing soon. These extra functions require functions that may not be defined
+ *		once changes go through. Commenting out for now
+ *	-3/8/2022:
+ *		Moved initialization of all components into the "configure" function of mainInclude.
  */
 
 #include "mainInclude.h"
@@ -19,7 +24,7 @@ status_t configure() {
 	initialize7SegLegs();
 	assignPinsToInterrupts();
 	initializeADC();
-	initializeStepperOutputPins();
+	initializeStepperPins();
 	initializeStepperMotors();
 	initializeServoPWM();
 

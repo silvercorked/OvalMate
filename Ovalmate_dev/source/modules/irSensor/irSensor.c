@@ -9,6 +9,8 @@
  * Update History:
  *	- 2/28/2022
  *		Moved this into separate "modules"
+ *	- 3/9/2022:
+ *		Removed while loop and commented out code from SDK example
  */
 
 #include "irSensor.h"
@@ -39,22 +41,15 @@ int getADCValue() {
 	}
 	#endif
 
-	//PRINTF("Please press any key to get user channel's ADC value.\r\n");
-	while (1)
-	{
-		//GETCHAR(); // these are commented as we don't use this functionality anymore
-		LPADC_DoSoftwareTrigger(LPADC_BASE, 1U); /* 1U is trigger0 mask. */
-		#if (defined(FSL_FEATURE_LPADC_FIFO_COUNT) && (FSL_FEATURE_LPADC_FIFO_COUNT == 2U))
-		while (!LPADC_GetConvResult(LPADC_BASE, &mLpadcResultConfigStruct, 0U))
-		#else
-		while (!LPADC_GetConvResult(LPADC_BASE, &mLpadcResultConfigStruct))
-		#endif /* FSL_FEATURE_LPADC_FIFO_COUNT */
-		{
-		}
+	LPADC_DoSoftwareTrigger(LPADC_BASE, 1U); /* 1U is trigger0 mask. */
+	#if (defined(FSL_FEATURE_LPADC_FIFO_COUNT) && (FSL_FEATURE_LPADC_FIFO_COUNT == 2U))
+	while (!LPADC_GetConvResult(LPADC_BASE, &mLpadcResultConfigStruct, 0U));
+	#else
+	while (!LPADC_GetConvResult(LPADC_BASE, &mLpadcResultConfigStruct));
+	#endif /* FSL_FEATURE_LPADC_FIFO_COUNT */
 
-		//PRINTF("ADC value: %d\r\n", ((mLpadcResultConfigStruct.convValue) >> g_LpadcResultShift));
-		return ((mLpadcResultConfigStruct.convValue) >> g_LpadcResultShift);
-	}
+	//PRINTF("ADC value: %d\r\n", ((mLpadcResultConfigStruct.convValue) >> g_LpadcResultShift));
+	return ((mLpadcResultConfigStruct.convValue) >> g_LpadcResultShift);
 }
 
 void initializeADC() {
