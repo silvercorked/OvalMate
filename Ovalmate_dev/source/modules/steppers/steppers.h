@@ -51,7 +51,7 @@
 // CLOCK_GetCTimerClkFreq(0U) should get CTIMER0's clock freq, but reports PLL0 is outputting 0Hz
 // manually setting clock freq of 12MHz
 
-#define MAXSTEPPERFREQ			3000U
+#define MAXSTEPPERFREQ			8000U
 #define STARTSTEPPERFREQ		1000U
 #define MAXSTEPPERSTEPS0		(CTIMER0_CLK_FREQ / (MAXSTEPPERFREQ * 2))	//  4000 steps
 #define STARTSTEPPERSTEPS0		(CTIMER0_CLK_FREQ / (STARTSTEPPERFREQ * 2))	// 12000 steps

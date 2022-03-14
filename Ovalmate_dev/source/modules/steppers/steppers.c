@@ -165,6 +165,9 @@ void initializeStepperMotors() {
 	CTIMER_GetDefaultConfig(&config);		// different from MatchConfig
 	CTIMER_Init(CTIMER0_X, &config);		// this config handles timer setup
 	CTIMER_Init(CTIMER1_Y, &config);
+
+	STEPPERS_writeOutputPin(stepperX_p->pinInfo_arr_p[ENABLE], 0U);
+	STEPPERS_writeOutputPin(stepperX_p->pinInfo_arr_p[ENABLE], 0U);
 }
 
 status_t setupStepperMotor(stepperMotor_s* motor_p, uint32_t steps) {
@@ -195,10 +198,12 @@ status_t moveSteps(stepperMotor_s* motor_p, int32_t steps) { // move step amount
 		return kStatus_Fail;
 	if (steps > 0)
 		motor_p->direction = true;
-	else
+	else {
+		steps *= -1;	// swap so steps is always a positive number before passing as int
 		motor_p->direction = false;	// if negative, dir = false
+	}
 	STEPPERS_writeOutputPin(motor_p->pinInfo_arr_p[DIRECITON], motor_p->direction);
-	driveStepperSteps(motor_p, steps);
+	driveStepperSteps(motor_p, (int32_t) steps);
 	return kStatus_Success;
 }
 
@@ -213,9 +218,9 @@ status_t setMotorStepsPerPhase(stepperMotorPhaseSteps_s* phaseSteps_p, uint32_t 
 	phaseSteps_p->steady = 0;
 	phaseSteps_p->slowing = 0;
 	phaseSteps_p->startSpeed = 0;	// clear phaseSteps
-	if (steps <= 100)
+	if (steps <= 3200)	// one full revolution
 		phaseSteps_p->startSpeed = steps;	// all steps are no accel at start speed
-	else if (steps <= 3200) { // one full revolution
+	else if (steps <= 9600) { // 3 full revolutions
 		phaseSteps_p->accelerating = steps / 4;					// 1/4 accel
 		phaseSteps_p->slowing = phaseSteps_p->accelerating;		// 1/4 decel
 		steps -= phaseSteps_p->accelerating << 1;				// left shift once == multiply by 2 in 1 clock

@@ -40,7 +40,7 @@ void initializeServoPWM() {
 }
 
 void setupServoPWM() {
-    /* Get the PWM period match value and pulse width match value of 20Khz PWM signal with 20% dutycycle */
+    /* Get the PWM period match value and pulse width match value of 50hz PWM signal with 18% dutycycle */
     CTIMER_getPWMPeriodValue(SERVOFREQUENCYPWM, PENUP, ctimer_timerClock);
     CTIMER_SetupPwmPeriod(CTIMER, CTIMER_MAT_PWM_PERIOD_CHANNEL, CTIMER_MAT_OUT, g_pwmPeriod, g_pulsePeriod, false);
     //PRINTF("\n starting servo pwm with period channel %d, output channel %d, period %d, pulsePeriod %d"
