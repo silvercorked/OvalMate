@@ -12,6 +12,8 @@
  *		Setup servo to be driven by a ctimer directly.
  *	- 3/9/2022:
  *		Added definition safeguards to avoid duplicate declarations
+ *	- 3/13/2022:
+ *		Set proper values for servo movement.
  */
 
 #ifndef SERVO_H
@@ -27,8 +29,9 @@
 #define CTIMER_MAT_OUT  kCTIMER_Match_2 /* Match output 2 */
 #define CTIMER_CLK_FREQ CLOCK_GetCTimerClkFreq(3U) // 3U for clock 3
 							// 1MHz => 50Hz = 20000 counts => 20ms
-#define PENDOWN			10U	// 20% duty cycle = 2ms pulse = 90 degree
-#define PENUP			7U	// 14% duty cylce = 1.5ms pulse = 0 degree
+							// 20% duty cycle = 2ms pulse = 90 degree
+#define PENUP			9U	// 18% duty cycle = 1.8ms pulse = 54 degree
+#define PENDOWN			7U	// 14% duty cycle = 1.4ms pulse = -9 degree
 							// 10% duty cycle = 1ms pulse = -90 degree
 							// https://content.instructables.com/ORIG/FA2/O1SS/J7ARLNBW/FA2O1SSJ7ARLNBW.pdf
 #define SERVOFREQUENCYPWM 50U

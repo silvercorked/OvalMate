@@ -71,10 +71,10 @@ int main(void) {
 	startServoPWM();
 
 	while (1) {
-		setHome(stepperX_p);
-		setHome(stepperY_p);
-		moveTo(stepperX_p, 40000);
-		moveTo(stepperY_p, 50000);
+		STEPPERS_setHome(stepperX_p);
+		STEPPERS_setHome(stepperY_p);
+		STEPPERS_moveTo(stepperX_p, 40000);
+		STEPPERS_moveTo(stepperY_p, 50000);
 		while (stepperX_p->status.running || stepperY_p->status.running);
 		delay();
 		delay();

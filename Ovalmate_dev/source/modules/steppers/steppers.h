@@ -25,6 +25,9 @@
  *	- 3/9/2022:
  *		Went to lab to confirm and finalize stepper motor behavior. Acceleration looks good and moveTo and moveSteps are really useful from a
  *		coordinate perspective.
+ *	- 3/13/2022:
+ *		Testing at ES&S suggest max speed for these motors to be around 5 MHz, which is absurd. Upping max speed to 8KHz from 3KHz
+ *		Swapped function names to be more acceptable of a module approach
  */
 
 #ifndef STEPPERS_H
@@ -69,7 +72,7 @@
 #define STEPPERMOTORPININFORMATIONARROFFSET
 typedef enum {
 	PWMOUT = 0U,
-	DIRECITON,
+	DIRECTION,
 	ENABLE,
 	RESET,
 	SLEEP,
@@ -130,29 +133,35 @@ extern stepperMotor_s* stepperY_p;
 // End Extern Variables
 
 // Prototypes
-void initializeStepperPins();					// setup stepper motor output pins as GPIO ouputs
-void initializeStepperMotors();					// must be called once before any ctimer interactions
+void STEPPERS_initializePins();					// setup stepper motor output pins as GPIO ouputs
+void STEPPERS_initializeMotors();					// must be called once before any ctimer interactions
 
-status_t setupStepperMotor(stepperMotor_s*, uint32_t);					// steps
-void driveStepperSteps(stepperMotor_s* motor_p, uint32_t steps);
-status_t moveSteps(stepperMotor_s* motor_p, int32_t steps);
-status_t moveTo(stepperMotor_s* motor_p, uint32_t target);
-void startMotor(stepperMotor_s*);
-void stopMotor(stepperMotor_s*);
+status_t STEPPERS_setupMotor(stepperMotor_s*, uint32_t);					// steps
+void STEPPERS_driveSteps(stepperMotor_s* motor_p, uint32_t steps);
+status_t STEPPERS_moveRelative(stepperMotor_s* motor_p, int32_t steps);
+status_t STEPPERS_moveTo(stepperMotor_s* motor_p, uint32_t target);
+void STEPPERS_startMotor(stepperMotor_s*);
+void STEPPERS_stopMotor(stepperMotor_s*);
 
-status_t setMotorStepsPerPhase(stepperMotorPhaseSteps_s*, uint32_t);	// assigns step values to stepperMotorPhaseSteps pointer
+status_t STEPPERS_setMotorStepsPerPhase(stepperMotorPhaseSteps_s*, uint32_t);	// assigns step values to stepperMotorPhaseSteps pointer
 
-void setHome(stepperMotor_s* motor_p);
+void STEPPERS_setHome(stepperMotor_s* motor_p);
 
-void stepperXTimerCallback(uint32_t);				// flags
-void stepperYTimerCallback(uint32_t);				// flags
-void stepperGeneralTimerCallback(uint32_t, stepperMotor_s*);
+void STEPPERS_XTimerCallback(uint32_t);				// flags
+void STEPPERS_YTimerCallback(uint32_t);				// flags
+void STEPPERS_generalTimerCallback(uint32_t, stepperMotor_s*);
 
-void stepperXFault(pint_pin_int_t pintr, uint32_t pmatch_status);
-void stepperYFault(pint_pin_int_t pintr, uint32_t pmatch_status);
+void STEPPERS_XFault(pint_pin_int_t pintr, uint32_t pmatch_status);
+void STEPPERS_YFault(pint_pin_int_t pintr, uint32_t pmatch_status);
 
 void STEPPERS_writeOutputPin(pinInformation_s*, bool);
 bool STEPPERS_readInputPin(pinInformation_s*);
+
+void STEPPERS_writeDirectionPin(stepperMotor_s*, bool);
+void STEPPERS_writeEnablePin(stepperMotor_s*, bool);
+void STEPPERS_writeResetPin(stepperMotor_s*, bool);
+void STEPPERS_writeSleepPin(stepperMotor_s*, bool);
+bool STEPPERS_readHomePin(stepperMotor_s*);
 // End Prototypes
 
 #endif

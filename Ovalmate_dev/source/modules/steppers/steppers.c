@@ -21,8 +21,14 @@
  *		coordinate perspective.
  *		Added in additional pins: direction, home, fault, enable, reset, and sleep for both motors. Changed pin writing function
  *		Added new pins to pin initialization function. Added fault pins as pin interrupts 5 and 6.
- *		Set direction GPIO in moveSteps function. Chanded pinInfo_p member on stepperMotor_s to pinInfo_arr_p
+ *		Set direction GPIO in moveSteps function. Changed pinInfo_p member on stepperMotor_s to pinInfo_arr_p
  *		which holds an array of 7 pinInformation_s pointers
+ *	- 3/13/2022:
+ *		Fixed bug in relative move. Negative steps were pass incorrectly to further functions.
+ *		Setup enable pins to active motor controller from microcontroller.
+ *		Increased limit for no acceleration mode to a full revolution at 3200 steps.
+ *		Added functions for setting pins.
+ *		Swapped function names to be more acceptable of a module approach.
  */
 
 #include "steppers.h"
@@ -69,7 +75,7 @@ stepperMotor_s stepperX = {
 		&stepperX_fault					// FAULT
 	},
 	.phaseSteps_p = &stepperX_phaseSteps,
-	.matchCallback = stepperXTimerCallback,
+	.matchCallback = STEPPERS_XTimerCallback,
 	.output = CTIMER0_MATCH0_CHANNEL,
 	.matchConfig = { },
 	.status = { }, // defaults are false
@@ -88,7 +94,7 @@ stepperMotor_s stepperY = {
 		&stepperY_fault					// FAULT
 	},
 	.phaseSteps_p = &stepperY_phaseSteps,
-	.matchCallback = stepperYTimerCallback,
+	.matchCallback = STEPPERS_YTimerCallback,
 	.output = CTIMER1_MATCH0_CHANNEL,
 	.matchConfig = { },
 	.status = { }
@@ -100,7 +106,7 @@ stepperMotor_s* stepperY_p = &stepperY;
 // End Variables
 
 // Functions
-void initializeStepperPins() {
+void STEPPERS_initializePins() {
 	gpio_pin_config_t gpioOUTConfigLOW = {
 		.pinDirection = kGPIO_DigitalOutput,
 		.outputLogic = 0
@@ -150,17 +156,17 @@ void initializeStepperPins() {
 	#endif
 
 	/* Setup Pin Interrupt 5 for falling edge */
-	PINT_PinInterruptConfig(PINT, kPINT_PinInt5, kPINT_PinIntEnableFallEdge, stepperXFault);
+	PINT_PinInterruptConfig(PINT, kPINT_PinInt5, kPINT_PinIntEnableFallEdge, STEPPERS_XFault);
 	/* Enable callbacks for PINT5 by Index */
 	PINT_EnableCallbackByIndex(PINT, kPINT_PinInt5);
 
 	/* Setup Pin Interrupt 6 for falling edge */
-	PINT_PinInterruptConfig(PINT, kPINT_PinInt6, kPINT_PinIntEnableFallEdge, stepperYFault);
+	PINT_PinInterruptConfig(PINT, kPINT_PinInt6, kPINT_PinIntEnableFallEdge, STEPPERS_YFault);
 	/* Enable callbacks for PINT6 by Index */
 	PINT_EnableCallbackByIndex(PINT, kPINT_PinInt6);
 }
 
-void initializeStepperMotors() {
+void STEPPERS_initializeMotors() {
 	ctimer_config_t config;					// can set prescale if need be (we don't need it for these ranges
 	CTIMER_GetDefaultConfig(&config);		// different from MatchConfig
 	CTIMER_Init(CTIMER0_X, &config);		// this config handles timer setup
@@ -170,7 +176,7 @@ void initializeStepperMotors() {
 	STEPPERS_writeOutputPin(stepperX_p->pinInfo_arr_p[ENABLE], 0U);
 }
 
-status_t setupStepperMotor(stepperMotor_s* motor_p, uint32_t steps) {
+status_t STEPPERS_setupMotor(stepperMotor_s* motor_p, uint32_t steps) {
 	motor_p->matchConfig.enableCounterReset = true;					// reload timer when on match
 	motor_p->matchConfig.enableCounterStop  = false;					// don't stop timer on match
 	if (motor_p == stepperX_p)										// these are the same currently, but might as well check
@@ -184,16 +190,16 @@ status_t setupStepperMotor(stepperMotor_s* motor_p, uint32_t steps) {
 	CTIMER_RegisterCallBack(motor_p->timer_p, &(motor_p->matchCallback), kCTIMER_SingleCallback);
 	CTIMER_SetupMatch(motor_p->timer_p, motor_p->output, &(motor_p->matchConfig));
 
-	setMotorStepsPerPhase(motor_p->phaseSteps_p, steps);	// presets all info about journey
+	STEPPERS_setMotorStepsPerPhase(motor_p->phaseSteps_p, steps);	// presets all info about journey
 	return kStatus_Success;
 }
 
-void driveStepperSteps(stepperMotor_s* motor_p, uint32_t steps) { // doesn't set direciton. moves in current direction
-	setupStepperMotor(motor_p, steps);
-	startMotor(motor_p);
+void STEPPERS_driveSteps(stepperMotor_s* motor_p, uint32_t steps) { // doesn't set direciton. moves in current direction
+	STEPPERS_setupMotor(motor_p, steps);
+	STEPPERS_startMotor(motor_p);
 }
 
-status_t moveSteps(stepperMotor_s* motor_p, int32_t steps) { // move step amount relative to position
+status_t STEPPERS_moveRelative(stepperMotor_s* motor_p, int32_t steps) { // move step amount relative to position
 	if (steps == 0)
 		return kStatus_Fail;
 	if (steps > 0)
@@ -202,17 +208,17 @@ status_t moveSteps(stepperMotor_s* motor_p, int32_t steps) { // move step amount
 		steps *= -1;	// swap so steps is always a positive number before passing as int
 		motor_p->direction = false;	// if negative, dir = false
 	}
-	STEPPERS_writeOutputPin(motor_p->pinInfo_arr_p[DIRECITON], motor_p->direction);
-	driveStepperSteps(motor_p, (int32_t) steps);
+	STEPPERS_writeOutputPin(motor_p->pinInfo_arr_p[DIRECTION], motor_p->direction);
+	STEPPERS_driveSteps(motor_p, (uint32_t) steps);
 	return kStatus_Success;
 }
 
-status_t moveTo(stepperMotor_s* motor_p, uint32_t target) {
+status_t STEPPERS_moveTo(stepperMotor_s* motor_p, uint32_t target) {
 	int32_t relativeSteps = target - motor_p->position;
-	return moveSteps(motor_p, relativeSteps);
+	return STEPPERS_moveRelative(motor_p, relativeSteps);
 }
 
-status_t setMotorStepsPerPhase(stepperMotorPhaseSteps_s* phaseSteps_p, uint32_t steps) {
+status_t STEPPERS_setMotorStepsPerPhase(stepperMotorPhaseSteps_s* phaseSteps_p, uint32_t steps) {
 	phaseSteps_p->accelValue = 0.0f;
 	phaseSteps_p->accelerating = 0;
 	phaseSteps_p->steady = 0;
@@ -239,9 +245,7 @@ status_t setMotorStepsPerPhase(stepperMotorPhaseSteps_s* phaseSteps_p, uint32_t 
 	return kStatus_Success;
 }
 
-
-
-void startMotor(stepperMotor_s* motor_p) {
+void STEPPERS_startMotor(stepperMotor_s* motor_p) {
 	if (motor_p->phaseSteps_p->accelerating != 0)	// all drives must start with accel or startSpeed.
 		motor_p->status.accelerating = true;		// if accel steps assigned, then start on accel
 	else											// otherwise start startSpeed, if error, then
@@ -249,7 +253,7 @@ void startMotor(stepperMotor_s* motor_p) {
 	CTIMER_StartTimer(motor_p->timer_p);
 	motor_p->status.running = true;
 }
-void stopMotor(stepperMotor_s* motor_p) {
+void STEPPERS_stopMotor(stepperMotor_s* motor_p) {
 	CTIMER_StopTimer(motor_p->timer_p);
 	motor_p->status.running = false;
 	motor_p->status.startSpeed = false;
@@ -258,22 +262,22 @@ void stopMotor(stepperMotor_s* motor_p) {
 	motor_p->status.slowing = false;
 }
 
-void setHome(stepperMotor_s* motor_p) {
+void STEPPERS_setHome(stepperMotor_s* motor_p) {
 	motor_p->position = 0;
 }
 
-void stepperXTimerCallback(uint32_t flags) {
+void STEPPERS_XTimerCallback(uint32_t flags) {
 	static bool periodOffsetX = false; // need to skip 1 interrupt per 2 to make pwm
 	if (periodOffsetX)
-		stepperGeneralTimerCallback(flags, stepperX_p);
+		STEPPERS_generalTimerCallback(flags, stepperX_p);
 	else
 		STEPPERS_writeOutputPin(stepperX_p->pinInfo_arr_p[PWMOUT], 1U); // write high
 	periodOffsetX = !periodOffsetX;
 }
-void stepperYTimerCallback(uint32_t flags) {
+void STEPPERS_YTimerCallback(uint32_t flags) {
 	static bool periodOffsetY = false; // need to skip 1 interrupt per 2 to make pwm
 	if (periodOffsetY)
-		stepperGeneralTimerCallback(flags, stepperY_p);
+		STEPPERS_generalTimerCallback(flags, stepperY_p);
 	else
 		STEPPERS_writeOutputPin(stepperY_p->pinInfo_arr_p[PWMOUT], 1U); // write high
 	periodOffsetY = !periodOffsetY;
@@ -282,7 +286,7 @@ void stepperYTimerCallback(uint32_t flags) {
  * designed with 2 modes in mind, either staying to one freq or
  * following a pattern of accelerating (+ velocity), sitting at max speed, and accelerating (- velocity)
  */
-void stepperGeneralTimerCallback(uint32_t flags, stepperMotor_s* motor_p) {
+void STEPPERS_generalTimerCallback(uint32_t flags, stepperMotor_s* motor_p) {
 	// handle based on bools, send output, update bools
 	//static uint32_t count = 0;
 	//count++;
@@ -305,7 +309,7 @@ void stepperGeneralTimerCallback(uint32_t flags, stepperMotor_s* motor_p) {
 			else if (motor_p->phaseSteps_p->slowing != 0)
 				motor_p->status.slowing = true;
 			else
-				stopMotor(motor_p);
+				STEPPERS_stopMotor(motor_p);
 		}
 		CTIMER_SetupMatch(motor_p->timer_p, motor_p->output, &(motor_p->matchConfig));
 	}
@@ -317,7 +321,7 @@ void stepperGeneralTimerCallback(uint32_t flags, stepperMotor_s* motor_p) {
 			if (motor_p->phaseSteps_p->slowing != 0)
 				motor_p->status.slowing = true;
 			else
-				stopMotor(motor_p);
+				STEPPERS_stopMotor(motor_p);
 		}
 	}
 	else if (motor_p->status.slowing) {
@@ -330,7 +334,7 @@ void stepperGeneralTimerCallback(uint32_t flags, stepperMotor_s* motor_p) {
 		}
 		if (motor_p->phaseSteps_p->slowing == 0) {
 			motor_p->status.slowing = false;
-			stopMotor(motor_p);
+			STEPPERS_stopMotor(motor_p);
 			//PRINTF("step Count : %d", count);
 			//count = 0;
 		}
@@ -341,24 +345,23 @@ void stepperGeneralTimerCallback(uint32_t flags, stepperMotor_s* motor_p) {
 		motor_p->phaseSteps_p->startSpeed--;
 		if (motor_p->phaseSteps_p->startSpeed == 0) {
 			motor_p->status.startSpeed = false;
-			stopMotor(motor_p);
+			STEPPERS_stopMotor(motor_p);
 		}
 	}
-	else {
-		stopMotor(motor_p); // failsafe. If somehow the bools get messed up and one of them isn't one, stop motor
-	}
+	else
+		STEPPERS_stopMotor(motor_p); // failsafe. If somehow the bools get messed up and one of them isn't one, stop motor
 	STEPPERS_writeOutputPin(motor_p->pinInfo_arr_p[PWMOUT], 0U); // clear
 	// clearing here means our PWM period starts with a cleared pulse and then a set pulse. This guarentees the motors always clear when done.
 }
 
-void stepperXFault(pint_pin_int_t pintr, uint32_t pmatch_status) {
+void STEPPERS_XFault(pint_pin_int_t pintr, uint32_t pmatch_status) {
 	PRINTF("\r\n motor fault on stepper X detected!!! stopping motor...");
-	stopMotor(stepperX_p);
+	STEPPERS_stopMotor(stepperX_p);
 }
 
-void stepperYFault(pint_pin_int_t pintr, uint32_t pmatch_status) {
+void STEPPERS_YFault(pint_pin_int_t pintr, uint32_t pmatch_status) {
 	PRINTF("\r\n motor fault on stepper Y detected!!! stopping motor...");
-	stopMotor(stepperY_p);
+	STEPPERS_stopMotor(stepperY_p);
 }
 
 void STEPPERS_writeOutputPin(pinInformation_s* pinInfo_p, bool highLow) {
@@ -366,6 +369,21 @@ void STEPPERS_writeOutputPin(pinInformation_s* pinInfo_p, bool highLow) {
 }
 bool STEPPERS_readInputPin(pinInformation_s* pinInfo_p) {
 	return GPIO_PinRead(GPIO, pinInfo_p->port, pinInfo_p->pin);
+}
+void STEPPERS_writeDirectionPin(stepperMotor_s* motor_p, bool highLow) {
+	STEPPERS_writeOutputPin(motor_p->pinInfo_arr_p[DIRECTION], highLow);
+}
+void STEPPERS_writeEnablePin(stepperMotor_s* motor_p, bool highLow) {
+	STEPPERS_writeOutputPin(motor_p->pinInfo_arr_p[ENABLE], highLow);
+}
+void STEPPERS_writeResetPin(stepperMotor_s* motor_p, bool highLow) {
+	STEPPERS_writeOutputPin(motor_p->pinInfo_arr_p[RESET], highLow);
+}
+void STEPPERS_writeSleepPin(stepperMotor_s* motor_p, bool highLow) {
+	STEPPERS_writeOutputPin(motor_p->pinInfo_arr_p[SLEEP], highLow);
+}
+bool STEPPERS_readHomePin(stepperMotor_s* motor_p) {
+	return STEPPERS_readInputPin(motor_p->pinInfo_arr_p[HOME]);
 }
 
 // End Functions
