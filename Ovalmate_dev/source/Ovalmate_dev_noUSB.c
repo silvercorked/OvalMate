@@ -24,6 +24,8 @@
  *		Getting hard faults when using the SCT_H 16-bit high timer. Low timer works fine.
  *	- 3/9/2022:
  *		Modifed example code in main to test ctimer based stepper motor functions.
+ *	- 3/14/2022:
+ *		Added findHome and drawOval functions. Will likely move them into other files later.
  */
 
 // MAIN INCLUDE
@@ -62,12 +64,13 @@ void findHome(void) {
 	}
 }
 
-//uint32_t ovalCurveEquation(uint32_t x) {
-//	double lx = ((double) x) / 1000000.0lf;
-//	return -1500000 * (lx * lx) + 1500000; // -1.5 x^2 + 1.5 == equation of 1 half of oval as parabola. Equation in code converted to take nanometers rather than millimeters
-//}
-
-// ballistic behavior. Presumes at center of oval
+/** ballistic behavior. Presumes at center of oval
+ * Oval is 3mm x 2mm (width x height). To avoid loss from floating point precision, convert to nanometers and divide oval in half.
+ * Half oval = 1.5mm x 1mm = 1500000nm x 1000000nm. Steppers w/ microstepping at 16 = 0.01143mm = 11430nm per step.
+ * Half oval = parabola. Rotate 90 degrees for concave downward parabola. Region defined by y > 0 and parabola need to be shaded.
+ * width of pen mark + bleed of pen ~= 0.25mm. 1.5mm x 1mm => 263 steps x 175 steps, so 4 lines across width of oval and mirrored on negative side => filled
+ * On parabola, equation in mm is y = -1.5 * (x^2) + 1.5. In nm, -1500000 ((x / 1000000)^2) + 1500000.
+ */
 void drawOval() {
 	uint32_t ovalLineDistance = 15000U;			// distance between lines		(nm)
 	uint32_t ovalLineStartDistance = 5000U;		// distance from top of oval	(nm)
@@ -94,13 +97,13 @@ void drawOval() {
 		while (stepperX_p->status.running && stepperY_p->status.running);
 
 		// in position
-		updateServoPWMDutyCycle(PENDOWN);
+		SERVO_setPenMode(PENDOWN);
 		delay();
 		uint32_t lineSteps = nanometersToSteps(y << 1);
 		STEPPERS_moveRelativeNoAccel(stepperX_p, lineSteps); // y * 2 == line width
 		while(stepperX_p->status.running);
 		currY = -y;
-		updateServoPWMDutyCycle(PENUP);
+		SERVO_setPenMode(PENUP);
 		delay();
 		k--;
 		PRINTF("\r\n line drawn 1,"
@@ -150,13 +153,13 @@ void drawOval() {
 		while (stepperX_p->status.running && stepperY_p->status.running);
 
 		// in position
-		updateServoPWMDutyCycle(PENDOWN);
+		SERVO_setPenMode(PENDOWN);
 		delay();
 		uint32_t lineSteps = nanometersToSteps(y << 1);
 		STEPPERS_moveRelativeNoAccel(stepperX_p, lineSteps); // y * 2 == line width
 		while(stepperX_p->status.running);
 		currY = -y;
-		updateServoPWMDutyCycle(PENUP);
+		SERVO_setPenMode(PENUP);
 		delay();
 		k++;
 		PRINTF("\r\n line drawn 2,"
@@ -241,8 +244,8 @@ int main(void) {
 	//startStepperPWM(motorY.timer);
 
 	// drive servo to default position
-	setupServoPWM();
-	startServoPWM();
+	SERVO_setupPWM();
+	SERVO_startPWM();
 
 	STEPPERS_moveRelativeAccel(stepperX_p, 10000);
 	while (stepperX_p->status.running);

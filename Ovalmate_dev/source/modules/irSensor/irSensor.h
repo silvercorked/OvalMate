@@ -13,6 +13,8 @@
  *		Changed ADC pin. ADC0_8 is the negative side of channel 0 of the ADC. It won't work, but it's positive terminal can.
  *	- 3/8/2022:
  *		Added definition safeguards to avoid extra imports or duplicate declarations
+ *	- 3/14/2022:
+ *		Reformatted function names to better fit with modular approach
  */
 
 #ifndef IRSENSOR_H
@@ -42,8 +44,8 @@ extern lpadc_conv_result_t mLpadcResultConfigStruct;
 // End Extern Variables
 
 // Prototypes
-int getADCValue(void);
-void initializeADC(void);
+int IRSENSOR_getADCValue(void);
+void IRSENSOR_initializeADC(void);
 // End Prototypes
 
 #endif

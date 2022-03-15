@@ -12,8 +12,12 @@
  *	- 3/6/2022:
  *		Removed some helper functions as systems are changing soon. These extra functions require functions that may not be defined
  *		once changes go through. Commenting out for now
- *	-3/8/2022:
+ *	- 3/8/2022:
  *		Moved initialization of all components into the "configure" function of mainInclude.
+ *	- 3/14/2022:
+ *		Moved PINT_Init outside of buttons.c assignPinsToInterrupts and STEPPERS_initializePins as they both try to set it, but they overwrite if PINT_Init is called twice
+ *		Added new button callback to stop relevant motor rather than all motors. This can be used when finding home without killing the motor that has yet to find the wall
+ *		Added two variables to check if the interrupt was the cause of the motor stopping. Should find a better way to do this, as it isn't very intuitive or clean.
  */
 
 #include "mainInclude.h"
@@ -30,12 +34,12 @@ status_t configure() {
 	PINT_Init(PINT); // need pin interrupts but can only init this once without overwritting
 	// buttons.c and steppers.c need this
 
-	initialize7SegLegs();
-	assignPinsToInterrupts();
-	initializeADC();
+	SEVENSEG_initializeLegs();
+	BUTTONS_assignPinsToInterrupts();
+	IRSENSOR_initializeADC();
 	STEPPERS_initializePins();
 	STEPPERS_initializeMotors();
-	initializeServoPWM();
+	SERVO_initializePWM();
 
 	emergencyBumpCallback = buttonCallback_stopRelaventMotor;
 	rightBumpCallback = buttonCallback_stopRelaventMotor;

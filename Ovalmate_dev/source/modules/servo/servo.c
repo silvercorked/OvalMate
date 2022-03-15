@@ -23,7 +23,7 @@ uint32_t ctimer_srcClock_Hz;
 uint32_t ctimer_timerClock;
 // End Variables
 
-void initializeServoPWM() {
+void SERVO_initializePWM() {
     /* CTimer3 counter uses the AHB clock, some CTimer1 modules use the Aysnc clock */
     ctimer_srcClock_Hz = CTIMER_CLK_FREQ;
 
@@ -39,9 +39,9 @@ void initializeServoPWM() {
     CTIMER_Init(CTIMER, &ctimer_config);
 }
 
-void setupServoPWM() {
+void SERVO_setupPWM() {
     /* Get the PWM period match value and pulse width match value of 50hz PWM signal with 18% dutycycle */
-    CTIMER_getPWMPeriodValue(SERVOFREQUENCYPWM, PENUP, ctimer_timerClock);
+	SERVO_getPWMPeriodValue(SERVOFREQUENCYPWM, PENUP, ctimer_timerClock);
     CTIMER_SetupPwmPeriod(CTIMER, CTIMER_MAT_PWM_PERIOD_CHANNEL, CTIMER_MAT_OUT, g_pwmPeriod, g_pulsePeriod, false);
     //PRINTF("\n starting servo pwm with period channel %d, output channel %d, period %d, pulsePeriod %d"
 	//	, CTIMER_MAT_PWM_PERIOD_CHANNEL
@@ -51,20 +51,20 @@ void setupServoPWM() {
 	//);
 }
 
-void updateServoPWMDutyCycle(uint8_t dutyCycle) {
-	CTIMER_updatePWMPulsePeriodValue(dutyCycle);
+void SERVO_updatePWMDutyCycle(uint8_t dutyCycle) {
+	SERVO_updatePWMPulsePeriodValue(dutyCycle);
 	CTIMER_UpdatePwmPulsePeriod(CTIMER, CTIMER_MAT_OUT, g_pulsePeriod);
 }
 
-void startServoPWM() {
+void SERVO_startPWM() {
     CTIMER_StartTimer(CTIMER);
 }
 
-void stopServoPWM() {
+void SERVO_stopPWM() {
 	CTIMER_StopTimer(CTIMER);
 }
 
-status_t CTIMER_getPWMPeriodValue(uint32_t pwmFreqHz, uint8_t dutyCyclePercent, uint32_t timerClock_Hz) {
+status_t SERVO_getPWMPeriodValue(uint32_t pwmFreqHz, uint8_t dutyCyclePercent, uint32_t timerClock_Hz) {
     /* Calculate PWM period match value */
     g_pwmPeriod = (timerClock_Hz / pwmFreqHz) - 1U;
     /* Calculate pulse width match value */
@@ -73,7 +73,7 @@ status_t CTIMER_getPWMPeriodValue(uint32_t pwmFreqHz, uint8_t dutyCyclePercent, 
     return kStatus_Success;
 }
 
-status_t CTIMER_updatePWMPulsePeriodValue(uint8_t dutyCyclePercent)
+status_t SERVO_updatePWMPulsePeriodValue(uint8_t dutyCyclePercent)
 {
     /* Calculate pulse width match value */
     g_pulsePeriod = (g_pwmPeriod + 1U) * (100 - dutyCyclePercent) / 100;

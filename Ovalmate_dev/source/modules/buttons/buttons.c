@@ -9,6 +9,8 @@
  * Update History:
  *	- 3/3/2022:
  *		Added settable function callbacks for button interrupts
+ *	- 3/14/2022:
+ *		Reformatted function names to better represent module approach
  */
 
 #include "buttons.h"
@@ -19,7 +21,7 @@ void (*leftBumpCallback)(pint_pin_int_t, uint32_t);
 void (*upBumpCallback)(pint_pin_int_t, uint32_t);
 void (*downBumpCallback)(pint_pin_int_t, uint32_t);
 
-void assignPinsToInterrupts() {
+void BUTTONS_assignPinsToInterrupts() {
 	/* Connect trigger sources to PINT */
 	INPUTMUX_Init(INPUTMUX);
 	INPUTMUX_AttachSignal(INPUTMUX, kPINT_PinInt1, PINT_PIN_INT1_SRC); // right bump switch
@@ -33,27 +35,27 @@ void assignPinsToInterrupts() {
 	//PRINTF("\f\r\nPINT Pin interrupt example\r\n");
 
 	/* Setup Pin Interrupt 0 for rising edge */
-	PINT_PinInterruptConfig(PINT, kPINT_PinInt0, kPINT_PinIntEnableRiseEdge, buttonEmergencyCallback);
+	PINT_PinInterruptConfig(PINT, kPINT_PinInt0, kPINT_PinIntEnableRiseEdge, BUTTONS_buttonEmergencyCallback);
 	/* Enable callbacks for PINT0 by Index */
 	PINT_EnableCallbackByIndex(PINT, kPINT_PinInt0);
 
 	/* Setup Pin Interrupt 1 for rising edge */
-	PINT_PinInterruptConfig(PINT, kPINT_PinInt1, kPINT_PinIntEnableRiseEdge, bumpRightCallback);
+	PINT_PinInterruptConfig(PINT, kPINT_PinInt1, kPINT_PinIntEnableRiseEdge, BUTTONS_bumpRightCallback);
 	/* Enable callbacks for PINT1 by Index */
 	PINT_EnableCallbackByIndex(PINT, kPINT_PinInt1);
 
 	/* Setup Pin Interrupt 2 for rising edge */
-	PINT_PinInterruptConfig(PINT, kPINT_PinInt2, kPINT_PinIntEnableRiseEdge, bumpLeftCallback);
+	PINT_PinInterruptConfig(PINT, kPINT_PinInt2, kPINT_PinIntEnableRiseEdge, BUTTONS_bumpLeftCallback);
 	/* Enable callbacks for PINT2 by Index */
 	PINT_EnableCallbackByIndex(PINT, kPINT_PinInt2);
 
 	/* Setup Pin Interrupt 3 for rising edge */
-	PINT_PinInterruptConfig(PINT, kPINT_PinInt3, kPINT_PinIntEnableRiseEdge, bumpDownCallback);
+	PINT_PinInterruptConfig(PINT, kPINT_PinInt3, kPINT_PinIntEnableRiseEdge, BUTTONS_bumpDownCallback);
 	/* Enable callbacks for PINT3 by Index */
 	PINT_EnableCallbackByIndex(PINT, kPINT_PinInt3);
 
 	/* Setup Pin Interrupt 4 for rising edge */
-	PINT_PinInterruptConfig(PINT, kPINT_PinInt4, kPINT_PinIntEnableRiseEdge, bumpUpCallback);
+	PINT_PinInterruptConfig(PINT, kPINT_PinInt4, kPINT_PinIntEnableRiseEdge, BUTTONS_bumpUpCallback);
 	/* Enable callbacks for PINT4 by Index */
 	PINT_EnableCallbackByIndex(PINT, kPINT_PinInt4);
 
@@ -64,7 +66,7 @@ void assignPinsToInterrupts() {
 /*!
  * @brief Call back for PINT Pin interrupt 0.
  */
-void buttonEmergencyCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
+void BUTTONS_buttonEmergencyCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
 {
 	PRINTF("\r\n\r\n emergency button hit");
 	if (emergencyBumpCallback != NULL)
@@ -74,7 +76,7 @@ void buttonEmergencyCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
 /*!
  * @brief Call back for PINT Pin interrupt 1.
  */
-void bumpRightCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
+void BUTTONS_bumpRightCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
 {
 	PRINTF("\r\n\r\n right button hit");
 	if (rightBumpCallback != NULL)
@@ -84,7 +86,7 @@ void bumpRightCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
 /*!
  * @brief Call back for PINT Pin interrupt 2.
  */
-void bumpLeftCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
+void BUTTONS_bumpLeftCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
 {
 	PRINTF("\r\n\r\n left button hit");
 	if (leftBumpCallback != NULL)
@@ -94,7 +96,7 @@ void bumpLeftCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
 /*!
  * @brief Call back for PINT Pin interrupt 3.
  */
-void bumpUpCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
+void BUTTONS_bumpUpCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
 {
 	PRINTF("\r\n\r\n up button hit");
 	if (upBumpCallback != NULL)
@@ -104,7 +106,7 @@ void bumpUpCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
 /*!
  * @brief Call back for PINT Pin interrupt 4.
  */
-void bumpDownCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
+void BUTTONS_bumpDownCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
 {
 	PRINTF("\r\n\r\n down button hit");
 	if (downBumpCallback != NULL)

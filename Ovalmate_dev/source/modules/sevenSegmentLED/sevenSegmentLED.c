@@ -9,6 +9,9 @@
  * Update History:
  *	- 2/28/2022
  *		Moved this into separate "modules"
+ *	- 3/14/2022:
+ *		modified seven seg function names to better represent the modular approach
+ *		Added displayErrorCode function. Takes a 8 bit val and uses the first 7 bits as flags to set legs, 0th pos -> a leg, 6th pos -> g leg
  */
 
 #include "sevenSegmentLED.h"
@@ -27,7 +30,7 @@ gpio_pin_config_t sevenSegConfig = { .pinDirection = kGPIO_DigitalOutput, .outpu
 // End Variables
 
 // Functions
-void set7Seg(bool a, bool b, bool c, bool d, bool e, bool f, bool g) {
+void SEVENSEG_setLegs(bool a, bool b, bool c, bool d, bool e, bool f, bool g) {
 	GPIO_PinWrite(GPIO, legA.port, legA.pin, a); // write bool value to pin
 	GPIO_PinWrite(GPIO, legB.port, legB.pin, b); // 1 = high
 	GPIO_PinWrite(GPIO, legC.port, legC.pin, c); // 0 = low
@@ -37,7 +40,18 @@ void set7Seg(bool a, bool b, bool c, bool d, bool e, bool f, bool g) {
 	GPIO_PinWrite(GPIO, legG.port, legG.pin, g);
 }
 
-void initialize7SegLegs() {
+void SEVENSEG_displayErrorCode(uint8_t errorCode) {
+	bool a = errorCode & (1 << 0);
+	bool b = errorCode & (1 << 1);
+	bool c = errorCode & (1 << 2);
+	bool d = errorCode & (1 << 3);
+	bool e = errorCode & (1 << 4);
+	bool f = errorCode & (1 << 5);
+	bool g = errorCode & (1 << 6);
+	SEVENSEG_setLegs(a, b, c, d, e, f, g);
+}
+
+void SEVENSEG_initializeLegs() {
     /* Init output LED GPIO. */
     //GPIO_PortInit(GPIO, legA.port);
     GPIO_PinInit(GPIO, legA.port, legA.pin, &sevenSegConfig);

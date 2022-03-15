@@ -1,3 +1,4 @@
-C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\drivers/fsl_gpio.h:153:20:GPIO_PinWrite	24	static
-../source/modules/sevenSegmentLED/sevenSegmentLED.c:30:6:set7Seg	24	static
-../source/modules/sevenSegmentLED/sevenSegmentLED.c:40:6:initialize7SegLegs	8	static
+C:\Users\Alex\Documents\MCUXpressoIDE_11.5.0_7232\workspace\OvalMate\Ovalmate_dev\drivers/fsl_gpio.h:153:20:GPIO_PinWrite	24	static
+../source/modules/sevenSegmentLED/sevenSegmentLED.c:33:6:SEVENSEG_setLegs	24	static
+../source/modules/sevenSegmentLED/sevenSegmentLED.c:43:6:SEVENSEG_displayErrorCode	48	static
+../source/modules/sevenSegmentLED/sevenSegmentLED.c:54:6:SEVENSEG_initializeLegs	8	static

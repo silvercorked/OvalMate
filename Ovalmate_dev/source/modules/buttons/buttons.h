@@ -11,6 +11,8 @@
  *		Added variables for assignable function callbacks for button interrupts
  *	- 3/8/2022:
  *		Added definition safeguards to avoid duplicate declarations
+ *	- 3/14/2022:
+ *		Reformatted function names to better represent module approach
  */
 
 #ifndef BUTTONS_H
@@ -41,12 +43,12 @@ extern void (*downBumpCallback)(pint_pin_int_t, uint32_t);
 // End Variables
 
 // Prototypes
-void buttonEmergencyCallback(pint_pin_int_t pintr, uint32_t pmatch_status);
-void bumpRightCallback(pint_pin_int_t pintr, uint32_t pmatch_status);
-void bumpLeftCallback(pint_pin_int_t pintr, uint32_t pmatch_status);
-void bumpUpCallback(pint_pin_int_t pintr, uint32_t pmatch_status);
-void bumpDownCallback(pint_pin_int_t pintr, uint32_t pmatch_status);
-void assignPinsToInterrupts(void);
+void BUTTONS_buttonEmergencyCallback(pint_pin_int_t pintr, uint32_t pmatch_status);
+void BUTTONS_bumpRightCallback(pint_pin_int_t pintr, uint32_t pmatch_status);
+void BUTTONS_bumpLeftCallback(pint_pin_int_t pintr, uint32_t pmatch_status);
+void BUTTONS_bumpUpCallback(pint_pin_int_t pintr, uint32_t pmatch_status);
+void BUTTONS_bumpDownCallback(pint_pin_int_t pintr, uint32_t pmatch_status);
+void BUTTONS_assignPinsToInterrupts(void);
 // End Prototypes
 
 #endif

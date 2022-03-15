@@ -1,4 +1,4 @@
-../source/Ovalmate_dev_noUSB.c:38:6:delay	16	static
-../source/Ovalmate_dev_noUSB.c:47:6:findHome	8	static
-../source/Ovalmate_dev_noUSB.c:71:6:drawOval	216	static
-../source/Ovalmate_dev_noUSB.c:220:5:main	8	static
+../source/Ovalmate_dev_noUSB.c:40:6:delay	16	static
+../source/Ovalmate_dev_noUSB.c:49:6:findHome	8	static
+../source/Ovalmate_dev_noUSB.c:74:6:drawOval	216	static
+../source/Ovalmate_dev_noUSB.c:223:5:main	8	static

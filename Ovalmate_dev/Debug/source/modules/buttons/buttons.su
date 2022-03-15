@@ -1,6 +1,6 @@
-../source/modules/buttons/buttons.c:22:6:assignPinsToInterrupts	8	static
-../source/modules/buttons/buttons.c:67:6:buttonEmergencyCallback	16	static
-../source/modules/buttons/buttons.c:77:6:bumpRightCallback	16	static
-../source/modules/buttons/buttons.c:87:6:bumpLeftCallback	16	static
-../source/modules/buttons/buttons.c:97:6:bumpUpCallback	16	static
-../source/modules/buttons/buttons.c:107:6:bumpDownCallback	16	static
+../source/modules/buttons/buttons.c:24:6:BUTTONS_assignPinsToInterrupts	8	static
+../source/modules/buttons/buttons.c:69:6:BUTTONS_buttonEmergencyCallback	16	static
+../source/modules/buttons/buttons.c:79:6:BUTTONS_bumpRightCallback	16	static
+../source/modules/buttons/buttons.c:89:6:BUTTONS_bumpLeftCallback	16	static
+../source/modules/buttons/buttons.c:99:6:BUTTONS_bumpUpCallback	16	static
+../source/modules/buttons/buttons.c:109:6:BUTTONS_bumpDownCallback	16	static

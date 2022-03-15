@@ -11,6 +11,10 @@
  *		Moved this into separate "modules"
  *	- 3/7/2022:
  *		Added definition safeguards around major declarations to avoid duplicate declarations and imports
+ *	- 3/14/2022:
+ *		modified seven seg function names to better represent the modular approach
+ *		Removed extern variables, as user shouldn't need those.
+ *		Setup macro functions for common functional outputs. Added displayErrorCode function for error states
  */
 
 #ifndef SEVENSEGMENT_H
@@ -31,22 +35,45 @@ typedef struct {
 #endif
 // End Structs
 
-// Extern Variables
-// Variables
-extern pinInformation_s legA;
-extern pinInformation_s legB;
-extern pinInformation_s legC;
-extern pinInformation_s legD;
-extern pinInformation_s legE;
-extern pinInformation_s legF;
-extern pinInformation_s legG;
-	// leg a w/ logic low = 1.6v, logic high = 3.3v (this doesn't activate the LED).
-	// leg b w/ logic low = 0v, logic high = 1.6v (this does activate the LED).
-extern gpio_pin_config_t sevenSegConfig;
-// End Extern Variables
+// Macro Functions
+#define SEVENSEG_setLegs_0() \
+	SEVENSEG_setLegs(true, true, true, true, true, true, false)
+#define SEVENSEG_setLegs_1() \
+	SEVENSEG_setLegs(false, true, true, false, false, false, false)
+#define SEVENSEG_setLegs_2() \
+	SEVENSEG_setLegs(true, true, false, true, true, false, true)
+#define SEVENSEG_setLegs_3() \
+	SEVENSEG_setLegs(true, true, true, true, false, false, true)
+#define SEVENSEG_setLegs_4() \
+	SEVENSEG_setLegs(false, true, true, false, false, true, true)
+#define SEVENSEG_setLegs_5() \
+	SEVENSEG_setLegs(true, false, true, true, false, true, true)
+#define SEVENSEG_setLegs_6() \
+	SEVENSEG_setLegs(true, false, true, true, true, true, true)
+#define SEVENSEG_setLegs_7() \
+	SEVENSEG_setLegs(true, true, true, false, false, false, false)
+#define SEVENSEG_setLegs_8() \
+	SEVENSEG_setLegs(true, true, true, true, true, true, true)
+#define SEVENSEG_setLegs_9() \
+	SEVENSEG_setLegs(true, true, true, true, false, true, true)
+#define SEVENSEG_setLegs_A() \
+	SEVENSEG_setLegs(true, true, true, false, true, true, false)
+// looks like 8
+#define SEVENSEG_setLegs_B() \
+	SEVENSEG_setLegs(true, true, true, true, true, true, true)
+#define SEVENSEG_setLegs_C() \
+	SEVENSEG_setLegs(true, false, false, true, true, true, false)
+// looks like 0
+#define SEVENSEG_setLegs_D() \
+	SEVENSEG_setLegs(true, true, true, true, true, true, false)
+#define SEVENSEG_setLegs_E() \
+	SEVENSEG_setLegs(true, false, false, true, true, true, true)
+#define SEVENSEG_setLegs_F() \
+	SEVENSEG_setLegs(true, false, false, false, true, true, true)
+// End Macro Functions
 
 // Prototypes
-void set7Seg(
+void SEVENSEG_setLegs(
 		bool legA,
 		bool legB,
 		bool legC,
@@ -55,7 +82,8 @@ void set7Seg(
 		bool legF,
 		bool legG
 );
-void initialize7SegLegs(void);
+void SEVENSEG_displayErrorCode(uint8_t);
+void SEVENSEG_initializeLegs(void);
 // End Prototypes
 
 #endif

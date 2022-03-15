@@ -11,6 +11,8 @@
  *		Moved this into separate "modules"
  *	- 3/9/2022:
  *		Removed while loop and commented out code from SDK example
+ *	- 3/14/2022:
+ *		Reformatted function names to better fit with modular approach
  */
 
 #include "irSensor.h"
@@ -29,7 +31,7 @@ lpadc_conv_command_config_t mLpadcCommandConfigStruct;
 lpadc_conv_result_t mLpadcResultConfigStruct;
 // End Variables
 
-int getADCValue() {
+int IRSENSOR_getADCValue() {
 	#if defined(FSL_FEATURE_LPADC_HAS_CMDL_CSCALE) && FSL_FEATURE_LPADC_HAS_CMDL_CSCALE // fails in lpc55s16
 	if (kLPADC_SampleFullScale == mLpadcCommandConfigStruct.sampleScaleMode)
 	{
@@ -52,7 +54,7 @@ int getADCValue() {
 	return ((mLpadcResultConfigStruct.convValue) >> g_LpadcResultShift);
 }
 
-void initializeADC() {
+void IRSENSOR_initializeADC() {
 	//PRINTF("LPADC Polling Example\r\n");
 
 	LPADC_GetDefaultConfig(&mLpadcConfigStruct);
