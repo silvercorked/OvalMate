@@ -28,8 +28,12 @@
 
 // MAIN INCLUDE
 #include "modules/mainInclude/mainInclude.h"
+#include "modules/utils/utils.h"
 #include <stdio.h>
 #include "fsl_debug_console.h"  // this gives access to PRINTF for debugging
+
+#define OVALSTEPSEPARATION		14U
+#define LINESPEROVALSIDE		6U
 
 void delay(void)
 {
@@ -38,6 +42,176 @@ void delay(void)
     {
         __asm("NOP"); /* delay */
     }
+}
+
+void findHome(void) {
+	while (1) {
+		if (!buttonCallback_stepperMotorX_stopped)
+			STEPPERS_moveRelativeNoAccel(stepperX_p, -10000);	// left interrupt expected
+		if (!buttonCallback_stepperMotorY_stopped)
+			STEPPERS_moveRelativeNoAccel(stepperY_p, 10000);	// up interrupt expected
+		// distance isn't important, if we don't hit, it will run again
+		while (stepperX_p->status.running && stepperY_p->status.running);
+		if (buttonCallback_stepperMotorX_stopped && buttonCallback_stepperMotorY_stopped) {
+			STEPPERS_setHome(stepperX_p);
+			STEPPERS_setHome(stepperY_p);
+			break;
+		}
+		else
+			while (stepperX_p->status.running || stepperY_p->status.running);
+	}
+}
+
+//uint32_t ovalCurveEquation(uint32_t x) {
+//	double lx = ((double) x) / 1000000.0lf;
+//	return -1500000 * (lx * lx) + 1500000; // -1.5 x^2 + 1.5 == equation of 1 half of oval as parabola. Equation in code converted to take nanometers rather than millimeters
+//}
+
+// ballistic behavior. Presumes at center of oval
+void drawOval() {
+	uint32_t ovalLineDistance = 15000U;			// distance between lines		(nm)
+	uint32_t ovalLineStartDistance = 5000U;		// distance from top of oval	(nm)
+	int8_t k = 6;								// start value
+
+	int32_t currX = 0; // presume in center of oval
+	int32_t currY = 0; // presume in center of oval
+
+	while (k >= 0) {
+		int32_t x = -(k * 150000 + 50000); // 0.15 mm * k + 0.05 mm = 6 evenly spaced divisions across 0-1 given input in space 0-6
+		// negative because this will do negative side first
+		int32_t relativeX = x - currX;
+		uint32_t xPosSteps = nanometersToSteps((uint64_t) (relativeX < 0 ? -relativeX : relativeX)); // negative side first, so
+		STEPPERS_moveRelativeNoAccel(stepperY_p, relativeX > 0 ? xPosSteps : -xPosSteps); // the parabola model is a 90 degree rotation of half the oval. So X coords actually correspond to Y's motor
+		currX = x;
+
+		double scaledX = (double) x / 1000000.0L; // scaled to 1mm (1000000 nm)
+		uint32_t y = -1500000 * (scaledX * scaledX) + 1500000;
+		int32_t relativeY = y - currY;
+		uint32_t yPosSteps = nanometersToSteps((uint64_t)relativeY);
+		STEPPERS_moveRelativeNoAccel(stepperX_p, relativeY > 0 ? -yPosSteps : yPosSteps); // x stepper drives in inverse directions compared to y, so opposite signs
+		currY = y;
+
+		while (stepperX_p->status.running && stepperY_p->status.running);
+
+		// in position
+		updateServoPWMDutyCycle(PENDOWN);
+		delay();
+		uint32_t lineSteps = nanometersToSteps(y << 1);
+		STEPPERS_moveRelativeNoAccel(stepperX_p, lineSteps); // y * 2 == line width
+		while(stepperX_p->status.running);
+		currY = -y;
+		updateServoPWMDutyCycle(PENUP);
+		delay();
+		k--;
+		PRINTF("\r\n line drawn 1,"
+			"\r\n\t %s%d,"
+			"\r\n\t %s%d,"
+			"\r\n\t %s%d"
+			"\r\n\t %s%d"
+			"\r\n\t %s%d"
+			"\r\n\t %s%d"
+			"\r\n\t %s%d"
+			"\r\n\t %s%d"
+			"\r\n\t %s%d",
+			"x = ",
+			x,
+			"y = ",
+			y,
+			"relativeX = ",
+			relativeX,
+			"relativeY = ",
+			relativeY,
+			"xPosSteps = ",
+			relativeX > 0 ? xPosSteps : -xPosSteps,
+			"yPosSteps = ",
+			relativeY > 0 ? yPosSteps : -yPosSteps,
+			"lineSteps = ",
+			lineSteps,
+			"currX = ",
+			currX,
+			"currY = ",
+			currY
+		);
+	}
+	while (k <= 6) {
+		int32_t x = k * 150000 + 50000; // 0.15 mm * k + 0.05 mm = 6 evenly spaced divisions across 0-1 given input in space 0-6
+		int32_t relativeX = x - currX;
+		uint32_t xPosSteps = nanometersToSteps((uint64_t) (relativeX < 0 ? -relativeX : relativeX)); // negative side first, so
+		STEPPERS_moveRelativeNoAccel(stepperY_p, relativeX > 0 ? xPosSteps : -xPosSteps); // the parabola model is a 90 degree rotation of half the oval. So X coords actually correspond to Y's motor
+		currX = x;
+
+		double scaledX = (double) x / 1000000.0L; // scaled to 1mm (1000000 nm)
+		uint32_t y = -1500000 * (scaledX * scaledX) + 1500000;
+		int32_t relativeY = y - currY;
+		uint32_t yPosSteps = nanometersToSteps((uint64_t)relativeY);
+		STEPPERS_moveRelativeNoAccel(stepperX_p, relativeY > 0 ? -yPosSteps : yPosSteps); // x stepper drives in inverse directions compared to y, so opposite signs
+		currY = y;
+
+		while (stepperX_p->status.running && stepperY_p->status.running);
+
+		// in position
+		updateServoPWMDutyCycle(PENDOWN);
+		delay();
+		uint32_t lineSteps = nanometersToSteps(y << 1);
+		STEPPERS_moveRelativeNoAccel(stepperX_p, lineSteps); // y * 2 == line width
+		while(stepperX_p->status.running);
+		currY = -y;
+		updateServoPWMDutyCycle(PENUP);
+		delay();
+		k++;
+		PRINTF("\r\n line drawn 2,"
+			"\r\n\t %s%d,"
+			"\r\n\t %s%d,"
+			"\r\n\t %s%d"
+			"\r\n\t %s%d"
+			"\r\n\t %s%d"
+			"\r\n\t %s%d"
+			"\r\n\t %s%d"
+			"\r\n\t %s%d"
+			"\r\n\t %s%d",
+			"x = ",
+			x,
+			"y = ",
+			y,
+			"relativeX = ",
+			relativeX,
+			"relativeY = ",
+			relativeY,
+			"xPosSteps = ",
+			relativeX > 0 ? xPosSteps : -xPosSteps,
+			"yPosSteps = ",
+			relativeY > 0 ? yPosSteps : -yPosSteps,
+			"lineSteps = ",
+			lineSteps,
+			"currX = ",
+			currX,
+			"currY = ",
+			currY
+		);
+	}
+
+	//updateServoPWMDutyCycle(PENDOWN);
+	//delay();
+	//STEPPERS_moveRelativeNoAccel(stepperX_p, -(startPosSteps << 1));
+
+	/*
+	// if at center of oval, need to move up 1mm - 0.03mm.
+	int32_t startPositionSteps = -millimetersToSteps(0.97L); // negative because we want to go upwards to top of oval
+	STEPPERS_moveRelativeNoAccel(stepperY_p, startPositionSteps);
+	while (stepperY_p->status.running);
+	// at (1.5, 0.03)mm
+	uint8_t k = 0;
+	double xCoord = k * 0.14L + 0.03L;
+	uint32_t xStepsHalf = millimetersToSteps(xCoord);
+	STEPPERS_moveRelativeNoAccel(stepperX_p, xStepsHalf);
+	while(stepperX_p->status.running);
+	updateServoPWMDutyCycle(PENDOWN);
+	delay();
+	STEPPERS_moveRelativeNoAccel(stepperX_p, -(xStepsHalf << 1));
+	while(stepperX_p->status.running);
+	updateServoPWMDutyCycle(PENUP);
+	PRINTF("\r\n oval drawn, \r\n\t startPosSteps = %d, \r\n\t xCoord = %lf, \r\n\t xStepsHalf = %d", startPositionSteps, xCoord, xStepsHalf);
+	*/
 }
 
 /*
@@ -70,6 +244,24 @@ int main(void) {
 	setupServoPWM();
 	startServoPWM();
 
+	STEPPERS_moveRelativeAccel(stepperX_p, 10000);
+	while (stepperX_p->status.running);
+	delay();
+	drawOval();
+
+
+
+	/*while (1) {
+		STEPPERS_moveRelativeNoAccel(stepperX_p, -100000);
+		while(stepperX_p->status.running);
+		if (buttonCallback_stepperMotorX_stopped) {
+			STEPPERS_setHome(stepperX_p);
+			buttonCallback_stepperMotorX_stopped = false; // clear flag
+			break;
+		}
+		// left is currently held high on dev board. has to be dropped low and back up to produce effect
+	}
+	/*
 	while (1) {
 		STEPPERS_setHome(stepperX_p);
 		STEPPERS_setHome(stepperY_p);

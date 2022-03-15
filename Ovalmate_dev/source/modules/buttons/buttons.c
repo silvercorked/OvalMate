@@ -32,12 +32,6 @@ void assignPinsToInterrupts() {
 
 	//PRINTF("\f\r\nPINT Pin interrupt example\r\n");
 
-	/* Initialize PINT */
-	#ifndef PINTINITIALIZED
-	#define	PINTINITIALIZED
-	PINT_Init(PINT);
-	#endif
-
 	/* Setup Pin Interrupt 0 for rising edge */
 	PINT_PinInterruptConfig(PINT, kPINT_PinInt0, kPINT_PinIntEnableRiseEdge, buttonEmergencyCallback);
 	/* Enable callbacks for PINT0 by Index */
@@ -72,6 +66,7 @@ void assignPinsToInterrupts() {
  */
 void buttonEmergencyCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
 {
+	PRINTF("\r\n\r\n emergency button hit");
 	if (emergencyBumpCallback != NULL)
 		emergencyBumpCallback(pintr, pmatch_status);
 }
@@ -81,6 +76,7 @@ void buttonEmergencyCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
  */
 void bumpRightCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
 {
+	PRINTF("\r\n\r\n right button hit");
 	if (rightBumpCallback != NULL)
 		rightBumpCallback(pintr, pmatch_status);
 }
@@ -90,6 +86,7 @@ void bumpRightCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
  */
 void bumpLeftCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
 {
+	PRINTF("\r\n\r\n left button hit");
 	if (leftBumpCallback != NULL)
 		leftBumpCallback(pintr, pmatch_status);
 }
@@ -99,6 +96,7 @@ void bumpLeftCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
  */
 void bumpUpCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
 {
+	PRINTF("\r\n\r\n up button hit");
 	if (upBumpCallback != NULL)
 		upBumpCallback(pintr, pmatch_status);
 }
@@ -108,6 +106,7 @@ void bumpUpCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
  */
 void bumpDownCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
 {
+	PRINTF("\r\n\r\n down button hit");
 	if (downBumpCallback != NULL)
 		downBumpCallback(pintr, pmatch_status);
 }

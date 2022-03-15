@@ -149,12 +149,6 @@ void STEPPERS_initializePins() {
 
 	//PRINTF("\f\r\nPINT Pin interrupt example\r\n");
 
-	/* Initialize PINT */
-	#ifndef PINTINITIALIZED	// this init func appears to reset previous items put upon it,
-	#define	PINTINITIALIZED	// should only need to initialize it once. use definition safeguard for pragma once
-	PINT_Init(PINT);
-	#endif
-
 	/* Setup Pin Interrupt 5 for falling edge */
 	PINT_PinInterruptConfig(PINT, kPINT_PinInt5, kPINT_PinIntEnableFallEdge, STEPPERS_XFault);
 	/* Enable callbacks for PINT5 by Index */
@@ -176,7 +170,7 @@ void STEPPERS_initializeMotors() {
 	STEPPERS_writeOutputPin(stepperX_p->pinInfo_arr_p[ENABLE], 0U);
 }
 
-status_t STEPPERS_setupMotor(stepperMotor_s* motor_p, uint32_t steps) {
+status_t STEPPERS_setupMotor(stepperMotor_s* motor_p, uint32_t steps, bool accel) {
 	motor_p->matchConfig.enableCounterReset = true;					// reload timer when on match
 	motor_p->matchConfig.enableCounterStop  = false;					// don't stop timer on match
 	if (motor_p == stepperX_p)										// these are the same currently, but might as well check
@@ -190,16 +184,16 @@ status_t STEPPERS_setupMotor(stepperMotor_s* motor_p, uint32_t steps) {
 	CTIMER_RegisterCallBack(motor_p->timer_p, &(motor_p->matchCallback), kCTIMER_SingleCallback);
 	CTIMER_SetupMatch(motor_p->timer_p, motor_p->output, &(motor_p->matchConfig));
 
-	STEPPERS_setMotorStepsPerPhase(motor_p->phaseSteps_p, steps);	// presets all info about journey
+	STEPPERS_setMotorStepsPerPhase(motor_p->phaseSteps_p, steps, accel);	// presets all info about journey
 	return kStatus_Success;
 }
 
-void STEPPERS_driveSteps(stepperMotor_s* motor_p, uint32_t steps) { // doesn't set direciton. moves in current direction
-	STEPPERS_setupMotor(motor_p, steps);
+void STEPPERS_driveSteps(stepperMotor_s* motor_p, uint32_t steps, bool accel) { // doesn't set direciton. moves in current direction
+	STEPPERS_setupMotor(motor_p, steps, accel);
 	STEPPERS_startMotor(motor_p);
 }
 
-status_t STEPPERS_moveRelative(stepperMotor_s* motor_p, int32_t steps) { // move step amount relative to position
+status_t STEPPERS_moveRelative(stepperMotor_s* motor_p, int32_t steps, bool accel) { // move step amount relative to position
 	if (steps == 0)
 		return kStatus_Fail;
 	if (steps > 0)
@@ -208,23 +202,23 @@ status_t STEPPERS_moveRelative(stepperMotor_s* motor_p, int32_t steps) { // move
 		steps *= -1;	// swap so steps is always a positive number before passing as int
 		motor_p->direction = false;	// if negative, dir = false
 	}
-	STEPPERS_writeOutputPin(motor_p->pinInfo_arr_p[DIRECTION], motor_p->direction);
-	STEPPERS_driveSteps(motor_p, (uint32_t) steps);
+	STEPPERS_writeDirectionPin(motor_p, motor_p->direction);
+	STEPPERS_driveSteps(motor_p, (uint32_t) steps, accel);
 	return kStatus_Success;
 }
 
-status_t STEPPERS_moveTo(stepperMotor_s* motor_p, uint32_t target) {
+status_t STEPPERS_moveTo(stepperMotor_s* motor_p, uint32_t target, bool accel) {
 	int32_t relativeSteps = target - motor_p->position;
-	return STEPPERS_moveRelative(motor_p, relativeSteps);
+	return STEPPERS_moveRelative(motor_p, relativeSteps, accel);
 }
 
-status_t STEPPERS_setMotorStepsPerPhase(stepperMotorPhaseSteps_s* phaseSteps_p, uint32_t steps) {
+status_t STEPPERS_setMotorStepsPerPhase(stepperMotorPhaseSteps_s* phaseSteps_p, uint32_t steps, bool accel) {
 	phaseSteps_p->accelValue = 0.0f;
 	phaseSteps_p->accelerating = 0;
 	phaseSteps_p->steady = 0;
 	phaseSteps_p->slowing = 0;
 	phaseSteps_p->startSpeed = 0;	// clear phaseSteps
-	if (steps <= 3200)	// one full revolution
+	if (steps <= 3200 || !accel)	// one full revolution
 		phaseSteps_p->startSpeed = steps;	// all steps are no accel at start speed
 	else if (steps <= 9600) { // 3 full revolutions
 		phaseSteps_p->accelerating = steps / 4;					// 1/4 accel

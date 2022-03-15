@@ -41,13 +41,15 @@
 
 // all variables used will start with the function callback's name in which they are used
 // Variables
-
+extern bool buttonCallback_stepperMotorX_stopped;
+extern bool buttonCallback_stepperMotorY_stopped;
 // End Variables
 
 // all functions will start with the void pointer they are meant to be assigned to.
 // Prototypes
 status_t configure(void);
 void buttonCallback_stopMotors(pint_pin_int_t, uint32_t);	// buttonCallbacks are of this form
+void buttonCallback_stopRelaventMotor(pint_pin_int_t, uint32_t);
 //void motorCallback_scheduleNextJob(stepperMotor_t*);		// motorCallbacks are of this form
 //void motorCallback_printCurrSteps(stepperMotor_t*);
 //void stopMotorIfJobComplete(stepperMotor_t*);

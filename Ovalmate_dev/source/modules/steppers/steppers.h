@@ -132,18 +132,29 @@ extern stepperMotor_s* stepperX_p;
 extern stepperMotor_s* stepperY_p;
 // End Extern Variables
 
+// Macro Functions
+#define STEPPERS_moveToAccel(motor_p, steps) \
+	STEPPERS_moveTo(motor_p, steps, true)
+#define STEPPERS_moveToNoAccel(motor_p, steps) \
+	STEPPERS_moveTo(motor_p, steps, false);
+#define STEPPERS_moveRelativeAccel(motor_p, steps) \
+	STEPPERS_moveRelative(motor_p, steps, true)
+#define STEPPERS_moveRelativeNoAccel(motor_p, steps) \
+	STEPPERS_moveRelative(motor_p, steps, false)
+// End Macro Functions
+
 // Prototypes
 void STEPPERS_initializePins();					// setup stepper motor output pins as GPIO ouputs
 void STEPPERS_initializeMotors();					// must be called once before any ctimer interactions
 
-status_t STEPPERS_setupMotor(stepperMotor_s*, uint32_t);					// steps
-void STEPPERS_driveSteps(stepperMotor_s* motor_p, uint32_t steps);
-status_t STEPPERS_moveRelative(stepperMotor_s* motor_p, int32_t steps);
-status_t STEPPERS_moveTo(stepperMotor_s* motor_p, uint32_t target);
+status_t STEPPERS_setupMotor(stepperMotor_s*, uint32_t, bool);					// steps
+void STEPPERS_driveSteps(stepperMotor_s*, uint32_t, bool);
+status_t STEPPERS_moveRelative(stepperMotor_s*, int32_t, bool);
+status_t STEPPERS_moveTo(stepperMotor_s*, uint32_t, bool);
 void STEPPERS_startMotor(stepperMotor_s*);
 void STEPPERS_stopMotor(stepperMotor_s*);
 
-status_t STEPPERS_setMotorStepsPerPhase(stepperMotorPhaseSteps_s*, uint32_t);	// assigns step values to stepperMotorPhaseSteps pointer
+status_t STEPPERS_setMotorStepsPerPhase(stepperMotorPhaseSteps_s*, uint32_t, bool);	// assigns step values to stepperMotorPhaseSteps pointer
 
 void STEPPERS_setHome(stepperMotor_s* motor_p);
 

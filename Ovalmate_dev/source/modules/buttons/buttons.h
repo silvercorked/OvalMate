@@ -16,6 +16,9 @@
 #ifndef BUTTONS_H
 #define BUTTONS_H
 
+#include <stdio.h>
+#include "fsl_debug_console.h"  // this gives access to PRINTF for debugging
+
 // Includes
 #include "fsl_pint.h"
 #include "fsl_inputmux.h"
