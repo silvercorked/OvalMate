@@ -62,6 +62,12 @@ void BOARD_InitBootPins(void);
  * @brief Selects pin function.: Alternative connection 0. */
 #define PIO0_14_FUNC_ALT0 0x00u
 /*!
+ * @brief Select Digital mode.: Enable Digital mode. Digital input is enabled. */
+#define PIO0_15_DIGIMODE_DIGITAL 0x01u
+/*!
+ * @brief Selects pin function.: Alternative connection 0. */
+#define PIO0_15_FUNC_ALT0 0x00u
+/*!
  * @brief Analog switch input control.: Analog switch is closed. (enable) */
 #define PIO0_16_ASW_ENABLE 0x01u
 /*!
@@ -113,12 +119,6 @@ void BOARD_InitBootPins(void);
 /*!
  * @brief Selects pin function.: Alternative connection 0. */
 #define PIO0_26_FUNC_ALT0 0x00u
-/*!
- * @brief Select Digital mode.: Enable Digital mode. Digital input is enabled. */
-#define PIO0_27_DIGIMODE_DIGITAL 0x01u
-/*!
- * @brief Selects pin function.: Alternative connection 3. */
-#define PIO0_27_FUNC_ALT3 0x03u
 /*!
  * @brief Select Digital mode.: Enable Digital mode. Digital input is enabled. */
 #define PIO0_28_DIGIMODE_DIGITAL 0x01u

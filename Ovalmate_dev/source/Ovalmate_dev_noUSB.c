@@ -51,7 +51,7 @@ void findHome(void) {
 		if (!buttonCallback_stepperMotorX_stopped)
 			STEPPERS_moveRelativeNoAccel(stepperX_p, -10000);	// left interrupt expected
 		if (!buttonCallback_stepperMotorY_stopped)
-			STEPPERS_moveRelativeNoAccel(stepperY_p, 10000);	// up interrupt expected
+			STEPPERS_moveRelativeNoAccel(stepperY_p, -10000);	// up interrupt expected
 		// distance isn't important, if we don't hit, it will run again
 		while (stepperX_p->status.running && stepperY_p->status.running);
 		if (buttonCallback_stepperMotorX_stopped && buttonCallback_stepperMotorY_stopped) {
@@ -103,38 +103,8 @@ void drawOval() {
 		STEPPERS_moveRelativeNoAccel(stepperX_p, lineSteps); // y * 2 == line width
 		while(stepperX_p->status.running);
 		currY = -y;
-		SERVO_setPenMode(PENUP);
-		delay();
+		//delay();
 		k--;
-		PRINTF("\r\n line drawn 1,"
-			"\r\n\t %s%d,"
-			"\r\n\t %s%d,"
-			"\r\n\t %s%d"
-			"\r\n\t %s%d"
-			"\r\n\t %s%d"
-			"\r\n\t %s%d"
-			"\r\n\t %s%d"
-			"\r\n\t %s%d"
-			"\r\n\t %s%d",
-			"x = ",
-			x,
-			"y = ",
-			y,
-			"relativeX = ",
-			relativeX,
-			"relativeY = ",
-			relativeY,
-			"xPosSteps = ",
-			relativeX > 0 ? xPosSteps : -xPosSteps,
-			"yPosSteps = ",
-			relativeY > 0 ? yPosSteps : -yPosSteps,
-			"lineSteps = ",
-			lineSteps,
-			"currX = ",
-			currX,
-			"currY = ",
-			currY
-		);
 	}
 	while (k <= 6) {
 		int32_t x = k * 150000 + 50000; // 0.15 mm * k + 0.05 mm = 6 evenly spaced divisions across 0-1 given input in space 0-6
@@ -159,62 +129,11 @@ void drawOval() {
 		STEPPERS_moveRelativeNoAccel(stepperX_p, lineSteps); // y * 2 == line width
 		while(stepperX_p->status.running);
 		currY = -y;
-		SERVO_setPenMode(PENUP);
-		delay();
+		//delay();
 		k++;
-		PRINTF("\r\n line drawn 2,"
-			"\r\n\t %s%d,"
-			"\r\n\t %s%d,"
-			"\r\n\t %s%d"
-			"\r\n\t %s%d"
-			"\r\n\t %s%d"
-			"\r\n\t %s%d"
-			"\r\n\t %s%d"
-			"\r\n\t %s%d"
-			"\r\n\t %s%d",
-			"x = ",
-			x,
-			"y = ",
-			y,
-			"relativeX = ",
-			relativeX,
-			"relativeY = ",
-			relativeY,
-			"xPosSteps = ",
-			relativeX > 0 ? xPosSteps : -xPosSteps,
-			"yPosSteps = ",
-			relativeY > 0 ? yPosSteps : -yPosSteps,
-			"lineSteps = ",
-			lineSteps,
-			"currX = ",
-			currX,
-			"currY = ",
-			currY
-		);
+
 	}
-
-	//updateServoPWMDutyCycle(PENDOWN);
-	//delay();
-	//STEPPERS_moveRelativeNoAccel(stepperX_p, -(startPosSteps << 1));
-
-	/*
-	// if at center of oval, need to move up 1mm - 0.03mm.
-	int32_t startPositionSteps = -millimetersToSteps(0.97L); // negative because we want to go upwards to top of oval
-	STEPPERS_moveRelativeNoAccel(stepperY_p, startPositionSteps);
-	while (stepperY_p->status.running);
-	// at (1.5, 0.03)mm
-	uint8_t k = 0;
-	double xCoord = k * 0.14L + 0.03L;
-	uint32_t xStepsHalf = millimetersToSteps(xCoord);
-	STEPPERS_moveRelativeNoAccel(stepperX_p, xStepsHalf);
-	while(stepperX_p->status.running);
-	updateServoPWMDutyCycle(PENDOWN);
-	delay();
-	STEPPERS_moveRelativeNoAccel(stepperX_p, -(xStepsHalf << 1));
-	while(stepperX_p->status.running);
-	updateServoPWMDutyCycle(PENUP);
-	PRINTF("\r\n oval drawn, \r\n\t startPosSteps = %d, \r\n\t xCoord = %lf, \r\n\t xStepsHalf = %d", startPositionSteps, xCoord, xStepsHalf);
-	*/
+	SERVO_setPenMode(PENUP);
 }
 
 /*
@@ -247,9 +166,19 @@ int main(void) {
 	SERVO_setupPWM();
 	SERVO_startPWM();
 
-	STEPPERS_moveRelativeAccel(stepperX_p, 10000);
-	while (stepperX_p->status.running);
+	/*
+	while (1) {
+		STEPPERS_moveRelativeAccel(stepperX_p, 1000);
+		STEPPERS_moveRelativeAccel(stepperY_p, -1000);
+		while (stepperX_p->status.running && stepperY_p->status.running);
+		STEPPERS_moveRelativeAccel(stepperX_p, -1000);
+		STEPPERS_moveRelativeAccel(stepperY_p, 1000);
+		while (stepperX_p->status.running && stepperY_p->status.running);
+		delay();
+	}*/
 	delay();
+	//while(1);
+	//findHome();
 	drawOval();
 
 

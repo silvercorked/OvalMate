@@ -129,16 +129,17 @@ void STEPPERS_initializePins() {
 	GPIO_PinInit(GPIO, stepperX_sleep.port, stepperX_sleep.pin, &gpioOUTConfigHIGH);			// active low
 
 	// Stepper X in
-	GPIO_PinInit(GPIO, stepperX_home.port, stepperX_reset.pin, &gpioINConfig);					// inputs (active low)
+	GPIO_PinInit(GPIO, stepperX_home.port, stepperX_home.pin, &gpioINConfig);					// inputs (active low)
 
+	// didn't go high
 	// Stepper Y out
-	GPIO_PinInit(GPIO, stepperY_direction.port, stepperX_direction.pin, &gpioOUTConfigLOW);		// start low
-	GPIO_PinInit(GPIO, stepperY_enable.port, stepperX_enable.pin, &gpioOUTConfigHIGH);			// active low
-	GPIO_PinInit(GPIO, stepperY_reset.port, stepperX_reset.pin, &gpioOUTConfigHIGH);			// active low
-	GPIO_PinInit(GPIO, stepperY_sleep.port, stepperX_sleep.pin, &gpioOUTConfigHIGH);			// active low
+	GPIO_PinInit(GPIO, stepperY_direction.port, stepperY_direction.pin, &gpioOUTConfigLOW);		// start low
+	GPIO_PinInit(GPIO, stepperY_enable.port, stepperY_enable.pin, &gpioOUTConfigHIGH);			// active low
+	GPIO_PinInit(GPIO, stepperY_reset.port, stepperY_reset.pin, &gpioOUTConfigHIGH);			// active low
+	GPIO_PinInit(GPIO, stepperY_sleep.port, stepperY_sleep.pin, &gpioOUTConfigHIGH);			// active low
 
 	// Stepper Y in
-	GPIO_PinInit(GPIO, stepperY_home.port, stepperX_reset.pin, &gpioINConfig);					// inputs (active low)
+	GPIO_PinInit(GPIO, stepperY_home.port, stepperY_home.pin, &gpioINConfig);					// inputs (active low)
 
 	/* Connect trigger sources to PINT */
 	INPUTMUX_Init(INPUTMUX);
@@ -167,7 +168,7 @@ void STEPPERS_initializeMotors() {
 	CTIMER_Init(CTIMER1_Y, &config);
 
 	STEPPERS_writeOutputPin(stepperX_p->pinInfo_arr_p[ENABLE], 0U);
-	STEPPERS_writeOutputPin(stepperX_p->pinInfo_arr_p[ENABLE], 0U);
+	STEPPERS_writeOutputPin(stepperY_p->pinInfo_arr_p[ENABLE], 0U);
 }
 
 status_t STEPPERS_setupMotor(stepperMotor_s* motor_p, uint32_t steps, bool accel) {
@@ -365,7 +366,12 @@ bool STEPPERS_readInputPin(pinInformation_s* pinInfo_p) {
 	return GPIO_PinRead(GPIO, pinInfo_p->port, pinInfo_p->pin);
 }
 void STEPPERS_writeDirectionPin(stepperMotor_s* motor_p, bool highLow) {
-	STEPPERS_writeOutputPin(motor_p->pinInfo_arr_p[DIRECTION], highLow);
+	if (motor_p == stepperY) // stepperY rotates opposite of StepperX.
+		//This makes their "directions", the same in code, but opposite in hardware,
+		// as long as this function is the how the direction is changed
+		STEPPERS_writeOutputPin(motor_p->pinInfo_arr_p[DIRECTION], !highLow);
+	else
+		STEPPERS_writeOutputPin(motor_p->pinInfo_arr_p[DIRECTION], highLow);
 }
 void STEPPERS_writeEnablePin(stepperMotor_s* motor_p, bool highLow) {
 	STEPPERS_writeOutputPin(motor_p->pinInfo_arr_p[ENABLE], highLow);

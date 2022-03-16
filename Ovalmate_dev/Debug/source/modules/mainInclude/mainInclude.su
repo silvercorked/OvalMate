@@ -1,3 +1,3 @@
 ../source/modules/mainInclude/mainInclude.c:31:10:configure	8	static
-../source/modules/mainInclude/mainInclude.c:57:6:buttonCallback_stopMotors	16	static
-../source/modules/mainInclude/mainInclude.c:70:6:buttonCallback_stopRelaventMotor	16	static
+../source/modules/mainInclude/mainInclude.c:58:6:buttonCallback_stopMotors	16	static
+../source/modules/mainInclude/mainInclude.c:71:6:buttonCallback_stopRelaventMotor	16	static
