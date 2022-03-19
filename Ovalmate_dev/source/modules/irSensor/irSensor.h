@@ -22,13 +22,15 @@
 
 // Includes
 #include "fsl_lpadc.h"
+#include "fsl_power.h"
+#include "fsl_anactrl.h"
 // End Includes
 
 // Definitions
 #define LPADC_BASE						ADC0
 #define LPADC_USER_CHANNEL				0U
 #define LPADC_USER_CMDID				1U /* CMD1 */
-#define LPADC_VREF_SOURCE				kLPADC_ReferenceVoltageAlt1	// 1 is internal VDD as ref, 2 is external ref
+#define LPADC_VREF_SOURCE				kLPADC_ReferenceVoltageAlt2	// 1 is internal VDD as ref, 2 is external ref
 										// https://community.nxp.com/t5/LPC-Microcontrollers/LPC55S69-adc-reference-voltages/m-p/984941
 #define LPADC_DO_OFFSET_CALIBRATION		true
 #define LPADC_USE_HIGH_RESOLUTION		true
@@ -44,7 +46,7 @@ extern lpadc_conv_result_t mLpadcResultConfigStruct;
 // End Extern Variables
 
 // Prototypes
-int IRSENSOR_getADCValue(void);
+uint32_t IRSENSOR_getADCValue(void);
 void IRSENSOR_initializeADC(void);
 // End Prototypes
 

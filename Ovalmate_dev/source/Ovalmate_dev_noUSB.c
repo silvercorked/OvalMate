@@ -26,6 +26,8 @@
  *		Modifed example code in main to test ctimer based stepper motor functions.
  *	- 3/14/2022:
  *		Added findHome and drawOval functions. Will likely move them into other files later.
+ *	- 3/15/2022:
+ *		Tested findHome and drawOval. Both looking good. drawOval is slow due to delays put in for testing. Will need to remove them.
  */
 
 // MAIN INCLUDE
@@ -34,16 +36,40 @@
 #include <stdio.h>
 #include "fsl_debug_console.h"  // this gives access to PRINTF for debugging
 
-#define OVALSTEPSEPARATION		14U
-#define LINESPEROVALSIDE		6U
+#define ADCVALUETOLERANCE 1000
 
-void delay(void)
-{
-    volatile uint32_t i = 0U;
-    for (i = 0U; i < 20000000U; ++i) // 20000000U for servo
-    {
+typedef struct {
+	uint32_t x;
+	uint32_t y;
+	uint32_t value;
+} sample_s;
+
+sample_s backgroundSample;
+sample_s blackSample;
+sample_s whiteSample;
+
+void drawRectangle();
+void sleepMotors();
+void wakeMotors();
+double readAvgADC(uint32_t);
+void pollADC(stepperMotor_s*, uint32_t);
+status_t findRectangleCorners(uint32_t**, uint8_t);
+void findRectangleCorner(sample_s*, bool, bool, bool, bool, bool);
+
+void delay20ms(void) {
+    uint32_t i = 0U;
+    for (i = 0U; i < 3000000U; ++i) // 20000000U for servo
+    {	// 3 000 000 should be 20ms delay
         __asm("NOP"); /* delay */
     }
+}
+
+void delay1ms(void) {
+	uint32_t i = 0U;
+	for (i = 0U; i < 15000U; ++i) // 20000000U for servo
+	{	// 3 000 000 should be 20ms delay
+		__asm("NOP"); /* delay */
+	}
 }
 
 void findHome(void) {
@@ -64,6 +90,8 @@ void findHome(void) {
 	}
 }
 
+sample_s pastSamples[100];
+
 /** ballistic behavior. Presumes at center of oval
  * Oval is 3mm x 2mm (width x height). To avoid loss from floating point precision, convert to nanometers and divide oval in half.
  * Half oval = 1.5mm x 1mm = 1500000nm x 1000000nm. Steppers w/ microstepping at 16 = 0.01143mm = 11430nm per step.
@@ -71,67 +99,46 @@ void findHome(void) {
  * width of pen mark + bleed of pen ~= 0.25mm. 1.5mm x 1mm => 263 steps x 175 steps, so 4 lines across width of oval and mirrored on negative side => filled
  * On parabola, equation in mm is y = -1.5 * (x^2) + 1.5. In nm, -1500000 ((x / 1000000)^2) + 1500000.
  */
-void drawOval() {
-	uint32_t ovalLineDistance = 15000U;			// distance between lines		(nm)
-	uint32_t ovalLineStartDistance = 5000U;		// distance from top of oval	(nm)
-	int8_t k = 6;								// start value
 
+#define OVALLINES				12
+#define OVALLINESHALF			(OVALLINES / 2)
+#define OVALLINESTARTPERCENT	5				// percentage of start and end that will be ignored in considering range
+#define OVALSTARTOFFSET			OVALLINESTARTPERCENT * 10000U
+uint32_t OVALLINEOFFSET =		((1.0 - (1.0 / (OVALLINESTARTPERCENT * 2.0))) * 1000000.0) / OVALLINESHALF; // Take twice percent off for both ends, get range we'll divide based on one side of oval and scale to nm
+void drawOval() {
+	int8_t k = OVALLINESHALF;				// start value
 	int32_t currX = 0; // presume in center of oval
 	int32_t currY = 0; // presume in center of oval
+	int8_t kInc = -1;
 
-	while (k >= 0) {
-		int32_t x = -(k * 150000 + 50000); // 0.15 mm * k + 0.05 mm = 6 evenly spaced divisions across 0-1 given input in space 0-6
-		// negative because this will do negative side first
+	SERVO_setPenMode(PENDOWN);
+	delay20ms();
+
+	while (k <= OVALLINESHALF) { // negate x result if doing negative side
+		int32_t x = kInc == -1 ? -(k * OVALLINEOFFSET + OVALSTARTOFFSET) : k * OVALLINEOFFSET + OVALSTARTOFFSET; // 0.15 mm * k + 0.05 mm = 6 evenly spaced divisions across 0-1 given input in space 0-6
 		int32_t relativeX = x - currX;
 		uint32_t xPosSteps = nanometersToSteps((uint64_t) (relativeX < 0 ? -relativeX : relativeX)); // negative side first, so
-		STEPPERS_moveRelativeNoAccel(stepperY_p, relativeX > 0 ? xPosSteps : -xPosSteps); // the parabola model is a 90 degree rotation of half the oval. So X coords actually correspond to Y's motor
-		currX = x;
 
 		double scaledX = (double) x / 1000000.0L; // scaled to 1mm (1000000 nm)
-		uint32_t y = -1500000 * (scaledX * scaledX) + 1500000;
+		uint32_t y = -1500000 * (scaledX * scaledX) + 1500000; // -1.5mm * x^2 + 1.5mm = equation of parabola
 		int32_t relativeY = y - currY;
 		uint32_t yPosSteps = nanometersToSteps((uint64_t)relativeY);
-		STEPPERS_moveRelativeNoAccel(stepperX_p, relativeY > 0 ? -yPosSteps : yPosSteps); // x stepper drives in inverse directions compared to y, so opposite signs
-		currY = y;
+		STEPPERS_moveRelativeNoAccel(stepperY_p, relativeX > 0 ? xPosSteps : -xPosSteps); // the parabola model is a 90 degree rotation of half the oval. So X coords actually correspond to Y's motor
+		STEPPERS_moveRelativeNoAccel(stepperX_p, relativeY > 0 ? -yPosSteps : yPosSteps);
 
-		while (stepperX_p->status.running && stepperY_p->status.running);
-
-		// in position
-		SERVO_setPenMode(PENDOWN);
-		delay();
+		while (stepperX_p->status.running || stepperY_p->status.running);
+		currX = x;
+		currY = y; // in position
 		uint32_t lineSteps = nanometersToSteps(y << 1);
 		STEPPERS_moveRelativeNoAccel(stepperX_p, lineSteps); // y * 2 == line width
 		while(stepperX_p->status.running);
 		currY = -y;
-		//delay();
-		k--;
-	}
-	while (k <= 6) {
-		int32_t x = k * 150000 + 50000; // 0.15 mm * k + 0.05 mm = 6 evenly spaced divisions across 0-1 given input in space 0-6
-		int32_t relativeX = x - currX;
-		uint32_t xPosSteps = nanometersToSteps((uint64_t) (relativeX < 0 ? -relativeX : relativeX)); // negative side first, so
-		STEPPERS_moveRelativeNoAccel(stepperY_p, relativeX > 0 ? xPosSteps : -xPosSteps); // the parabola model is a 90 degree rotation of half the oval. So X coords actually correspond to Y's motor
-		currX = x;
-
-		double scaledX = (double) x / 1000000.0L; // scaled to 1mm (1000000 nm)
-		uint32_t y = -1500000 * (scaledX * scaledX) + 1500000;
-		int32_t relativeY = y - currY;
-		uint32_t yPosSteps = nanometersToSteps((uint64_t)relativeY);
-		STEPPERS_moveRelativeNoAccel(stepperX_p, relativeY > 0 ? -yPosSteps : yPosSteps); // x stepper drives in inverse directions compared to y, so opposite signs
-		currY = y;
-
-		while (stepperX_p->status.running && stepperY_p->status.running);
-
-		// in position
-		SERVO_setPenMode(PENDOWN);
-		delay();
-		uint32_t lineSteps = nanometersToSteps(y << 1);
-		STEPPERS_moveRelativeNoAccel(stepperX_p, lineSteps); // y * 2 == line width
-		while(stepperX_p->status.running);
-		currY = -y;
-		//delay();
-		k++;
-
+		k += kInc;
+		if (k == -1) {
+			kInc = 1;
+			k++;
+		}
+		delay1ms();
 	}
 	SERVO_setPenMode(PENUP);
 }
@@ -166,6 +173,70 @@ int main(void) {
 	SERVO_setupPWM();
 	SERVO_startPWM();
 
+	SERVO_setPenMode(PENUP); // begin with pen high
+	delay20ms();
+	//drawOval();
+
+	STEPPERS_setHome(stepperX_p);
+	STEPPERS_setHome(stepperY_p);
+
+	//drawRectangle();
+	//sleepMotors();
+
+	uint32_t rectangleCorners[4];
+	status_t a = findRectangleCorners(&rectangleCorners, 4);
+	PRINTF("status: %c", a == kStatus_Fail ? "F" : "S");
+	//sample_s samples[100];
+
+	//pollADC(stepperX_p, 1000);
+	//for (uint32_t i = 0; i < 100; i++) {
+	//	PRINTF("\r\n %d, %d, %d", samples[i].x, samples[i].y, samples[i].value);
+	//}
+
+	sleepMotors();
+
+
+	/*while (1) {
+		PRINTF("\r\n adcValue: %lf", readAvgADC(1000));
+	}*/
+
+
+
+	//STEPPERS_moveRelativeAccel(stepperY_p, 4000);
+	//while(stepperY_p->status.running);
+
+	/*for (uint32_t i = 0; i < 10; i++) {
+		STEPPERS_moveToAccel(stepperX_p, 10000);
+		while(stepperX_p->status.running);
+
+		//SERVO_setPenMode(PENUP);
+		STEPPERS_moveToAccel(stepperX_p, 0);
+		while(stepperX_p->status.running);
+
+		STEPPERS_moveRelativeNoAccel(stepperY_p, 5);
+		while (stepperY_p->status.running);
+	}
+	*/
+
+	/*
+	STEPPERS_moveRelativeNoAccel(stepperY_p, 10000);
+	uint32_t adcVal = 0;
+	while (adcVal < 16000) {
+		adcVal = IRSENSOR_getADCValue();
+		PRINTF("\r\n adc Val: %d", adcVal);
+	}
+	STEPPERS_stopMotor(stepperY_p);
+	PRINTF("StepperY pos: %d", stepperY_p->position);
+	*/
+
+
+	/*while(1) {
+		STEPPERS_moveRelative(stepperY_p, 10000, true);
+		while (stepperY_p->status.running);
+		STEPPERS_moveRelative(stepperY_p, -10000, true);
+		while (stepperY_p->status.running);
+	}*/
+
 	/*
 	while (1) {
 		STEPPERS_moveRelativeAccel(stepperX_p, 1000);
@@ -176,11 +247,12 @@ int main(void) {
 		while (stepperX_p->status.running && stepperY_p->status.running);
 		delay();
 	}*/
-	delay();
+	//delay();
 	//while(1);
-	//findHome();
-	drawOval();
 
+	//findHome();
+
+	//STEPPERS_moveRelative(motor_p, steps, accel)
 
 
 	/*while (1) {
@@ -266,4 +338,203 @@ int main(void) {
 //		__asm volatile ("nop");
 //	}
 	return 0;
+}
+
+void pollADC(stepperMotor_s* motor_p, uint32_t steps) {
+	uint32_t stepsInc = steps / 100;
+	for (uint32_t i = 0; i < 100; i++) {
+		sample_s s = {
+			.x = stepperX_p->position,
+			.y = stepperY_p->position,
+			.value = readAvgADC(1000)
+		};
+		pastSamples[i] = s;
+		STEPPERS_moveRelativeNoAccel(motor_p, stepsInc);
+		while(stepperX_p->status.running);
+	}
+}
+
+void findCorners() {
+	// presume findHome has been called and home set
+
+	STEPPERS_moveToNoAccel(stepperX_p, 0);
+	STEPPERS_moveToNoAccel(stepperY_p, 0);
+	while (stepperX_p->status.running || stepperY_p->status.running);
+
+	sample_s backgroundSample = {
+		.x = stepperX_p->position,
+		.y = stepperY_p->position,
+		.value = readAvgADC(5000)
+	}; // quick sample of background color
+
+	PRINTF("backgroundSample val: %d", backgroundSample.value);
+	// move diagonal but stop when ADC reads angled bracket for lining up document
+	STEPPERS_moveRelativeNoAccel(stepperX_p, 10000);
+	STEPPERS_moveRelativeNoAccel(stepperY_p, 10000);
+
+	uint32_t s = backgroundSample.value;
+	// wrapping issue
+	while (backgroundSample.value <= s + ADCVALUETOLERANCE && backgroundSample.value <= s + ADCVALUETOLERANCE) {
+		s = readAvgADC(1000);
+		if (!stepperX_p->status.running) { // keep driving until we find it
+			STEPPERS_moveRelativeNoAccel(stepperX_p, 10000);
+		}
+		else if (!stepperY_p->status.running) {
+			STEPPERS_moveRelativeNoAccel(stepperY_p, 10000);
+		}
+	}
+	PRINTF("currentSample val: %d", s);
+	// when we break out, reading new unique value
+	STEPPERS_stopMotor(stepperX_p);
+	STEPPERS_stopMotor(stepperY_p);
+
+	//TODO
+}
+
+/**
+ * Attempts to find 4 points of a rectangle using the ADC
+ */
+status_t findRectangleCorners(uint32_t* rectPoints[], uint8_t size) {
+	if (size != 4) {
+		return kStatus_Fail; // failure. the rect points will be used to set the points in the array. If it isn't the right size, we can't use it
+	}
+	// presume above rectangle
+	sample_s upRight;
+	sample_s downRight;
+	sample_s downLeft;
+	sample_s upLeft;
+	findRectangleCorner(&upRight, false, true, false, false, false);
+	PRINTF("\r\n upRight.x: %d, upRight.y: %d, upRight.value: %d", upRight.x, upRight.y, upRight.value);
+	STEPPERS_moveToNoAccel(stepperX_p, upRight.x);
+	STEPPERS_moveToNoAccel(stepperY_p, upRight.y + 10); // go to corner, but more towards middle of rect
+	while(stepperX_p->)
+	findRectangleCorner(&downRight, false, false, true, false, false);
+	PRINTF("\r\n downRight.x: %d, downRight.y: %d, downRight.value: %d", downRight.x, downRight.y, downRight.value);
+	while(1);
+	findRectangleCorner(&downLeft, false, false, false, true, false);
+	findRectangleCorner(&upLeft, false, false, false, false, true);
+	//findUpRight();
+
+	/*PRINTF("\r\n start.x: %d, start.y: %d, start.value: %d, cornerUR.x: %d, cornerUR.y: %d, cornerUR.value: %d, cornerDR.x: %d, cornerDR.y: %d, cornerDR.value: %d\r\n",
+		start.x,
+		start.y,
+		start.value,
+		cornerUpRight.x,
+		cornerUpRight.y,
+		cornerUpRight.value,
+		cornerDownRight.x,
+		cornerDownRight.y,
+		cornerDownRight.value
+	);*/
+	sleepMotors();
+	// on black now, start steppering right to find first corner
+	while (1);
+
+	return kStatus_Success;
+}
+
+void findRectangleCorner(sample_s* corner_p, bool slim, bool upRight, bool downRight, bool downLeft, bool upLeft) {
+	bool startFound = false;
+	sample_s start;
+	uint32_t i = 0;
+	uint32_t tries = 0;
+	while (!startFound) {
+		tries++;
+		if (tries > 3) {
+			return kStatus_Fail; // couldn't find rectangle
+		}
+		if (upRight) { // presume start above rectangle
+			pollADC(stepperY_p, 200); // 200 * 0.01143 = 2.286mm
+		}
+		else if (downRight) { // presume start to the right of rectangle
+			pollADC(stepperX_p, -200); // 200 * 0.01143 = 2.286mm
+		}
+		else if (downLeft) { // presume start below rectangle
+			pollADC(stepperY_p, -200); // 200 * 0.01143 == 2.286mm
+		}
+		else { // upLeft, presume start to the left of rectangle
+			pollADC(stepperX_p, 200); // 200 * 0.01143 = 2.286mm
+		}
+		i = 0;
+		while (i < 100) {
+			if (pastSamples[i].value > 27000U) {
+				start = pastSamples[i];
+				startFound = true;
+				break;
+			}
+			i++;
+		}
+	}
+	PRINTF("\r\n moving motors to startx: %d, starty: %d", start.x, start.y);
+	STEPPERS_moveToNoAccel(stepperX_p, start.x);
+	STEPPERS_moveToNoAccel(stepperY_p, start.y);
+	while (stepperX_p->status.running || stepperY_p->status.running);
+	if (upRight) { // drive right until ADC no longer reads rect
+		pollADC(stepperX_p, slim ? 200 : 400); // 400 steps = 0.01143*400 ~~ 4.5mm to the right
+	}
+	else if (downRight) { // drive down until ADC no longer reads rect
+		pollADC(stepperY_p, slim ? 200 : 400); // 400 steps = 0.01143*400 ~~ 4.5mm to the right
+	}
+	else if (downLeft) { // drive left until ADC no longer reads rect
+		pollADC(stepperX_p, slim ? -200 : -400); // 400 steps = 0.01143*400 ~~ 4.5mm to the right
+	}
+	else { // upLeft, drive up until ADC no longer reads rect
+		pollADC(stepperY_p, slim ? -200 : -400); // 400 steps = 0.01143*400 ~~ 4.5mm to the right
+	}
+	i = 0;
+	while (i < 100) {
+		if (pastSamples[i].value < 24000U) {
+			corner_p->x = pastSamples[i - 1].x;
+			corner_p->y = pastSamples[i - 1].y;
+			corner_p->value = pastSamples[i - 1].value;
+			break;
+		}
+		i++;
+	}
+}
+
+// 3000 x 250 debugging oval (for moving around a rectangle and finding IR center
+void drawRectangle() {
+	SERVO_setPenMode(PENDOWN);
+	delay20ms();
+	uint32_t i = 0;
+	while (i < 250) {
+		STEPPERS_moveRelativeAccel(stepperX_p, i % 10 == 0 ? -3000 : 3000);
+		while(stepperX_p->status.running);
+		STEPPERS_moveRelativeNoAccel(stepperY_p, 5);
+		while (stepperY_p->status.running);
+		delay1ms();
+		i+= 5;
+	}
+	SERVO_setPenMode(PENUP);
+	delay20ms();
+}
+
+double readAvgADC(uint32_t samples) {
+	uint32_t sum = 0;
+	for (uint32_t i = 0; i < samples; i++) {
+		uint32_t reading = IRSENSOR_getADCValue();
+		sum += reading;
+	}
+	return sum / ((double) samples);	 // returns double
+}
+
+// warning, stepper home state reset. If steps % 16 != 0, stepper will shift so steps % 16 == 0
+void sleepMotors() {
+	STEPPERS_writeEnablePin(stepperX_p, true);
+	STEPPERS_writeEnablePin(stepperY_p, true);	// disable motors
+	STEPPERS_writeSleepPin(stepperX_p, false);
+	STEPPERS_writeSleepPin(stepperY_p, false);	// set sleep
+}
+
+void wakeMotors() {
+	STEPPERS_writeResetPin(stepperX_p, false);	// reset motors
+	STEPPERS_writeResetPin(stepperY_p, false);
+	STEPPERS_writeSleepPin(stepperX_p, true);	// wake motors
+	STEPPERS_writeSleepPin(stepperY_p, true);
+	STEPPERS_writeResetPin(stepperX_p, true);	// end reset
+	STEPPERS_writeResetPin(stepperY_p, true);
+	STEPPERS_writeEnablePin(stepperX_p, false);	// enable motors
+	STEPPERS_writeEnablePin(stepperY_p, false);
+
 }

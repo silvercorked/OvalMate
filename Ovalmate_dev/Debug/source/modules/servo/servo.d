@@ -13,13 +13,7 @@ source/modules/servo/servo.o source/modules/servo/servo.d: \
  C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\device/LPC55S16_features.h \
  C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\drivers/fsl_common_arm.h \
  C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\drivers/fsl_clock.h \
- C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\drivers/fsl_reset.h \
- C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\drivers/fsl_gpio.h \
- C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\utilities/fsl_debug_console.h \
- C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\drivers/fsl_common.h \
- C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\component\serial_manager/fsl_component_serial_manager.h \
- C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\component\serial_manager/fsl_component_serial_port_uart.h \
- C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\component\uart/fsl_adapter_uart.h
+ C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\drivers/fsl_reset.h
 ../source/modules/servo/servo.h:
 C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\drivers/fsl_ctimer.h:
 C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\drivers/fsl_common.h:
@@ -35,9 +29,3 @@ C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalma
 C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\drivers/fsl_common_arm.h:
 C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\drivers/fsl_clock.h:
 C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\drivers/fsl_reset.h:
-C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\drivers/fsl_gpio.h:
-C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\utilities/fsl_debug_console.h:
-C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\drivers/fsl_common.h:
-C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\component\serial_manager/fsl_component_serial_manager.h:
-C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\component\serial_manager/fsl_component_serial_port_uart.h:
-C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\component\uart/fsl_adapter_uart.h:

@@ -29,6 +29,10 @@
  *		Increased limit for no acceleration mode to a full revolution at 3200 steps.
  *		Added functions for setting pins.
  *		Swapped function names to be more acceptable of a module approach.
+ *  - 3/14/2022:
+ *		Swapped direction pin setting for stepperY. StepperY rotates opposite stepperX. So one of them needed to be inverted.
+ *		This was done by handling the case in the STEPPER_writeDirectionPin function. As long as that function is used for setting steppers,
+ *		The use can be safe to assume X and Y point in the same direction.
  */
 
 #include "steppers.h"
@@ -219,9 +223,9 @@ status_t STEPPERS_setMotorStepsPerPhase(stepperMotorPhaseSteps_s* phaseSteps_p, 
 	phaseSteps_p->steady = 0;
 	phaseSteps_p->slowing = 0;
 	phaseSteps_p->startSpeed = 0;	// clear phaseSteps
-	if (steps <= 3200 || !accel)	// one full revolution
+	if (steps <= 1000 || !accel)	// 5/16 of a revolution = 1000 steps
 		phaseSteps_p->startSpeed = steps;	// all steps are no accel at start speed
-	else if (steps <= 9600) { // 3 full revolutions
+	else if (steps <= 3200) { // one full revolution = 3200 steps
 		phaseSteps_p->accelerating = steps / 4;					// 1/4 accel
 		phaseSteps_p->slowing = phaseSteps_p->accelerating;		// 1/4 decel
 		steps -= phaseSteps_p->accelerating << 1;				// left shift once == multiply by 2 in 1 clock
@@ -366,7 +370,7 @@ bool STEPPERS_readInputPin(pinInformation_s* pinInfo_p) {
 	return GPIO_PinRead(GPIO, pinInfo_p->port, pinInfo_p->pin);
 }
 void STEPPERS_writeDirectionPin(stepperMotor_s* motor_p, bool highLow) {
-	if (motor_p == stepperY) // stepperY rotates opposite of StepperX.
+	if (motor_p == stepperY_p) // stepperY rotates opposite of StepperX.
 		//This makes their "directions", the same in code, but opposite in hardware,
 		// as long as this function is the how the direction is changed
 		STEPPERS_writeOutputPin(motor_p->pinInfo_arr_p[DIRECTION], !highLow);
