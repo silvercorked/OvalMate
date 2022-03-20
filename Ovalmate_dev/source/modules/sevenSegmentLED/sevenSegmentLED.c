@@ -12,6 +12,8 @@
  *	- 3/14/2022:
  *		modified seven seg function names to better represent the modular approach
  *		Added displayErrorCode function. Takes a 8 bit val and uses the first 7 bits as flags to set legs, 0th pos -> a leg, 6th pos -> g leg
+ *	- 3/19/2022:
+ *		Added comments to all functions in preparation for Software Design Review
  */
 
 #include "sevenSegmentLED.h"
@@ -24,12 +26,22 @@ pinInformation_s legD = { .port = 0, .pin = 8 };
 pinInformation_s legE = { .port = 0, .pin = 13 };
 pinInformation_s legF = { .port = 0, .pin = 14 };
 pinInformation_s legG = { .port = 0, .pin = 18 };
-	// leg a w/ logic low = 1.6v, logic high = 3.3v (this doesn't activate the LED).
-	// leg b w/ logic low = 0v, logic high = 1.6v (this does activate the LED).
 gpio_pin_config_t sevenSegConfig = { .pinDirection = kGPIO_DigitalOutput, .outputLogic = 0};
 // End Variables
 
 // Functions
+/**
+ * Set the legs of the seven segment display, leg-by-leg.
+ *
+ * @params	- bool a	: a leg of seven segment display. true -> 1U, false -> 0U
+ * 			- bool b	: b leg of seven segment display. true -> 1U, false -> 0U
+ * 			- bool c	: c leg of seven segment display. true -> 1U, false -> 0U
+ * 			- bool d	: d leg of seven segment display. true -> 1U, false -> 0U
+ * 			- bool e	: e leg of seven segment display. true -> 1U, false -> 0U
+ * 			- bool f	: f leg of seven segment display. true -> 1U, false -> 0U
+ * 			- bool g	: g leg of seven segment display. true -> 1U, false -> 0U
+ * @return	- None
+ */
 void SEVENSEG_setLegs(bool a, bool b, bool c, bool d, bool e, bool f, bool g) {
 	GPIO_PinWrite(GPIO, legA.port, legA.pin, a); // write bool value to pin
 	GPIO_PinWrite(GPIO, legB.port, legB.pin, b); // 1 = high
@@ -40,6 +52,12 @@ void SEVENSEG_setLegs(bool a, bool b, bool c, bool d, bool e, bool f, bool g) {
 	GPIO_PinWrite(GPIO, legG.port, legG.pin, g);
 }
 
+/**
+ * Set the legs of the seven segment display, packed in a uint32_t. Most likely for error reporting.
+ *
+ * @params	- uint32_t errorCode	: 0-127 (128-255 are equal to themselves - 128). First 7 bits are used to set legs.
+ * @return	- None
+ */
 void SEVENSEG_displayErrorCode(uint8_t errorCode) {
 	bool a = errorCode & (1 << 0);
 	bool b = errorCode & (1 << 1);
@@ -51,6 +69,14 @@ void SEVENSEG_displayErrorCode(uint8_t errorCode) {
 	SEVENSEG_setLegs(a, b, c, d, e, f, g);
 }
 
+/**
+ * Initialize the legs of the seven segment display.
+ *
+ * Run this once before using seven segment display. No need to call again.
+ *
+ * @params	- None
+ * @return	- None
+ */
 void SEVENSEG_initializeLegs() {
     /* Init output LED GPIO. */
     //GPIO_PortInit(GPIO, legA.port);

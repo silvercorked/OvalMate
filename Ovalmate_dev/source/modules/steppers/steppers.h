@@ -133,24 +133,57 @@ extern stepperMotor_s* stepperY_p;
 // End Extern Variables
 
 // Macro Functions
+//	Blocking
 #define STEPPERS_moveToAccel(motor_p, steps) \
-	STEPPERS_moveTo(motor_p, steps, true)
+	STEPPERS_moveTo(motor_p, steps, true, true)
 #define STEPPERS_moveToNoAccel(motor_p, steps) \
-	STEPPERS_moveTo(motor_p, steps, false);
+	STEPPERS_moveTo(motor_p, steps, false, true)
 #define STEPPERS_moveRelativeAccel(motor_p, steps) \
-	STEPPERS_moveRelative(motor_p, steps, true)
+	STEPPERS_moveRelative(motor_p, steps, true, true)
 #define STEPPERS_moveRelativeNoAccel(motor_p, steps) \
-	STEPPERS_moveRelative(motor_p, steps, false)
+	STEPPERS_moveRelative(motor_p, steps, false, true)
+//	Non-blocking
+#define STEPPERS_moveToAccelNoBlock(motor_p, steps) \
+	STEPPERS_moveTo(motor_p, steps, true, false)
+#define STEPPERS_moveToNoAccelNoBlock(motor_p, steps) \
+	STEPPERS_moveTo(motor_p, steps, false, false)
+#define STEPPERS_moveRelativeAccelNoBlock(motor_p, steps) \
+	STEPPERS_moveRelative(motor_p, steps, true, false)
+#define STEPPERS_moveRelativeNoAccelNoBlock(motor_p, steps) \
+	STEPPERS_moveRelative(motor_p, steps, false, false)
+
+//	Multi-Motor
+//		Blocking
+#define STEPPERS_moveBothToAccel(motor_p, steps) \
+	STEPPERS_moveBothTo(motor_p, steps, true, true)
+#define STEPPERS_moveBothToNoAccel(motor_p, steps) \
+	STEPPERS_moveBothTo(motor_p, steps, false, true)
+#define STEPPERS_moveBothRelativeAccel(motor_p, steps) \
+	STEPPERS_moveBothRelative(motor_p, steps, true, true)
+#define STEPPERS_moveBothRelativeNoAccel(motor_p, steps) \
+	STEPPERS_moveBothRelative(motor_p, steps, false, true)
+//		Non-blocking
+#define STEPPERS_moveBothToAccelNoBlock(motor_p, steps) \
+	STEPPERS_moveBothTo(motor_p, steps, true, false)
+#define STEPPERS_moveBothToNoAccelNoBlock(motor_p, steps) \
+	STEPPERS_moveBothTo(motor_p, steps, false, false)
+#define STEPPERS_moveBothRelativeAccelNoBlock(motor_p, steps) \
+	STEPPERS_moveBothRelative(motor_p, steps, true, false)
+#define STEPPERS_moveBothRelativeNoAccelNoBlock(motor_p, steps) \
+	STEPPERS_moveBothRelative(motor_p, steps, false, false)
 // End Macro Functions
 
 // Prototypes
-void STEPPERS_initializePins();					// setup stepper motor output pins as GPIO ouputs
-void STEPPERS_initializeMotors();					// must be called once before any ctimer interactions
+void STEPPERS_initializePins(void);					// setup stepper motor output pins as GPIO ouputs
+void STEPPERS_initializeMotors(void);					// must be called once before any ctimer interactions
 
 status_t STEPPERS_setupMotor(stepperMotor_s*, uint32_t, bool);					// steps
 void STEPPERS_driveSteps(stepperMotor_s*, uint32_t, bool);
-status_t STEPPERS_moveRelative(stepperMotor_s*, int32_t, bool);
-status_t STEPPERS_moveTo(stepperMotor_s*, uint32_t, bool);
+status_t STEPPERS_moveRelative(stepperMotor_s*, int32_t, bool, bool);
+status_t STEPPERS_moveTo(stepperMotor_s*, uint32_t, bool, bool);
+status_t STEPPERS_moveBothRelative(int32_t, int32_t, bool, bool);
+status_t STEPPERS_moveBothTo(uint32_t, uint32_t, bool, bool);
+
 void STEPPERS_startMotor(stepperMotor_s*);
 void STEPPERS_stopMotor(stepperMotor_s*);
 
@@ -165,6 +198,9 @@ void STEPPERS_generalTimerCallback(uint32_t, stepperMotor_s*);
 void STEPPERS_XFault(pint_pin_int_t pintr, uint32_t pmatch_status);
 void STEPPERS_YFault(pint_pin_int_t pintr, uint32_t pmatch_status);
 
+void STEPPERS_sleepMotor(stepperMotor_s*);
+void STEPPERS_wakeMotor(stepperMotor_s*);
+
 void STEPPERS_writeOutputPin(pinInformation_s*, bool);
 bool STEPPERS_readInputPin(pinInformation_s*);
 
@@ -173,6 +209,8 @@ void STEPPERS_writeEnablePin(stepperMotor_s*, bool);
 void STEPPERS_writeResetPin(stepperMotor_s*, bool);
 void STEPPERS_writeSleepPin(stepperMotor_s*, bool);
 bool STEPPERS_readHomePin(stepperMotor_s*);
+
+void delay1ms(void);
 // End Prototypes
 
 #endif

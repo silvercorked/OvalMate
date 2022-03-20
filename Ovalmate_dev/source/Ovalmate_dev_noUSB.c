@@ -64,14 +64,6 @@ void delay20ms(void) {
     }
 }
 
-void delay1ms(void) {
-	uint32_t i = 0U;
-	for (i = 0U; i < 15000U; ++i) // 20000000U for servo
-	{	// 3 000 000 should be 20ms delay
-		__asm("NOP"); /* delay */
-	}
-}
-
 void findHome(void) {
 	while (1) {
 		if (!buttonCallback_stepperMotorX_stopped)
@@ -193,7 +185,8 @@ int main(void) {
 	//	PRINTF("\r\n %d, %d, %d", samples[i].x, samples[i].y, samples[i].value);
 	//}
 
-	sleepMotors();
+	STEPPERS_sleepMotor(stepperX_p);
+	STEPPERS_sleepMotor(stepperY_p);
 
 
 	/*while (1) {
@@ -407,7 +400,7 @@ status_t findRectangleCorners(uint32_t* rectPoints[], uint8_t size) {
 	PRINTF("\r\n upRight.x: %d, upRight.y: %d, upRight.value: %d", upRight.x, upRight.y, upRight.value);
 	STEPPERS_moveToNoAccel(stepperX_p, upRight.x);
 	STEPPERS_moveToNoAccel(stepperY_p, upRight.y + 10); // go to corner, but more towards middle of rect
-	while(stepperX_p->)
+	//while(stepperX_p->)
 	findRectangleCorner(&downRight, false, false, true, false, false);
 	PRINTF("\r\n downRight.x: %d, downRight.y: %d, downRight.value: %d", downRight.x, downRight.y, downRight.value);
 	while(1);
@@ -517,24 +510,4 @@ double readAvgADC(uint32_t samples) {
 		sum += reading;
 	}
 	return sum / ((double) samples);	 // returns double
-}
-
-// warning, stepper home state reset. If steps % 16 != 0, stepper will shift so steps % 16 == 0
-void sleepMotors() {
-	STEPPERS_writeEnablePin(stepperX_p, true);
-	STEPPERS_writeEnablePin(stepperY_p, true);	// disable motors
-	STEPPERS_writeSleepPin(stepperX_p, false);
-	STEPPERS_writeSleepPin(stepperY_p, false);	// set sleep
-}
-
-void wakeMotors() {
-	STEPPERS_writeResetPin(stepperX_p, false);	// reset motors
-	STEPPERS_writeResetPin(stepperY_p, false);
-	STEPPERS_writeSleepPin(stepperX_p, true);	// wake motors
-	STEPPERS_writeSleepPin(stepperY_p, true);
-	STEPPERS_writeResetPin(stepperX_p, true);	// end reset
-	STEPPERS_writeResetPin(stepperY_p, true);
-	STEPPERS_writeEnablePin(stepperX_p, false);	// enable motors
-	STEPPERS_writeEnablePin(stepperY_p, false);
-
 }

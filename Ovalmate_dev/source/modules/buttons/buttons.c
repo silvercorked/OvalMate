@@ -11,16 +11,29 @@
  *		Added settable function callbacks for button interrupts
  *	- 3/14/2022:
  *		Reformatted function names to better represent module approach
+ *	- 3/19/2022:
+ *		Added comments to all functions in preparation for Software Design Review
  */
 
 #include "buttons.h"
 
+// Variables
 void (*emergencyBumpCallback)(pint_pin_int_t, uint32_t);
 void (*rightBumpCallback)(pint_pin_int_t, uint32_t);
 void (*leftBumpCallback)(pint_pin_int_t, uint32_t);
 void (*upBumpCallback)(pint_pin_int_t, uint32_t);
 void (*downBumpCallback)(pint_pin_int_t, uint32_t);
+// End Variables
 
+// Functions
+/**
+ * Initialize the pins used by the bump switch interrupts.
+ * The bump switches utilize pin interrupts 0-4. Each are triggered on rising edge.
+ * Run this once before for the bump switch interrupts to work.
+ *
+ * @params	- None
+ * @return	- None
+ */
 void BUTTONS_assignPinsToInterrupts() {
 	/* Connect trigger sources to PINT */
 	INPUTMUX_Init(INPUTMUX);
@@ -63,8 +76,13 @@ void BUTTONS_assignPinsToInterrupts() {
 	//PRINTF("\r\nPress corresponding switches to generate events\r\n");
 }
 
-/*!
- * @brief Call back for PINT Pin interrupt 0.
+/**
+ * This callback is used to signal the emergency button has been pressed.
+ * A custom callback can be called alongside the default behavior by setting the emergencyBumpCallback variable.
+ *
+ * @params	- pint_pin_int_t pintr			: an identifier for which pin interrupt is triggering this function call. (always kPINT_PinInt0)
+ * 			- uint32_t pmatch_status		: I actually don't know what this is. Should probably print it out and try to figure it out.
+ * @return	- None
  */
 void BUTTONS_buttonEmergencyCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
 {
@@ -73,8 +91,13 @@ void BUTTONS_buttonEmergencyCallback(pint_pin_int_t pintr, uint32_t pmatch_statu
 		emergencyBumpCallback(pintr, pmatch_status);
 }
 
-/*!
- * @brief Call back for PINT Pin interrupt 1.
+/**
+ * This callback is used to signal the right button has been pressed.
+ * A custom callback can be called alongside the default behavior by setting the rightBumpCallback variable.
+ *
+ * @params	- pint_pin_int_t pintr			: an identifier for which pin interrupt is triggering this function call. (always kPINT_PinInt1)
+ * 			- uint32_t pmatch_status		: I actually don't know what this is. Should probably print it out and try to figure it out.
+ * @return	- None
  */
 void BUTTONS_bumpRightCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
 {
@@ -83,8 +106,13 @@ void BUTTONS_bumpRightCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
 		rightBumpCallback(pintr, pmatch_status);
 }
 
-/*!
- * @brief Call back for PINT Pin interrupt 2.
+/**
+ * This callback is used to signal the left button has been pressed.
+ * A custom callback can be called alongside the default behavior by setting the leftBumpCallback variable.
+ *
+ * @params	- pint_pin_int_t pintr			: an identifier for which pin interrupt is triggering this function call. (always kPINT_PinInt2)
+ * 			- uint32_t pmatch_status		: I actually don't know what this is. Should probably print it out and try to figure it out.
+ * @return	- None
  */
 void BUTTONS_bumpLeftCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
 {
@@ -93,8 +121,13 @@ void BUTTONS_bumpLeftCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
 		leftBumpCallback(pintr, pmatch_status);
 }
 
-/*!
- * @brief Call back for PINT Pin interrupt 3.
+/**
+ * This callback is used to signal the up button has been pressed.
+ * A custom callback can be called alongside the default behavior by setting the upBumpCallback variable.
+ *
+ * @params	- pint_pin_int_t pintr			: an identifier for which pin interrupt is triggering this function call. (always kPINT_PinInt3)
+ * 			- uint32_t pmatch_status		: I actually don't know what this is. Should probably print it out and try to figure it out.
+ * @return	- None
  */
 void BUTTONS_bumpUpCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
 {
@@ -103,8 +136,13 @@ void BUTTONS_bumpUpCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
 		upBumpCallback(pintr, pmatch_status);
 }
 
-/*!
- * @brief Call back for PINT Pin interrupt 4.
+/**
+ * This callback is used to signal the down button has been pressed.
+ * A custom callback can be called alongside the default behavior by setting the downBumpCallback variable.
+ *
+ * @params	- pint_pin_int_t pintr			: an identifier for which pin interrupt is triggering this function call. (always kPINT_PinInt4)
+ * 			- uint32_t pmatch_status		: I actually don't know what this is. Should probably print it out and try to figure it out.
+ * @return	- None
  */
 void BUTTONS_bumpDownCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
 {
@@ -112,3 +150,4 @@ void BUTTONS_bumpDownCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
 	if (downBumpCallback != NULL)
 		downBumpCallback(pintr, pmatch_status);
 }
+// End Functions

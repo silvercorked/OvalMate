@@ -13,6 +13,8 @@
  *		Removed while loop and commented out code from SDK example
  *	- 3/14/2022:
  *		Reformatted function names to better fit with modular approach
+ *	- 3/19/2022:
+ *		Added comments to all functions in preparation for Software Design Review
  */
 
 #include "irSensor.h"
@@ -31,6 +33,12 @@ lpadc_conv_command_config_t mLpadcCommandConfigStruct;
 lpadc_conv_result_t mLpadcResultConfigStruct;
 // End Variables
 
+/**
+ * Causes the ADC channel (specified by definitions) to do a software trigger to capture ADC input voltage.
+ *
+ * @params	- None
+ * @return	- uint32_t	: ADC input voltage. Mapped from 0V-3.3V -> 0-(2^16) (ADC is 16 bits)
+ */
 uint32_t IRSENSOR_getADCValue() {
 	LPADC_DoSoftwareTrigger(LPADC_BASE, 1U); /* 1U is trigger0 mask. */
 	#if (defined(FSL_FEATURE_LPADC_FIFO_COUNT) && (FSL_FEATURE_LPADC_FIFO_COUNT == 2U))
@@ -44,6 +52,14 @@ uint32_t IRSENSOR_getADCValue() {
 	return ((mLpadcResultConfigStruct.convValue) >> g_LpadcResultShift);
 }
 
+/**
+ * Initialize the ADC & setup IRSensor's ADC channel.
+ *
+ * Run this once before using IRSensor. No need to call again.
+ *
+ * @params	- None
+ * @return	- None
+ */
 void IRSENSOR_initializeADC() {
     /* Disable LDOGPADC power down */
     POWER_DisablePD(kPDRUNCFG_PD_LDOGPADC);
@@ -94,7 +110,7 @@ void IRSENSOR_initializeADC() {
     LPADC_GetDefaultConvTriggerConfig(&mLpadcTriggerConfigStruct);
     mLpadcTriggerConfigStruct.targetCommandId       = LPADC_USER_CMDID;
     mLpadcTriggerConfigStruct.enableHardwareTrigger = false;
-    LPADC_SetConvTriggerConfig(LPADC_BASE, 0U, &mLpadcTriggerConfigStruct); /* Configurate the trigger0. */
+    LPADC_SetConvTriggerConfig(LPADC_BASE, 0U, &mLpadcTriggerConfigStruct); /* Configure the trigger0. */
 
 /*
     PRINTF("ADC Full Range: %d\r\n", g_LpadcFullRange);
