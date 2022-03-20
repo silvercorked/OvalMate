@@ -92,7 +92,38 @@ void buttonCallback_stopRelaventMotor(pint_pin_int_t pintr, uint32_t pmatch_stat
 		buttonCallback_stepperMotorX_stopped = true;
 		buttonCallback_stepperMotorY_stopped = true;
 	}
+}
 
+void findHome() {
+	while (1) {
+		if (!buttonCallback_stepperMotorX_stopped)
+			STEPPERS_moveRelativeNoAccel(stepperX_p, -10000);	// left interrupt expected
+		if (!buttonCallback_stepperMotorY_stopped)
+			STEPPERS_moveRelativeNoAccel(stepperY_p, -10000);	// up interrupt expected
+		// distance isn't important, if we don't hit, it will run again
+		while (stepperX_p->status.running && stepperY_p->status.running);
+		if (buttonCallback_stepperMotorX_stopped && buttonCallback_stepperMotorY_stopped) {
+			STEPPERS_setHome(stepperX_p);
+			STEPPERS_setHome(stepperY_p);
+			break;
+		}
+		else
+			while (stepperX_p->status.running || stepperY_p->status.running);
+	}
+}
+
+void pollADC(stepperMotor_s* motor_p, uint32_t steps) {
+	uint32_t stepsInc = steps / 100;
+	for (uint32_t i = 0; i < 100; i++) {
+		sample_s s = {
+			.x = stepperX_p->position,
+			.y = stepperY_p->position,
+			.value = readAvgADC(1000)
+		};
+		pastSamples[i] = s;
+		STEPPERS_moveRelativeNoAccel(motor_p, stepsInc);
+		while(motor_p->status.running);
+	}
 }
 
 //void motorCallback_scheduleNextJob(stepperMotor_t* motorP) {

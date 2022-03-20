@@ -28,6 +28,18 @@
  *		Added findHome and drawOval functions. Will likely move them into other files later.
  *	- 3/15/2022:
  *		Tested findHome and drawOval. Both looking good. drawOval is slow due to delays put in for testing. Will need to remove them.
+ *	- 3/16/2022:
+ *		Removed slows from drawOval. It runs nicely. Started to reformat it as it is rather long and probably doesn't need to be.
+ *		It's much shorter and easier to read now. Start messing with the IR sensor and trying to pull values.
+ *	- 3/18/2022:
+ *		Wrote a function to draw a rectangle with the pen. Not useful later, but for testing our algorithm for finding the sides of a rectangle, it should be useful.
+ *		It was not useful. Turns out the Pen's mark is actually more reflective than the white paper. white ~ 10k, black ~ 40k, pen mark ~ 7k.
+ *	- 3/19/2022:
+ *		Created an initial algorithm for finding the corners of a rectangle. If we can accurately measure the top right, top left, and bottom left corners,
+ *		then we should know every position on the document.
+ *	-3/20/2022:
+ *		Began rearranging functions and placing them in more understandable spaces to avoid cluttering this main file
+ *
  */
 
 // MAIN INCLUDE
@@ -49,38 +61,8 @@ sample_s blackSample;
 sample_s whiteSample;
 
 void drawRectangle();
-void sleepMotors();
-void wakeMotors();
-double readAvgADC(uint32_t);
-void pollADC(stepperMotor_s*, uint32_t);
 status_t findRectangleCorners(uint32_t**, uint8_t);
 void findRectangleCorner(sample_s*, bool, bool, bool, bool, bool);
-
-void delay20ms(void) {
-    uint32_t i = 0U;
-    for (i = 0U; i < 3000000U; ++i) // 20000000U for servo
-    {	// 3 000 000 should be 20ms delay
-        __asm("NOP"); /* delay */
-    }
-}
-
-void findHome(void) {
-	while (1) {
-		if (!buttonCallback_stepperMotorX_stopped)
-			STEPPERS_moveRelativeNoAccel(stepperX_p, -10000);	// left interrupt expected
-		if (!buttonCallback_stepperMotorY_stopped)
-			STEPPERS_moveRelativeNoAccel(stepperY_p, -10000);	// up interrupt expected
-		// distance isn't important, if we don't hit, it will run again
-		while (stepperX_p->status.running && stepperY_p->status.running);
-		if (buttonCallback_stepperMotorX_stopped && buttonCallback_stepperMotorY_stopped) {
-			STEPPERS_setHome(stepperX_p);
-			STEPPERS_setHome(stepperY_p);
-			break;
-		}
-		else
-			while (stepperX_p->status.running || stepperY_p->status.running);
-	}
-}
 
 sample_s pastSamples[100];
 
@@ -333,20 +315,6 @@ int main(void) {
 	return 0;
 }
 
-void pollADC(stepperMotor_s* motor_p, uint32_t steps) {
-	uint32_t stepsInc = steps / 100;
-	for (uint32_t i = 0; i < 100; i++) {
-		sample_s s = {
-			.x = stepperX_p->position,
-			.y = stepperY_p->position,
-			.value = readAvgADC(1000)
-		};
-		pastSamples[i] = s;
-		STEPPERS_moveRelativeNoAccel(motor_p, stepsInc);
-		while(stepperX_p->status.running);
-	}
-}
-
 void findCorners() {
 	// presume findHome has been called and home set
 
@@ -501,13 +469,4 @@ void drawRectangle() {
 	}
 	SERVO_setPenMode(PENUP);
 	delay20ms();
-}
-
-double readAvgADC(uint32_t samples) {
-	uint32_t sum = 0;
-	for (uint32_t i = 0; i < samples; i++) {
-		uint32_t reading = IRSENSOR_getADCValue();
-		sum += reading;
-	}
-	return sum / ((double) samples);	 // returns double
 }

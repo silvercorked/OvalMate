@@ -118,3 +118,17 @@ status_t SERVO_updatePWMPulsePeriodValue(uint8_t dutyCyclePercent) {
 
     return kStatus_Success;
 }
+
+/**
+ * Delay for 20 milliseconds. This is exactly 1 period length of the servo motors only frequency.
+ *
+ * @params	- None
+ * @return	- None
+ */
+void delay20ms() {
+    uint32_t i = 0U;
+    for (i = 0U; i < 3000000U; ++i) // 20000000U for servo
+    {	// 3 000 000 should be 20ms delay
+        __asm("NOP"); /* delay */
+    }
+}

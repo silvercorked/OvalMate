@@ -53,6 +53,19 @@ uint32_t IRSENSOR_getADCValue() {
 }
 
 /**
+ * reads and averages the ADC output a given number of times.
+ *
+ * @params	- uint32_t samples	: number of times the ADC should be polled.
+ * @return	- double			: ADC input voltage averaged over a period (samples / 48MHz). 48MHz is the frequency of the ADC.
+ */
+double readAvgADC(uint32_t samples) {
+	uint32_t sum = 0;
+	for (uint32_t i = 0; i < samples; i++)
+		sum += IRSENSOR_getADCValue();
+	return sum / ((double) samples);	 // returns double
+}
+
+/**
  * Initialize the ADC & setup IRSensor's ADC channel.
  *
  * Run this once before using IRSensor. No need to call again.

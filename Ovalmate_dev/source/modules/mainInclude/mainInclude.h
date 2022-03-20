@@ -50,6 +50,8 @@ extern bool buttonCallback_stepperMotorY_stopped;
 status_t configure(void);
 void buttonCallback_stopMotors(pint_pin_int_t, uint32_t);	// buttonCallbacks are of this form
 void buttonCallback_stopRelaventMotor(pint_pin_int_t, uint32_t);
+void findHome(void);
+void pollADC(stepperMotor_s*, uint32_t);
 //void motorCallback_scheduleNextJob(stepperMotor_t*);		// motorCallbacks are of this form
 //void motorCallback_printCurrSteps(stepperMotor_t*);
 //void stopMotorIfJobComplete(stepperMotor_t*);
