@@ -23,6 +23,7 @@ component/uart \
 device \
 drivers \
 source \
+source/modules/blackDots \
 source/modules/buttons \
 source/modules/irSensor \
 source/modules/mainInclude \

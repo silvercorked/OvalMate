@@ -27,7 +27,6 @@ bool buttonCallback_stepperMotorX_stopped = false;
 bool buttonCallback_stepperMotorY_stopped = false;
 // End Variables
 
-
 status_t configure() {
 
 	/* Initialize PINT */
@@ -109,20 +108,6 @@ void findHome() {
 		}
 		else
 			while (stepperX_p->status.running || stepperY_p->status.running);
-	}
-}
-
-void pollADC(stepperMotor_s* motor_p, uint32_t steps) {
-	uint32_t stepsInc = steps / 100;
-	for (uint32_t i = 0; i < 100; i++) {
-		sample_s s = {
-			.x = stepperX_p->position,
-			.y = stepperY_p->position,
-			.value = readAvgADC(1000)
-		};
-		pastSamples[i] = s;
-		STEPPERS_moveRelativeNoAccel(motor_p, stepsInc);
-		while(motor_p->status.running);
 	}
 }
 

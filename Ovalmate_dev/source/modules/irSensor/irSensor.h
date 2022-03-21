@@ -48,6 +48,7 @@ extern lpadc_conv_result_t mLpadcResultConfigStruct;
 // Prototypes
 uint32_t IRSENSOR_getADCValue(void);
 void IRSENSOR_initializeADC(void);
+double IRSENSOR_readAvgADC(uint32_t);
 // End Prototypes
 
 #endif

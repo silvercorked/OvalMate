@@ -4,12 +4,18 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../source/modules/mainInclude/advancedSteppers.c \
+../source/modules/mainInclude/localization.c \
 ../source/modules/mainInclude/mainInclude.c 
 
 OBJS += \
+./source/modules/mainInclude/advancedSteppers.o \
+./source/modules/mainInclude/localization.o \
 ./source/modules/mainInclude/mainInclude.o 
 
 C_DEPS += \
+./source/modules/mainInclude/advancedSteppers.d \
+./source/modules/mainInclude/localization.d \
 ./source/modules/mainInclude/mainInclude.d 
 
 

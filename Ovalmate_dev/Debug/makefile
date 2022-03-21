@@ -17,6 +17,7 @@ RM := rm -rf
 -include source/modules/mainInclude/subdir.mk
 -include source/modules/irSensor/subdir.mk
 -include source/modules/buttons/subdir.mk
+-include source/modules/blackDots/subdir.mk
 -include source/subdir.mk
 -include drivers/subdir.mk
 -include device/subdir.mk

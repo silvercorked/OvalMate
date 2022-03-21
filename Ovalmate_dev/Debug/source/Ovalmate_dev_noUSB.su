@@ -1,10 +1,1 @@
-../source/Ovalmate_dev_noUSB.c:59:6:delay20ms	16	static
-../source/Ovalmate_dev_noUSB.c:67:6:findHome	8	static
-../source/Ovalmate_dev_noUSB.c:100:6:drawOval	88	static
-../source/Ovalmate_dev_noUSB.c:141:5:main	32	static
-../source/Ovalmate_dev_noUSB.c:336:6:pollADC	48	static
-../source/Ovalmate_dev_noUSB.c:350:6:findCorners	24	static
-../source/Ovalmate_dev_noUSB.c:390:10:findRectangleCorners	72	static
-../source/Ovalmate_dev_noUSB.c:429:6:findRectangleCorner	40	static
-../source/Ovalmate_dev_noUSB.c:490:6:drawRectangle	16	static
-../source/Ovalmate_dev_noUSB.c:506:8:readAvgADC	40	static
+../source/Ovalmate_dev_noUSB.c:56:5:main	32	static

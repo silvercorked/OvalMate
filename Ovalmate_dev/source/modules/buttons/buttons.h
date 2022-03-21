@@ -1,7 +1,7 @@
 /**
  * Title: OvalMate_button_module_DevBoard
  * Version: 0.0.1
- * Filename: LPC55S16_Project_main_dev.c
+ * Filename: buttons.h
  * Authors: Alex Wissing
  * Purpose of Program: Initialize button interrupts
  * How Program is Run on Target System:

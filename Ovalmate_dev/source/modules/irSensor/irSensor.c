@@ -13,6 +13,8 @@
  *		Removed while loop and commented out code from SDK example
  *	- 3/14/2022:
  *		Reformatted function names to better fit with modular approach
+ *	- 3/17/2022:
+ *		Fixed IR sensor and even found out how to run it through the correct pin (ADC0_8 ie ADC0_0 side b)
  *	- 3/19/2022:
  *		Added comments to all functions in preparation for Software Design Review
  */
@@ -58,7 +60,7 @@ uint32_t IRSENSOR_getADCValue() {
  * @params	- uint32_t samples	: number of times the ADC should be polled.
  * @return	- double			: ADC input voltage averaged over a period (samples / 48MHz). 48MHz is the frequency of the ADC.
  */
-double readAvgADC(uint32_t samples) {
+double IRSENSOR_readAvgADC(uint32_t samples) {
 	uint32_t sum = 0;
 	for (uint32_t i = 0; i < samples; i++)
 		sum += IRSENSOR_getADCValue();

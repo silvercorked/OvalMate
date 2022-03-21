@@ -8,3 +8,4 @@ C:\Users\Alex\Documents\MCUXpressoIDE_11.5.0_7232\workspace\OvalMate\Ovalmate_de
 ../source/modules/servo/servo.c:87:6:SERVO_stopPWM	8	static
 ../source/modules/servo/servo.c:100:10:SERVO_getPWMPeriodValue	24	static
 ../source/modules/servo/servo.c:115:10:SERVO_updatePWMPulsePeriodValue	16	static
+../source/modules/servo/servo.c:128:6:delay20ms	16	static
