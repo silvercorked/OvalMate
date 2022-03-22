@@ -69,6 +69,9 @@ int main(void) {
 	// init
 	configure(); // from MainInclude. This sets the base for all function pointers
 	// end init
+	//STEPPERS_sleepMotor(stepperX_p);
+	//STEPPERS_sleepMotor(stepperY_p);
+	/**/
 
 	// give motors job w/ step param
 	//setupStepperPWM(&motorX, 20);
@@ -84,15 +87,30 @@ int main(void) {
 	delay20ms();
 	//drawOval();
 
-	STEPPERS_setHome(stepperX_p);
-	STEPPERS_setHome(stepperY_p);
+	//STEPPERS_setHome(stepperX_p);
+	//STEPPERS_setHome(stepperY_p);
+	stepperX_p->position = 5000;
+	stepperY_p->position = 5000;
 
-	//drawRectangle();
-	//sleepMotors();
+	//findHome();
+	point_s rectangleCorners[4];
+	status_t a = findRectangleCorners(rectangleCorners, 4);
+	PRINTF("status: %c", a == kStatus_Fail ? 'F' : 'S');
+	if (a != kStatus_Fail) {
+		point_s center;
+		a = getCenterFromRectCorners(rectangleCorners, 4, &center);
+		PRINTF("\r\n center.x: %d, center.y: %d, status: %c", center.x, center.y, a == kStatus_Fail ? 'F' : 'S');
+		STEPPERS_moveBothToNoAccel(center.x, center.y);
 
-	uint32_t rectangleCorners[4];
-	status_t a = findRectangleCorners(&rectangleCorners, 4);
-	PRINTF("status: %c", a == kStatus_Fail ? "F" : "S");
+		STEPPERS_moveBothRelativeNoAccel(2124, -3291); // from IR sensor mode to pen mode;
+		SERVO_setPenMode(PENDOWN);
+		delay20ms();
+		STEPPERS_moveRelativeNoAccel(stepperY_p, 1000);
+		STEPPERS_moveRelativeNoAccel(stepperY_p, -1000);
+		STEPPERS_moveRelativeNoAccel(stepperX_p, 500);
+		STEPPERS_moveRelativeNoAccel(stepperX_p, -500);
+		SERVO_setPenMode(PENUP);
+	}
 	//sample_s samples[100];
 
 	//pollADC(stepperX_p, 1000);
@@ -102,6 +120,8 @@ int main(void) {
 
 	STEPPERS_sleepMotor(stepperX_p);
 	STEPPERS_sleepMotor(stepperY_p);
+
+
 
 
 	/*while (1) {

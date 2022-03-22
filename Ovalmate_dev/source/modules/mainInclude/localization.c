@@ -55,18 +55,25 @@ status_t findRectangleCorners(point_s rectPoints[], uint8_t size) {
 	sample_s downLeft;
 	sample_s upLeft;
 
-	findRectangleCorner(&upRight, false, true, false, false, false);
+	status_t runningStatus = findRectangleCorner(&upRight, false, true, false, false, false);
 	PRINTF("\r\n upRight.x: %d, upRight.y: %d, upRight.value: %d", upRight.x, upRight.y, upRight.value);
+	if (runningStatus != kStatus_Success)
+		return runningStatus;
 	STEPPERS_moveBothToNoAccel(upRight.x, upRight.y + 10); // go to corner, but more towards middle of rect
-	findRectangleCorner(&downRight, false, false, true, false, false);
+	runningStatus = findRectangleCorner(&downRight, false, false, true, false, false);
 	PRINTF("\r\n downRight.x: %d, downRight.y: %d, downRight.value: %d", downRight.x, downRight.y, downRight.value);
-	STEPPERS_moveBothToNoAccel(upRight.x, upRight.y + 10); // go to corner, but more towards middle of rect
-	findRectangleCorner(&downLeft, false, false, false, true, false);
+	if (runningStatus != kStatus_Success)
+			return runningStatus;
+	STEPPERS_moveBothToNoAccel(downRight.x, downRight.y + 10); // go to corner, but more towards middle of rect
+	runningStatus = findRectangleCorner(&downLeft, false, false, false, true, false);
 	PRINTF("\r\n downLeft.x: %d, downLeft.y: %d, downLeft.value: %d", downLeft.x, downLeft.y, downLeft.value);
-	STEPPERS_moveBothToNoAccel(upRight.x, upRight.y + 10); // go to corner, but more towards middle of rect
-	findRectangleCorner(&upLeft, false, false, false, false, true);
+	if (runningStatus != kStatus_Success)
+			return runningStatus;
+	STEPPERS_moveBothToNoAccel(downLeft.x, downLeft.y + 10); // go to corner, but more towards middle of rect
+	runningStatus = findRectangleCorner(&upLeft, false, false, false, false, true);
 	PRINTF("\r\n upLeft.x: %d, upLeft.y: %d, upLeft.value: %d", upLeft.x, upLeft.y, upLeft.value);
-
+	if (runningStatus != kStatus_Success)
+			return runningStatus;
 	rectPoints[0].x = upRight.x; rectPoints[0].y = upRight.y;
 	rectPoints[1].x = downRight.x; rectPoints[1].y = downRight.y;
 	rectPoints[2].x = downLeft.x; rectPoints[2].y = downLeft.y;
@@ -139,10 +146,14 @@ status_t findRectangleCorner(sample_s* corner_p, bool slim, bool upRight, bool d
 	return kStatus_Success;
 }
 
-status_t getCenterFromRectCorners(const point_s* points_arr, uint8_t size, point_s* center) {
+status_t getCenterFromRectCorners(const point_s points_arr[], uint8_t size, point_s* center) {
 	if (size != 4) {
 		return kStatus_Fail; // failure. the rect points will be used to set the points in the array. If it isn't the right size, we can't use it
 	}
+	// points_arr[0] == topRight corner
+	// points_arr[1] == bottomRight corner
+	// points_arr[2] == bottomLeft corner
+	// points_arr[3] == top
 	point_s upRight = points_arr[0];
 	point_s downRight = points_arr[1];
 	point_s downLeft = points_arr[2];

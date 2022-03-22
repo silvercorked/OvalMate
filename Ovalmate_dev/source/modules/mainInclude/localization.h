@@ -16,7 +16,7 @@ status_t findDocumentCorners();
 status_t followBlackSquares(stepperMotor_s*);
 status_t findRectangleCorners(point_s*, uint8_t);
 status_t findRectangleCorner(sample_s*, bool, bool, bool, bool, bool);
-status_t getCenterFromRectCorners(const point_s*, uint8_t, point_s*);
+status_t getCenterFromRectCorners(const point_s[], uint8_t, point_s*);
 void pollADC(stepperMotor_s*, int32_t);
 bool isAlignmentBracket();
 bool isBlack();
