@@ -65,13 +65,21 @@ int main(void) {
 #endif
 
 	PRINTF("Hello World\n");
+	USB_DeviceApplicationInit();
+	// testingUSB
 
+
+	while (1) {
+		USB_DeviceTasks();
+	}
+
+	while (1);
 	// init
-	configure(); // from MainInclude. This sets the base for all function pointers
+	//configure(); // from MainInclude. This sets the base for all function pointers
 	// end init
 	//STEPPERS_sleepMotor(stepperX_p);
 	//STEPPERS_sleepMotor(stepperY_p);
-	/**/
+	/*
 
 	// give motors job w/ step param
 	//setupStepperPWM(&motorX, 20);

@@ -16,6 +16,7 @@ C_DEPS :=
 SUBDIRS := \
 board \
 component/lists \
+component/osa \
 component/pwm \
 component/serial_manager \
 component/timer \
@@ -23,6 +24,7 @@ component/uart \
 device \
 drivers \
 source \
+source/generated \
 source/modules/blackDots \
 source/modules/buttons \
 source/modules/irSensor \
@@ -32,5 +34,9 @@ source/modules/sevenSegmentLED \
 source/modules/steppers \
 source/modules/utils \
 startup \
+usb/device/class/hid \
+usb/device/class \
+usb/device/source/lpcip3511 \
+usb/device/source \
 utilities \
 

@@ -10,7 +10,7 @@ product: Peripherals v11.0
 processor: LPC55S16
 package_id: LPC55S16JBD100
 mcu_data: ksdk2_0
-processor_version: 11.0.1
+processor_version: 11.0.2
 board: LPCXpresso55S16
 functionalGroups:
 - name: BOARD_InitPeripherals
@@ -33,6 +33,14 @@ component:
 - type: 'uart_cmsis_common'
 - type_id: 'uart_cmsis_common_9cb8e302497aa696fdbb5a4fd622c2a8'
 - global_USART_CMSIS_common:
+  - quick_selection: 'default'
+ * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
+
+/* TEXT BELOW IS USED AS SETTING FOR TOOLS *************************************
+component:
+- type: 'gpio_adapter_common'
+- type_id: 'gpio_adapter_common_57579b9ac814fe26bf95df0a384c36b6'
+- global_gpio_adapter_common:
   - quick_selection: 'default'
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
 /* clang-format on */
@@ -70,11 +78,138 @@ static void NVIC_init(void) {
 } */
 
 /***********************************************************************************************************************
+ * USB0 initialization code
+ **********************************************************************************************************************/
+/* clang-format off */
+/* TEXT BELOW IS USED AS SETTING FOR TOOLS *************************************
+instance:
+- name: 'USB0'
+- type: 'usb'
+- mode: 'device'
+- custom_name_enabled: 'false'
+- type_id: 'usb_cbf31fb9a3cef21890d93e737c3d2690'
+- functional_group: 'BOARD_InitPeripherals'
+- peripheral: 'USB0'
+- config_sets:
+  - deviceSetting:
+    - vendor_id: '0xA110'
+    - product_id: '0x05A1'
+    - manufacturer_string: 'Team 110, University of Nebraska at Omaha'
+    - product_string: 'Ovalmate'
+    - self_powered: 'false'
+    - max_power: '100'
+    - interfaces:
+      - 0:
+        - interface_class: 'kClassHid'
+        - setting_hid:
+          - interface_name: 'Ovalmate'
+          - subclass: 'kSubclassBootInterface'
+          - protocol: 'kProtocolNone'
+          - implementation: 'kImplementationGeneric'
+          - endpoints_settings:
+            - 0:
+              - setting_name: 'CoordinateStream'
+              - endpoints:
+                - 0:
+                  - direction: 'kIn'
+                  - transfer_type: 'kInterrupt'
+                  - synchronization: 'kNoSynchronization'
+                  - usage: 'kData'
+                  - max_packet_size_fs: 'custom:2'
+                  - polling_interval_fs: '1'
+                  - bRefresh: '0'
+                  - bSynchAddress: 'NoSynchronization'
+                - 1:
+                  - direction: 'kOut'
+                  - transfer_type: 'kInterrupt'
+                  - synchronization: 'kNoSynchronization'
+                  - usage: 'kData'
+                  - max_packet_size_fs: 'k8'
+                  - polling_interval_fs: '1'
+                  - bRefresh: '0'
+                  - bSynchAddress: 'NoSynchronization'
+          - report_descriptor:
+            - 0:
+              - type: 'kUsage_Page'
+              - value: '0x81'
+              - remarks: 'Usage Page (Vendor defined)'
+            - 1:
+              - type: 'kUsage'
+              - value: '0x82'
+              - remarks: 'Usage (Vendor defined)'
+            - 2:
+              - type: 'kCollection'
+              - value: '0x01'
+              - remarks: 'Collection (Application)'
+            - 3:
+              - type: 'kUsage'
+              - value: '0x83'
+              - remarks: 'Usage (Vendor defined)'
+            - 4:
+              - type: 'kUsage'
+              - value: '0x84'
+              - remarks: 'Usage (Vendor defined)'
+            - 5:
+              - type: 'kLogical_Minimum'
+              - value: '0'
+              - remarks: 'Logical Minimum (0)'
+            - 6:
+              - type: 'kLogical_Maximum'
+              - value: '0x7F'
+              - remarks: 'Logical Maximum (127)'
+            - 7:
+              - type: 'kReport_Size'
+              - value: '0x08'
+              - remarks: 'Report Size (8U)'
+            - 8:
+              - type: 'kReport_Count'
+              - value: '0x02'
+              - remarks: 'Report Count (2U)'
+            - 9:
+              - type: 'kInput'
+              - value: '0x02'
+              - remarks: 'Input(Data, Variable, Absolute)'
+            - 10:
+              - type: 'kUsage'
+              - value: '0x84'
+              - remarks: 'Usage (Vendor defined)'
+            - 11:
+              - type: 'kLogical_Minimum'
+              - value: '0'
+              - remarks: 'Logical Minimum (0)'
+            - 12:
+              - type: 'kLogical_Maximum'
+              - value: '0x7F'
+              - remarks: 'Logical Maximum (127)'
+            - 13:
+              - type: 'kReport_Size'
+              - value: '0x08'
+              - remarks: 'Report Size (8U)'
+            - 14:
+              - type: 'kReport_Count'
+              - value: '0x08'
+              - remarks: 'Report Count (8U)'
+            - 15:
+              - type: 'kOutput'
+              - value: '0x02'
+              - remarks: 'Output(Data, Variable, Absolute)'
+            - 16:
+              - type: 'kEnd_Collection'
+              - remarks: 'End collection,'
+ * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
+/* clang-format on */
+
+static void USB0_init(void) {
+  USB_DeviceApplicationInit();
+}
+
+/***********************************************************************************************************************
  * Initialization functions
  **********************************************************************************************************************/
 void BOARD_InitPeripherals(void)
 {
   /* Initialize components */
+  USB0_init();
 }
 
 /***********************************************************************************************************************

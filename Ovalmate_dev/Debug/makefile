@@ -9,6 +9,10 @@ RM := rm -rf
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include utilities/subdir.mk
+-include usb/device/source/lpcip3511/subdir.mk
+-include usb/device/source/subdir.mk
+-include usb/device/class/hid/subdir.mk
+-include usb/device/class/subdir.mk
 -include startup/subdir.mk
 -include source/modules/utils/subdir.mk
 -include source/modules/steppers/subdir.mk
@@ -18,6 +22,7 @@ RM := rm -rf
 -include source/modules/irSensor/subdir.mk
 -include source/modules/buttons/subdir.mk
 -include source/modules/blackDots/subdir.mk
+-include source/generated/subdir.mk
 -include source/subdir.mk
 -include drivers/subdir.mk
 -include device/subdir.mk
@@ -25,6 +30,7 @@ RM := rm -rf
 -include component/timer/subdir.mk
 -include component/serial_manager/subdir.mk
 -include component/pwm/subdir.mk
+-include component/osa/subdir.mk
 -include component/lists/subdir.mk
 -include board/subdir.mk
 -include subdir.mk

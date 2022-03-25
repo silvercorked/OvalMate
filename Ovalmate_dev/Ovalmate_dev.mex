@@ -24,7 +24,7 @@
             <file path="board/pin_mux.h" update_enabled="true"/>
          </generated_project_files>
          <pins_profile>
-            <processor_version>11.0.1</processor_version>
+            <processor_version>11.0.2</processor_version>
             <pin_labels>
                <pin_label pin_num="32" pin_signal="RESETN" label="(Reset Microcontroller) SW2/J7[2]/J10[9]/J10[10]/U18[16]/N4M_RESET#" identifier="SW2;RESET"/>
                <pin_label pin_num="98" pin_signal="USB0_DM" label="(USB FS  DM) J3[2]/FS_USB0_DN" identifier="USB0_DM"/>
@@ -618,7 +618,7 @@
             <file path="board/clock_config.h" update_enabled="true"/>
          </generated_project_files>
          <clocks_profile>
-            <processor_version>11.0.1</processor_version>
+            <processor_version>11.0.2</processor_version>
          </clocks_profile>
          <clock_configurations>
             <clock_configuration name="BOARD_BootClockFRO12M" id_prefix="" prefix_user_defined="false">
@@ -749,7 +749,6 @@
                   <clock_output id="CTIMER0_clock.outFreq" value="12 MHz" locked="false" accuracy=""/>
                   <clock_output id="CTIMER1_clock.outFreq" value="12 MHz" locked="false" accuracy=""/>
                   <clock_output id="CTIMER3_clock.outFreq" value="1 MHz" locked="false" accuracy=""/>
-                  <clock_output id="CTIMER4_clock.outFreq" value="96 MHz" locked="false" accuracy=""/>
                   <clock_output id="FRO_12MHz_clock.outFreq" value="12 MHz" locked="false" accuracy=""/>
                   <clock_output id="FRO_1MHz_clock.outFreq" value="1 MHz" locked="false" accuracy=""/>
                   <clock_output id="FXCOM0_clock.outFreq" value="12 MHz" locked="false" accuracy=""/>
@@ -768,7 +767,6 @@
                   <setting id="SYSCON.CTIMERCLKSEL0.sel" value="SYSCON.PLL0_BYPASS" locked="false"/>
                   <setting id="SYSCON.CTIMERCLKSEL1.sel" value="SYSCON.PLL0_BYPASS" locked="false"/>
                   <setting id="SYSCON.CTIMERCLKSEL3.sel" value="SYSCON.fro_1m" locked="false"/>
-                  <setting id="SYSCON.CTIMERCLKSEL4.sel" value="ANACTRL.fro_hf_clk" locked="false"/>
                   <setting id="SYSCON.FCCLKSEL0.sel" value="ANACTRL.fro_12m_clk" locked="false"/>
                   <setting id="SYSCON.FRO1MDIV.scale" value="25" locked="true"/>
                   <setting id="SYSCON.MAINCLKSELB.sel" value="SYSCON.PLL1_BYPASS" locked="false"/>
@@ -856,23 +854,206 @@
          <dcdx_configurations/>
       </dcdx>
       <periphs name="Peripherals" version="11.0" enabled="true" update_project_code="true">
+         <dependencies>
+            <dependency resourceType="SWComponent" resourceId="middleware.usb.common_header" description="USB Common Header not found in the toolchain/IDE project. Project will not compile!" problem_level="2" source="Peripherals">
+               <feature name="enabled" evaluation="equal">
+                  <data type="Boolean">true</data>
+               </feature>
+            </dependency>
+            <dependency resourceType="SWComponent" resourceId="middleware.usb.common_header" description="Unsupported version of the USB Common Header in the toolchain/IDE project. Required: ${required_value}, actual: ${actual_value}. Project might not compile correctly." problem_level="1" source="Peripherals">
+               <feature name="version" evaluation="equivalent">
+                  <data type="Version">2.8.0</data>
+               </feature>
+            </dependency>
+         </dependencies>
          <generated_project_files>
             <file path="board/peripherals.c" update_enabled="true"/>
             <file path="board/peripherals.h" update_enabled="true"/>
+            <file path="source/generated/usb_device_composite.c" update_enabled="true"/>
+            <file path="source/generated/usb_device_composite.h" update_enabled="true"/>
+            <file path="source/generated/usb_device_config.h" update_enabled="true"/>
+            <file path="source/generated/usb_device_descriptor.c" update_enabled="true"/>
+            <file path="source/generated/usb_device_descriptor.h" update_enabled="true"/>
+            <file path="source/usb_device_interface_0_ovalmate.c" update_enabled="true"/>
          </generated_project_files>
          <peripherals_profile>
-            <processor_version>11.0.1</processor_version>
+            <processor_version>11.0.2</processor_version>
          </peripherals_profile>
          <functional_groups>
             <functional_group name="BOARD_InitPeripherals" uuid="e48301ba-6eae-42f0-b2e4-0109e547ef26" called_from_default_init="true" id_prefix="" core="cm33_core0">
                <description></description>
                <options/>
-               <dependencies/>
+               <dependencies>
+                  <dependency resourceType="SWComponent" resourceId="middleware.usb.device_controller_ip3511fs" description="&quot;USB Device IP3511FS Controller Driver(FS)&quot; component is missing in the project." problem_level="2" source="Peripherals:BOARD_InitPeripherals">
+                     <feature name="enabled" evaluation="equal">
+                        <data type="Boolean">true</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="SWComponent" resourceId="platform.drivers.power" description="Component Power is missing in the project." problem_level="2" source="Peripherals:BOARD_InitPeripherals">
+                     <feature name="enabled" evaluation="equal">
+                        <data type="Boolean">true</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="SWComponent" resourceId="platform.drivers.common" description="&quot;Common&quot; driver is missing in the project." problem_level="2" source="Peripherals:BOARD_InitPeripherals">
+                     <feature name="enabled" evaluation="equal">
+                        <data type="Boolean">true</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="ClockOutput" resourceId="USB0_clock" description="Function Clock (USB0_clock) is inactive and USB module will not work." problem_level="2" source="Peripherals:BOARD_InitPeripherals">
+                     <feature name="frequency" evaluation="greaterThan">
+                        <data type="Frequency" unit="Hz">0</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="PeripheralUnifiedSignal" resourceId="USBFSH.usb_vbus" description="Signal USB_VBUS of the peripheral USBFSH is not routed." problem_level="2" source="Peripherals:BOARD_InitPeripherals">
+                     <feature name="routed" evaluation="equal">
+                        <data type="Boolean">true</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="SWComponent" resourceId="middleware.usb.device.hid.external" description="&quot;USB device HID&quot; driver is missing in the project." problem_level="2" source="Peripherals:BOARD_InitPeripherals">
+                     <feature name="enabled" evaluation="equal">
+                        <data type="Boolean">true</data>
+                     </feature>
+                  </dependency>
+               </dependencies>
                <instances>
                   <instance name="NVIC" uuid="a1c62bed-c631-4424-b720-c961fb21b08c" type="nvic" type_id="nvic_57b5eef3774cc60acaede6f5b8bddc67" mode="general" peripheral="NVIC" enabled="true" comment="" custom_name_enabled="false" editing_lock="false">
                      <config_set name="nvic">
                         <array name="interrupt_table"/>
                         <array name="interrupts"/>
+                     </config_set>
+                  </instance>
+                  <instance name="USB0" uuid="253af069-1afe-4b0f-9f2d-1b364fcf1ffe" type="usb" type_id="usb_cbf31fb9a3cef21890d93e737c3d2690" mode="device" peripheral="USB0" enabled="true" comment="" custom_name_enabled="false" editing_lock="false">
+                     <config_set name="deviceSetting">
+                        <setting name="vendor_id" value="0xA110"/>
+                        <setting name="product_id" value="0x05A1"/>
+                        <setting name="manufacturer_string" value="Team 110, University of Nebraska at Omaha"/>
+                        <setting name="product_string" value="Ovalmate"/>
+                        <setting name="self_powered" value="false"/>
+                        <setting name="max_power" value="100"/>
+                        <array name="interfaces">
+                           <struct name="0">
+                              <setting name="interface_class" value="kClassHid"/>
+                              <struct name="setting_hid">
+                                 <setting name="interface_name" value="Ovalmate"/>
+                                 <setting name="subclass" value="kSubclassBootInterface"/>
+                                 <setting name="protocol" value="kProtocolNone"/>
+                                 <setting name="implementation" value="kImplementationGeneric"/>
+                                 <array name="endpoints_settings">
+                                    <struct name="0">
+                                       <setting name="setting_name" value="CoordinateStream"/>
+                                       <array name="endpoints">
+                                          <struct name="0">
+                                             <setting name="direction" value="kIn"/>
+                                             <setting name="transfer_type" value="kInterrupt"/>
+                                             <setting name="synchronization" value="kNoSynchronization"/>
+                                             <setting name="usage" value="kData"/>
+                                             <setting name="max_packet_size_fs" value="custom:2"/>
+                                             <setting name="polling_interval_fs" value="1"/>
+                                             <setting name="bRefresh" value="0"/>
+                                             <setting name="bSynchAddress" value="NoSynchronization"/>
+                                          </struct>
+                                          <struct name="1">
+                                             <setting name="direction" value="kOut"/>
+                                             <setting name="transfer_type" value="kInterrupt"/>
+                                             <setting name="synchronization" value="kNoSynchronization"/>
+                                             <setting name="usage" value="kData"/>
+                                             <setting name="max_packet_size_fs" value="k8"/>
+                                             <setting name="polling_interval_fs" value="1"/>
+                                             <setting name="bRefresh" value="0"/>
+                                             <setting name="bSynchAddress" value="NoSynchronization"/>
+                                          </struct>
+                                       </array>
+                                    </struct>
+                                 </array>
+                                 <array name="report_descriptor">
+                                    <struct name="0">
+                                       <setting name="type" value="kUsage_Page"/>
+                                       <setting name="value" value="0x81"/>
+                                       <setting name="remarks" value="Usage Page (Vendor defined)"/>
+                                    </struct>
+                                    <struct name="1">
+                                       <setting name="type" value="kUsage"/>
+                                       <setting name="value" value="0x82"/>
+                                       <setting name="remarks" value="Usage (Vendor defined)"/>
+                                    </struct>
+                                    <struct name="2">
+                                       <setting name="type" value="kCollection"/>
+                                       <setting name="value" value="0x01"/>
+                                       <setting name="remarks" value="Collection (Application)"/>
+                                    </struct>
+                                    <struct name="3">
+                                       <setting name="type" value="kUsage"/>
+                                       <setting name="value" value="0x83"/>
+                                       <setting name="remarks" value="Usage (Vendor defined)"/>
+                                    </struct>
+                                    <struct name="4">
+                                       <setting name="type" value="kUsage"/>
+                                       <setting name="value" value="0x84"/>
+                                       <setting name="remarks" value="Usage (Vendor defined)"/>
+                                    </struct>
+                                    <struct name="5">
+                                       <setting name="type" value="kLogical_Minimum"/>
+                                       <setting name="value" value="0"/>
+                                       <setting name="remarks" value="Logical Minimum (0)"/>
+                                    </struct>
+                                    <struct name="6">
+                                       <setting name="type" value="kLogical_Maximum"/>
+                                       <setting name="value" value="0x7F"/>
+                                       <setting name="remarks" value="Logical Maximum (127)"/>
+                                    </struct>
+                                    <struct name="7">
+                                       <setting name="type" value="kReport_Size"/>
+                                       <setting name="value" value="0x08"/>
+                                       <setting name="remarks" value="Report Size (8U)"/>
+                                    </struct>
+                                    <struct name="8">
+                                       <setting name="type" value="kReport_Count"/>
+                                       <setting name="value" value="0x02"/>
+                                       <setting name="remarks" value="Report Count (2U)"/>
+                                    </struct>
+                                    <struct name="9">
+                                       <setting name="type" value="kInput"/>
+                                       <setting name="value" value="0x02"/>
+                                       <setting name="remarks" value="Input(Data, Variable, Absolute)"/>
+                                    </struct>
+                                    <struct name="10">
+                                       <setting name="type" value="kUsage"/>
+                                       <setting name="value" value="0x84"/>
+                                       <setting name="remarks" value="Usage (Vendor defined)"/>
+                                    </struct>
+                                    <struct name="11">
+                                       <setting name="type" value="kLogical_Minimum"/>
+                                       <setting name="value" value="0"/>
+                                       <setting name="remarks" value="Logical Minimum (0)"/>
+                                    </struct>
+                                    <struct name="12">
+                                       <setting name="type" value="kLogical_Maximum"/>
+                                       <setting name="value" value="0x7F"/>
+                                       <setting name="remarks" value="Logical Maximum (127)"/>
+                                    </struct>
+                                    <struct name="13">
+                                       <setting name="type" value="kReport_Size"/>
+                                       <setting name="value" value="0x08"/>
+                                       <setting name="remarks" value="Report Size (8U)"/>
+                                    </struct>
+                                    <struct name="14">
+                                       <setting name="type" value="kReport_Count"/>
+                                       <setting name="value" value="0x08"/>
+                                       <setting name="remarks" value="Report Count (8U)"/>
+                                    </struct>
+                                    <struct name="15">
+                                       <setting name="type" value="kOutput"/>
+                                       <setting name="value" value="0x02"/>
+                                       <setting name="remarks" value="Output(Data, Variable, Absolute)"/>
+                                    </struct>
+                                    <struct name="16">
+                                       <setting name="type" value="kEnd_Collection"/>
+                                       <setting name="remarks" value="End collection,"/>
+                                    </struct>
+                                 </array>
+                              </struct>
+                           </struct>
+                        </array>
                      </config_set>
                   </instance>
                </instances>
@@ -899,6 +1080,9 @@
             </component>
             <component name="generic_can" uuid="1f7bd46a-eda1-4f7f-a205-7853346b0df6" type_id="generic_can_1bfdd78b1af214566c1f23cf6a582d80">
                <config_set_global name="global_can"/>
+            </component>
+            <component name="gpio_adapter_common" uuid="b6c60925-cb93-4703-9112-35cd03e42a23" type_id="gpio_adapter_common_57579b9ac814fe26bf95df0a384c36b6">
+               <config_set_global name="global_gpio_adapter_common" quick_selection="default"/>
             </component>
          </components>
       </periphs>

@@ -6,7 +6,7 @@
  * Generated linker script file for LPC55S16
  * Created from linkscript.ldt by FMCreateLinkLibraries
  * Using Freemarker v2.3.30
- * MCUXpresso IDE v11.5.0 [Build 7232] [2022-01-11] on Mar 21, 2022, 1:49:16 PM
+ * MCUXpresso IDE v11.5.0 [Build 7232] [2022-01-11] on Mar 24, 2022, 10:57:59 PM
  */
 
 INCLUDE "Ovalmate_dev_noUSB_Debug_library.ld"

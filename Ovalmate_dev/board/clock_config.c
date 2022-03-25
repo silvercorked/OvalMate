@@ -21,7 +21,7 @@ product: Clocks v9.0
 processor: LPC55S16
 package_id: LPC55S16JBD100
 mcu_data: ksdk2_0
-processor_version: 11.0.1
+processor_version: 11.0.2
 board: LPCXpresso55S16
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
 /* clang-format on */
@@ -225,7 +225,6 @@ outputs:
 - {id: CTIMER0_clock.outFreq, value: 12 MHz}
 - {id: CTIMER1_clock.outFreq, value: 12 MHz}
 - {id: CTIMER3_clock.outFreq, value: 1 MHz}
-- {id: CTIMER4_clock.outFreq, value: 96 MHz}
 - {id: FRO_12MHz_clock.outFreq, value: 12 MHz}
 - {id: FRO_1MHz_clock.outFreq, value: 1 MHz}
 - {id: FXCOM0_clock.outFreq, value: 12 MHz}
@@ -243,7 +242,6 @@ settings:
 - {id: SYSCON.CTIMERCLKSEL0.sel, value: SYSCON.PLL0_BYPASS}
 - {id: SYSCON.CTIMERCLKSEL1.sel, value: SYSCON.PLL0_BYPASS}
 - {id: SYSCON.CTIMERCLKSEL3.sel, value: SYSCON.fro_1m}
-- {id: SYSCON.CTIMERCLKSEL4.sel, value: ANACTRL.fro_hf_clk}
 - {id: SYSCON.FCCLKSEL0.sel, value: ANACTRL.fro_12m_clk}
 - {id: SYSCON.FRO1MDIV.scale, value: '25', locked: true}
 - {id: SYSCON.MAINCLKSELB.sel, value: SYSCON.PLL1_BYPASS}
@@ -330,7 +328,6 @@ void BOARD_BootClockPLL150M(void)
     CLOCK_AttachClk(kPLL0_to_CTIMER0);                 /*!< Switch CTIMER0 to PLL0 */
     CLOCK_AttachClk(kPLL0_to_CTIMER1);                 /*!< Switch CTIMER1 to PLL0 */
     CLOCK_AttachClk(kFRO1M_to_CTIMER3);                 /*!< Switch CTIMER3 to FRO1M */
-    CLOCK_AttachClk(kFRO_HF_to_CTIMER4);                 /*!< Switch CTIMER4 to FRO_HF */
     CLOCK_AttachClk(kMAIN_CLK_to_OSTIMER);                 /*!< Switch OSTIMER to MAIN_CLK */
 
     /*!< Set SystemCoreClock variable. */
