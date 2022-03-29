@@ -1,6 +1,6 @@
-C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\drivers/fsl_lpadc.h:821:20:LPADC_DoSoftwareTrigger	16	static
-C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\drivers/fsl_power.h:385:20:POWER_DisablePD	16	static
-C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\drivers/fsl_anactrl.h:339:20:ANACTRL_EnableVref1V	16	static
+C:\Users\Alex\Documents\MCUXpressoIDE_11.5.0_7232\workspace\OvalMate\Ovalmate_dev\drivers/fsl_lpadc.h:821:20:LPADC_DoSoftwareTrigger	16	static
+C:\Users\Alex\Documents\MCUXpressoIDE_11.5.0_7232\workspace\OvalMate\Ovalmate_dev\drivers/fsl_power.h:385:20:POWER_DisablePD	16	static
+C:\Users\Alex\Documents\MCUXpressoIDE_11.5.0_7232\workspace\OvalMate\Ovalmate_dev\drivers/fsl_anactrl.h:339:20:ANACTRL_EnableVref1V	16	static
 ../source/modules/irSensor/irSensor.c:44:10:IRSENSOR_getADCValue	8	static
 ../source/modules/irSensor/irSensor.c:63:8:IRSENSOR_readAvgADC	32	static
 ../source/modules/irSensor/irSensor.c:78:6:IRSENSOR_initializeADC	8	static

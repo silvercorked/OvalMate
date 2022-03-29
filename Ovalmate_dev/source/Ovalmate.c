@@ -48,7 +48,13 @@
 #include <stdio.h>
 #include "fsl_debug_console.h"  // this gives access to PRINTF for debugging
 
-#define ADCVALUETOLERANCE	1000
+uint32_t getbottomleftxcoord(uint32_t measuredY, double scaleFactor) {
+	return (uint32_t) (measuredY * scaleFactor);
+}
+
+uint32_t getbottomrightycoord(uint32_t measuredX, double scaleFactor) {
+	return (uint32_t) (measuredX * scaleFactor);
+}
 
 /*
  * @brief   Application entry point.
@@ -69,9 +75,9 @@ int main(void) {
 	// testingUSB
 
 
-	//while (1) {
-	//	USB_DeviceTasks(); // nothing runs from this? is it needed? p sure not
-	//}
+	while (1) {
+		USB_DeviceTasks(); // nothing runs from this? is it needed? p sure not
+	}
 
 	//while (1);
 	// init
@@ -105,6 +111,44 @@ int main(void) {
 	//	PRINTF("\r\n val: %d", (uint32_t) IRSENSOR_readAvgADC(1000));
 	//}
 
+
+	// Top Left Rect
+	// x: 5.95
+	// y: 12.05 from top
+
+	// Top Right Last Col (10mm from right side)
+	// x: 215.90 - (13.95 + 2) // 199.95mm
+	// y: 12.05
+
+	// 4mm white space on cols
+	// 4mm thick square on cols
+
+	// 3mm black quare on rows
+	// 3.5 mm white space on rows
+
+	// Bottom left
+	// x: 5.95
+	// y: 15.55 + (70 * 6.5) + 1.5 // 482.6 - (9.05 + 1.5) // 472.05
+
+	// scale factor on similar triangles = 472.05 / 199.95 = 2.36084021005
+	// take the triangle formed by the found locations and the point directly horizontal the top left rect
+	// and directly vertical the top right last col
+	// call it 1
+	// take the triangle fromed by the top left rect, bottom left rect (position unknown), and the point
+	// directly vertical the top left rect and directly horizontal the bottom left rect
+	// call it 2
+	//    /|c
+	//  k/ | y
+	// a/t_|b
+	//    x
+	// c is top left rect. a is position of reference element (top right last col or bottom left rect).
+	// b is the expected position, (there shouldn't be a change in one axis given perfect printing and alignment, but those errors produce the point c
+	// k is the known distance these points are seperated by
+	// x is the measured x component of the distance k
+	// y is the measured y component of the distance k (knowing these gives the angle t)
+
+	// x2 = x1 * scale factor (2.36084)
+	// y2 = y1 * scale factor (2.36084)
 	findHome();
 
 	findDocumentCorners();

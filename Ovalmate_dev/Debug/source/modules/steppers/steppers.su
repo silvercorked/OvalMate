@@ -1,7 +1,7 @@
-C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\drivers/fsl_gpio.h:153:20:GPIO_PinWrite	24	static
-C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\drivers/fsl_gpio.h:172:24:GPIO_PinRead	24	static
-C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\drivers/fsl_ctimer.h:497:20:CTIMER_StartTimer	16	static
-C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\drivers/fsl_ctimer.h:507:20:CTIMER_StopTimer	16	static
+C:\Users\Alex\Documents\MCUXpressoIDE_11.5.0_7232\workspace\OvalMate\Ovalmate_dev\drivers/fsl_gpio.h:153:20:GPIO_PinWrite	24	static
+C:\Users\Alex\Documents\MCUXpressoIDE_11.5.0_7232\workspace\OvalMate\Ovalmate_dev\drivers/fsl_gpio.h:172:24:GPIO_PinRead	24	static
+C:\Users\Alex\Documents\MCUXpressoIDE_11.5.0_7232\workspace\OvalMate\Ovalmate_dev\drivers/fsl_ctimer.h:497:20:CTIMER_StartTimer	16	static
+C:\Users\Alex\Documents\MCUXpressoIDE_11.5.0_7232\workspace\OvalMate\Ovalmate_dev\drivers/fsl_ctimer.h:507:20:CTIMER_StopTimer	16	static
 ../source/modules/steppers/steppers.c:145:6:STEPPERS_initializePins	24	static
 ../source/modules/steppers/steppers.c:208:6:STEPPERS_initializeMotors	16	static
 ../source/modules/steppers/steppers.c:227:10:STEPPERS_setupMotor	24	static
