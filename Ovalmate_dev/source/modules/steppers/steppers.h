@@ -154,23 +154,23 @@ extern stepperMotor_s* stepperY_p;
 
 //	Multi-Motor
 //		Blocking
-#define STEPPERS_moveBothToAccel(motor_p, steps) \
-	STEPPERS_moveBothTo(motor_p, steps, true, true)
-#define STEPPERS_moveBothToNoAccel(motor_p, steps) \
-	STEPPERS_moveBothTo(motor_p, steps, false, true)
-#define STEPPERS_moveBothRelativeAccel(motor_p, steps) \
-	STEPPERS_moveBothRelative(motor_p, steps, true, true)
-#define STEPPERS_moveBothRelativeNoAccel(motor_p, steps) \
-	STEPPERS_moveBothRelative(motor_p, steps, false, true)
+#define STEPPERS_moveBothToAccel(targetX, targetY) \
+	STEPPERS_moveBothTo(targetX, targetY, true, true)
+#define STEPPERS_moveBothToNoAccel(targetX, targetY) \
+	STEPPERS_moveBothTo(targetX, targetY, false, true)
+#define STEPPERS_moveBothRelativeAccel(stepsX, stepsY) \
+	STEPPERS_moveBothRelative(stepsX, stepsY, true, true)
+#define STEPPERS_moveBothRelativeNoAccel(stepsX, stepsY) \
+	STEPPERS_moveBothRelative(stepsX, stepsY, false, true)
 //		Non-blocking
-#define STEPPERS_moveBothToAccelNoBlock(motor_p, steps) \
-	STEPPERS_moveBothTo(motor_p, steps, true, false)
-#define STEPPERS_moveBothToNoAccelNoBlock(motor_p, steps) \
-	STEPPERS_moveBothTo(motor_p, steps, false, false)
-#define STEPPERS_moveBothRelativeAccelNoBlock(motor_p, steps) \
-	STEPPERS_moveBothRelative(motor_p, steps, true, false)
-#define STEPPERS_moveBothRelativeNoAccelNoBlock(motor_p, steps) \
-	STEPPERS_moveBothRelative(motor_p, steps, false, false)
+#define STEPPERS_moveBothToAccelNoBlock(targetX, targetY) \
+	STEPPERS_moveBothTo(targetX, targetY, true, false)
+#define STEPPERS_moveBothToNoAccelNoBlock(targetX, targetY) \
+	STEPPERS_moveBothTo(targetX, targetY, false, false)
+#define STEPPERS_moveBothRelativeAccelNoBlock(stepsX, stepsY) \
+	STEPPERS_moveBothRelative(stepsX, stepsY, true, false)
+#define STEPPERS_moveBothRelativeNoAccelNoBlock(stepsX, stepsY) \
+	STEPPERS_moveBothRelative(stepsX, stepsY, false, false)
 // End Macro Functions
 
 // Prototypes

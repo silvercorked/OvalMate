@@ -96,9 +96,9 @@ void buttonCallback_stopRelaventMotor(pint_pin_int_t pintr, uint32_t pmatch_stat
 void findHome() {
 	while (1) {
 		if (!buttonCallback_stepperMotorX_stopped)
-			STEPPERS_moveRelativeNoAccel(stepperX_p, -10000);	// left interrupt expected
+			STEPPERS_moveRelativeNoAccelNoBlock(stepperX_p, -10000);	// left interrupt expected
 		if (!buttonCallback_stepperMotorY_stopped)
-			STEPPERS_moveRelativeNoAccel(stepperY_p, -10000);	// up interrupt expected
+			STEPPERS_moveRelativeNoAccelNoBlock(stepperY_p, -10000);	// up interrupt expected
 		// distance isn't important, if we don't hit, it will run again
 		while (stepperX_p->status.running && stepperY_p->status.running);
 		if (buttonCallback_stepperMotorX_stopped && buttonCallback_stepperMotorY_stopped) {

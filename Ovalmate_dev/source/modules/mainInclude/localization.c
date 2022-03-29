@@ -20,7 +20,7 @@ status_t findDocumentCorners() {
 	STEPPERS_moveRelativeNoAccelNoBlock(stepperY_p, 10000);
 
 	// wrapping issue
-	while (!isAlignmentBracket()) {
+	while (!aboveAlignmentBracket()) {
 		if (!(stepperX_p->status.running || stepperY_p->status.running)) {
 			PRINTF("failed to find bracket");
 			return kStatus_Fail;	// if motors stopped, fail
@@ -31,8 +31,53 @@ status_t findDocumentCorners() {
 	STEPPERS_stopMotor(stepperX_p);
 	STEPPERS_stopMotor(stepperY_p);
 
+	PRINTF("\r\n should be above angle bracket");
+
+	STEPPERS_moveRelativeNoAccelNoBlock(stepperY_p, 10000);
+
+	while (aboveAlignmentBracket()) {
+		if (!stepperY_p->status.running) {
+			PRINTF("failed to drive past alignment bracket");
+			return kStatus_Fail;
+		}
+	}
+
+	while (!aboveWhite()) {
+		if (!stepperY_p->status.running) {
+			PRINTF("failed to find white under bracket");
+			return kStatus_Fail;
+		}
+	}
+
+	STEPPERS_stopMotor(stepperY_p);
+
+	PRINTF("\r\n should be above white");
+
+	STEPPERS_moveRelativeNoAccel(stepperY_p, 500); // get closer to rectangle
+
+	point_s rectangleCorners[4];
+	status_t a = findRectangleCorners(rectangleCorners, 4);
+	PRINTF("status: %c", a == kStatus_Fail ? 'F' : 'S');
+	if (a != kStatus_Fail) {
+		point_s center;
+		a = getCenterFromRectCorners(rectangleCorners, 4, &center);
+		PRINTF("\r\n center.x: %d, center.y: %d, status: %c", center.x, center.y, a == kStatus_Fail ? 'F' : 'S');
+		STEPPERS_moveBothToNoAccel(center.x, center.y);
+
+		STEPPERS_moveBothRelativeNoAccel(2386, -3728); // from IR sensor mode to pen mode;
+		SERVO_setPenMode(PENDOWN);
+		delay20ms();
+		STEPPERS_moveRelativeNoAccel(stepperY_p, 1000);
+		STEPPERS_moveRelativeNoAccel(stepperY_p, -1000);
+		STEPPERS_moveRelativeNoAccel(stepperX_p, 500);
+		STEPPERS_moveRelativeNoAccel(stepperX_p, -500);
+		SERVO_setPenMode(PENUP);
+		delay20ms();
+		STEPPERS_moveBothRelativeNoAccel(-2386, 3728);
+	}
+
 	//TODO
-	STEPPERS_moveBothRelativeNoAccelNoBlock(10000, 10000);
+	//STEPPERS_moveBothRelativeNoAccelNoBlock(10000, 10000);
 	//s = (uint32_t) IRSENSOR_readAvgADC(1000);
 
 }
@@ -171,8 +216,14 @@ status_t getCenterFromRectCorners(const point_s points_arr[], uint8_t size, poin
 }
 
 void pollADC(stepperMotor_s* motor_p, int32_t steps) {
-	uint32_t stepsInc = steps / 100;
-	for (uint32_t i = 0; i < 100; i++) {
+	pollADCRange(motor_p, steps, 0, 100);
+}
+
+void pollADCRange(stepperMotor_s* motor_p, int32_t steps, uint8_t start, uint8_t end) {
+	if (start >= end || start >= 100 || end > 100)
+		return; // fail, don't run.
+	uint32_t stepsInc = steps / (end - start);
+	for (uint32_t i = start; i < end; i++) {
 		sample_s s = {
 			.x = stepperX_p->position,
 			.y = stepperY_p->position,
@@ -183,15 +234,73 @@ void pollADC(stepperMotor_s* motor_p, int32_t steps) {
 	}
 }
 
-bool isAlignmentBracket() {
-	return IRSENSOR_readAvgADC(1000) > 50000;
+uint8_t locateBetterCenter(stepperMotor_s* motor_p, uint8_t start, uint8_t end) {
+	uint8_t index = -1;
+	uint8_t mid = (end - start) / 2;
+	if (start > end || start > 100 || end > 100)
+		return index;
+	int32_t steps = mid * 100;
+	pollADCRange(motor_p, steps, start, start + mid); // poll range on desired axis
+	STEPPERS_moveRelativeNoAccel(motor_p, -steps); // move back to start
+	pollADCRange(motor_p, -steps, start + mid, end); // go in other direction
+	STEPPERS_moveRelativeNoAccel(motor_p, steps);
+	return findPeak(start, end); // return index of high point to allow caller to recenter on peak
 }
 
-bool isBlack() {
-	return IRSENSOR_readAvgADC(1000) > 30000.0;
+uint8_t findPeak(uint8_t start, uint8_t end) {
+	uint8_t index = -1;
+	uint16_t max = 0;
+	if (start > end || start > 100 || end > 100)
+		return index;
+	for (uint8_t i = start; i < end; i++) {
+		if (pastSamples[i].value > max) {
+			index = i;
+			max = pastSamples[i].value;
+		}
+	}
+	return index;
 }
 
-bool isWhite() {
-	double temp = IRSENSOR_readAvgADC(1000);
-	return temp > 7000 && temp < 20000;
+uint8_t findRiseStart(uint8_t start) {
+	uint8_t index = -1;
+	if (start > 100)
+		return index;
+	for (uint32_t i = start; i < 100; i++) {
+		if (isBlack(pastSamples[i].value)) {
+			index = i;
+			break;
+		}
+	}
+	return index;
+}
+
+uint8_t findFallEnd(uint8_t start) {
+	uint8_t index = -1;
+	if (start > 100)
+		return index;
+	for (uint32_t i = start; i < 100; i++) {
+		if (!isBlack(pastSamples[i].value)) {
+			index = i;
+			break;
+		}
+	}
+	return index;
+}
+bool aboveAlignmentBracket() {
+	return isAlignmentBracket((uint32_t) IRSENSOR_readAvgADC(1000));
+}
+bool aboveBlack() {
+	return isBlack((uint32_t) IRSENSOR_readAvgADC(1000));
+}
+bool aboveWhite() {
+	return isWhite((uint32_t) IRSENSOR_readAvgADC(1000));
+}
+bool isAlignmentBracket(uint32_t adcVal) {
+	return adcVal > 50000;
+}
+bool isBlack(uint32_t adcVal) {
+	return adcVal > 30000;
+}
+bool isWhite(uint32_t adcVal) {
+	return adcVal > 4000 && adcVal < 20000;
 }

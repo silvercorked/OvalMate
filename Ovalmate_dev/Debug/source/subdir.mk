@@ -4,17 +4,17 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../source/Ovalmate_dev_noUSB.c \
+../source/Ovalmate.c \
 ../source/semihost_hardfault.c \
 ../source/usb_device_interface_0_ovalmate.c 
 
 OBJS += \
-./source/Ovalmate_dev_noUSB.o \
+./source/Ovalmate.o \
 ./source/semihost_hardfault.o \
 ./source/usb_device_interface_0_ovalmate.o 
 
 C_DEPS += \
-./source/Ovalmate_dev_noUSB.d \
+./source/Ovalmate.d \
 ./source/semihost_hardfault.d \
 ./source/usb_device_interface_0_ovalmate.d 
 

@@ -65,21 +65,21 @@ int main(void) {
 #endif
 
 	PRINTF("Hello World\n");
-	USB_DeviceApplicationInit();
+	//USB_DeviceApplicationInit(); // done in BOARD_InitBootPeripherals()
 	// testingUSB
 
 
-	while (1) {
-		USB_DeviceTasks();
-	}
+	//while (1) {
+	//	USB_DeviceTasks(); // nothing runs from this? is it needed? p sure not
+	//}
 
-	while (1);
+	//while (1);
 	// init
-	//configure(); // from MainInclude. This sets the base for all function pointers
+	configure(); // from MainInclude. This sets the base for all function pointers
 	// end init
 	//STEPPERS_sleepMotor(stepperX_p);
 	//STEPPERS_sleepMotor(stepperY_p);
-	/*
+	/**/
 
 	// give motors job w/ step param
 	//setupStepperPWM(&motorX, 20);
@@ -97,20 +97,62 @@ int main(void) {
 
 	//STEPPERS_setHome(stepperX_p);
 	//STEPPERS_setHome(stepperY_p);
-	stepperX_p->position = 5000;
-	stepperY_p->position = 5000;
+	//stepperX_p->position = 5000;
+	//stepperY_p->position = 5000;
+	//STEPPERS_sleepMotor(stepperX_p);
+	//STEPPERS_sleepMotor(stepperY_p);
+	//while(1) {
+	//	PRINTF("\r\n val: %d", (uint32_t) IRSENSOR_readAvgADC(1000));
+	//}
 
-	//findHome();
-	point_s rectangleCorners[4];
-	status_t a = findRectangleCorners(rectangleCorners, 4);
-	PRINTF("status: %c", a == kStatus_Fail ? 'F' : 'S');
-	if (a != kStatus_Fail) {
+	findHome();
+
+	findDocumentCorners();
+
+	STEPPERS_moveRelativeAccel(stepperX_p, -500);
+
+	STEPPERS_moveRelativeAccel(stepperX_p, 18000);
+	pollADC(stepperX_p, 2000);
+	sample_s right;
+	for (uint32_t i = 0; i < 100; i++) {
+		if (pastSamples[i].value < 3400) {
+			STEPPERS_moveBothToNoAccel(pastSamples[i].x, pastSamples[i].y);
+			right = pastSamples[i];
+			break;
+		}
+		//PRINTF("\r\n%d, %d", pastSamples[i].x, pastSamples[i].value);
+	}
+
+
+
+	STEPPERS_moveRelativeNoAccel(stepperX_p, -200);
+	pollADC(stepperY_p, -2000);
+	sample_s top;
+	for (uint32_t i = 0; i < 100; i++) {
+		if (pastSamples[i].value < 3400) {
+			STEPPERS_moveBothToNoAccel(pastSamples[i].x, pastSamples[i].y);
+			top = pastSamples[i];
+			break;
+		}
+		//PRINTF("\r\n%d, %d", pastSamples[i].x, pastSamples[i].value);
+	}
+
+	PRINTF("\r\n\r\n r.x: %d, r.y: %d, t.x: %d, t.y: %d", right.x, right.y, top.x, top.y);
+
+	point_s corner = { .x = top.x, .y = right.y };
+
+	STEPPERS_moveBothToNoAccel(corner.x - 1312, corner.y); // 15 mm offset on x
+
+	point_s rectangleCorners2[4];
+	status_t a2 = findRectangleCorners(rectangleCorners2, 4);
+	PRINTF("status: %c", a2 == kStatus_Fail ? 'F' : 'S');
+	if (a2 != kStatus_Fail) {
 		point_s center;
-		a = getCenterFromRectCorners(rectangleCorners, 4, &center);
-		PRINTF("\r\n center.x: %d, center.y: %d, status: %c", center.x, center.y, a == kStatus_Fail ? 'F' : 'S');
+		a2 = getCenterFromRectCorners(rectangleCorners2, 4, &center);
+		PRINTF("\r\n center.x: %d, center.y: %d, status: %c", center.x, center.y, a2 == kStatus_Fail ? 'F' : 'S');
 		STEPPERS_moveBothToNoAccel(center.x, center.y);
 
-		STEPPERS_moveBothRelativeNoAccel(2124, -3291); // from IR sensor mode to pen mode;
+		STEPPERS_moveBothRelativeNoAccel(2386, -3728); // from IR sensor mode to pen mode;
 		SERVO_setPenMode(PENDOWN);
 		delay20ms();
 		STEPPERS_moveRelativeNoAccel(stepperY_p, 1000);
@@ -119,12 +161,51 @@ int main(void) {
 		STEPPERS_moveRelativeNoAccel(stepperX_p, -500);
 		SERVO_setPenMode(PENUP);
 	}
+
 	//sample_s samples[100];
 
 	//pollADC(stepperX_p, 1000);
 	//for (uint32_t i = 0; i < 100; i++) {
 	//	PRINTF("\r\n %d, %d, %d", samples[i].x, samples[i].y, samples[i].value);
 	//}
+	/*
+	bool endOfLine = false;
+	while (!endOfLine) {
+		pollADC(stepperX_p, 2000);
+		uint8_t firstRise = findRiseStart(0); // presuming first peak is best
+		if (pastSamples[firstRise].value == -1 || pastSamples[firstRise].value < 20000) {
+			PRINTF("No peaks");
+			endOfLine = true;
+		}
+		uint8_t firstFall = findFallEnd(firstRise);
+		uint8_t firstPeak = findPeak(firstRise, firstFall);
+		uint8_t index = firstFall + 1;
+		uint8_t peakIndex = 255;
+		while (index < 100) {
+			uint8_t rise = findRiseStart(index);
+			uint8_t fall = findFallEnd(rise);
+			uint8_t peak = findPeak(rise, fall);
+			if (peak == 255 || fall == 255)
+				break;
+			if (pastSamples[firstPeak].value > pastSamples[peak].value + 1000 && peak < 90) {
+				STEPPERS_moveBothToNoAccel(pastSamples[peak].x, pastSamples[peak].y);
+				peakIndex = locateBetterCenter(stepperY_p, peak, peak + 10);
+				if (peakIndex == -1) {
+					PRINTF("\r\n no peak found");
+				}
+				PRINTF("\r\n new center found: %d, x: %d, y: %d", peakIndex, pastSamples[peakIndex].x, pastSamples[peakIndex].y);
+				break;
+			}
+			index = fall + 1;
+		}
+		if (peakIndex != -1)
+			STEPPERS_moveBothToNoAccel(pastSamples[peakIndex].x, pastSamples[peakIndex].y);
+	}
+
+	for (uint32_t i = 0; i < 100; i++) {
+		PRINTF("\r\n%d, %d", pastSamples[i].x, pastSamples[i].value);
+	}
+	*/
 
 	STEPPERS_sleepMotor(stepperX_p);
 	STEPPERS_sleepMotor(stepperY_p);
