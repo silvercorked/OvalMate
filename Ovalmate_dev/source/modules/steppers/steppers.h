@@ -38,6 +38,7 @@
 #include <stdbool.h>
 #include "fsl_pint.h"
 #include "fsl_inputmux.h"
+#include <modules/utils/delays.h>
 
 #include <stdio.h>
 #include "fsl_debug_console.h"  // this gives access to PRINTF for debugging
@@ -54,7 +55,7 @@
 // CLOCK_GetCTimerClkFreq(0U) should get CTIMER0's clock freq, but reports PLL0 is outputting 0Hz
 // manually setting clock freq of 12MHz
 
-#define MAXSTEPPERFREQ			8000U
+#define MAXSTEPPERFREQ			4000U
 #define STARTSTEPPERFREQ		1000U
 #define MAXSTEPPERSTEPS0		(CTIMER0_CLK_FREQ / (MAXSTEPPERFREQ * 2))	//  4000 steps
 #define STARTSTEPPERSTEPS0		(CTIMER0_CLK_FREQ / (STARTSTEPPERFREQ * 2))	// 12000 steps
@@ -65,6 +66,9 @@
 
 #define PINT_PIN_INT5_SRC			kINPUTMUX_GpioPort1Pin13ToPintsel // stepperX fault interrupt inputmux val
 #define PINT_PIN_INT6_SRC			kINPUTMUX_GpioPort1Pin7ToPintsel  // stepperY fault interrupt inputmux val
+
+#define PENIROFFSETX			-2170 // -2190
+#define PENIROFFSETY			3660  // 3635
 // End Definitions
 
 // Enums
@@ -79,6 +83,13 @@ typedef enum {
 	HOME,
 	FAULT
 } stepperMotorPinInformationArrayOffset;
+#endif
+#ifndef STEPPERMOTORMODE_S
+#define STEPPERMOTORMODE_S
+typedef enum {
+	IRMODE = 0U,
+	PENMODE
+} stepperMotorMode;
 #endif
 // End Enums
 
@@ -191,6 +202,10 @@ status_t STEPPERS_setMotorStepsPerPhase(stepperMotorPhaseSteps_s*, uint32_t, boo
 
 void STEPPERS_setHome(stepperMotor_s* motor_p);
 
+stepperMotorMode STEPPERS_switchMode();
+stepperMotorMode STEPPERS_getCurrentMode();
+stepperMotorMode STEPPERS_setCurrentMode(stepperMotorMode mode);
+
 void STEPPERS_XTimerCallback(uint32_t);				// flags
 void STEPPERS_YTimerCallback(uint32_t);				// flags
 void STEPPERS_generalTimerCallback(uint32_t, stepperMotor_s*);
@@ -210,7 +225,7 @@ void STEPPERS_writeResetPin(stepperMotor_s*, bool);
 void STEPPERS_writeSleepPin(stepperMotor_s*, bool);
 bool STEPPERS_readHomePin(stepperMotor_s*);
 
-void delay1ms(void);
+bool debounceFault(pinInformation_s*);
 // End Prototypes
 
 #endif

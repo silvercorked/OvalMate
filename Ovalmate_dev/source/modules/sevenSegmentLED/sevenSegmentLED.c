@@ -43,13 +43,13 @@ gpio_pin_config_t sevenSegConfig = { .pinDirection = kGPIO_DigitalOutput, .outpu
  * @return	- None
  */
 void SEVENSEG_setLegs(bool a, bool b, bool c, bool d, bool e, bool f, bool g) {
-	GPIO_PinWrite(GPIO, legA.port, legA.pin, a); // write bool value to pin
-	GPIO_PinWrite(GPIO, legB.port, legB.pin, b); // 1 = high
-	GPIO_PinWrite(GPIO, legC.port, legC.pin, c); // 0 = low
-	GPIO_PinWrite(GPIO, legD.port, legD.pin, d);
-	GPIO_PinWrite(GPIO, legE.port, legE.pin, e);
-	GPIO_PinWrite(GPIO, legF.port, legF.pin, f);
-	GPIO_PinWrite(GPIO, legG.port, legG.pin, g);
+	GPIO_PinWrite(GPIO, legA.port, legA.pin, ~a); // write bool value to pin
+	GPIO_PinWrite(GPIO, legB.port, legB.pin, ~b); // 1 = high
+	GPIO_PinWrite(GPIO, legC.port, legC.pin, ~c); // 0 = low
+	GPIO_PinWrite(GPIO, legD.port, legD.pin, ~d);
+	GPIO_PinWrite(GPIO, legE.port, legE.pin, ~e);
+	GPIO_PinWrite(GPIO, legF.port, legF.pin, ~f);
+	GPIO_PinWrite(GPIO, legG.port, legG.pin, ~g);
 }
 
 /**
@@ -59,13 +59,13 @@ void SEVENSEG_setLegs(bool a, bool b, bool c, bool d, bool e, bool f, bool g) {
  * @return	- None
  */
 void SEVENSEG_displayErrorCode(uint8_t errorCode) {
-	bool a = errorCode & (1 << 0);
-	bool b = errorCode & (1 << 1);
-	bool c = errorCode & (1 << 2);
-	bool d = errorCode & (1 << 3);
-	bool e = errorCode & (1 << 4);
-	bool f = errorCode & (1 << 5);
-	bool g = errorCode & (1 << 6);
+	bool a = ~(errorCode & (1 << 0));
+	bool b = ~(errorCode & (1 << 1));
+	bool c = ~(errorCode & (1 << 2));
+	bool d = ~(errorCode & (1 << 3));
+	bool e = ~(errorCode & (1 << 4));
+	bool f = ~(errorCode & (1 << 5));
+	bool g = ~(errorCode & (1 << 6));
 	SEVENSEG_setLegs(a, b, c, d, e, f, g);
 }
 

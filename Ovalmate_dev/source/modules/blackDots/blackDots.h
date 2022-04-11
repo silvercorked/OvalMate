@@ -20,8 +20,16 @@
 #include <stdbool.h>
 // End Includes
 
+// Structs
+typedef struct {
+	uint8_t row;
+	uint8_t col;
+	bool value;
+} blackDotCoordinate_s;
+// End Structs
+
 // Extern Variables
-extern volatile uint32_t points[70];
+extern volatile uint32_t points[50];
 // End Extern Variables
 
 // Prototypes
@@ -32,6 +40,8 @@ void BLACKDOTS_clearPoint(uint8_t, uint8_t);
 void BLACKDOTS_changePoint(uint8_t, uint8_t, bool);
 void BLACKDOTS_togglePoint(uint8_t, uint8_t);
 bool BLACKDOTS_getPoint(uint8_t, uint8_t);
+void BLACKDOTS_getPointAsCoordinate(uint8_t x, uint8_t y, blackDotCoordinate_s* dot);
+void BLACKDOTS_getNext(blackDotCoordinate_s* dot);
 // End Prototypes
 
 #endif

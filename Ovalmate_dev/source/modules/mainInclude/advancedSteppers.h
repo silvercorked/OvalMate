@@ -1,21 +1,34 @@
-
+/**
+ * Title: OvalMate_stepper_module_DevBoard
+ * Version: 0.0.1
+ * Filename: LPC55S16_Project_main_dev.c
+ * Authors: Alex Wissing
+ * Purpose of Program: Complex behaviors and shape drawing using the Stepper motors, the IR sensor, and the Servo motor
+ * How Program is Run on Target System:
+ * Date Started: 2/28/2022
+ * Update History:
+ *	- 3/22/2022
+ *		Moved drawOval into it's own space, seperate from mainInclude
+ *	- 3/23/2022
+ *		Created debugging function drawRectangle
+ *		Turned out to not be very useful because the IR received from the drawn Rectangle was less than the white paper. Weird.
+ *	- 3/31/2022
+ *		Added prefix to advanced stepper functions
+ */
 
 #ifndef ADVANCEDSTEPPERS_H
 #define ADVANCEDSTEPPERS_H
 
 // Includes
+#include <modules/utils/conversion.h>
 #include "modules/irSensor/irSensor.h"
 #include "modules/servo/servo.h"
 #include "modules/steppers/steppers.h"
-#include "modules/utils/utils.h"
 // End Includes
 
 // Definitions
-#define OVALLINES				12
+#define OVALLINES				14
 #define OVALLINESHALF			(OVALLINES / 2)
-#define OVALLINESTARTPERCENT	5				// percentage of start and end that will be ignored in considering range
-#define OVALSTARTOFFSET			OVALLINESTARTPERCENT * 10000U
-// #define OVALLINEOFFSET		((1.0 - (1.0 / (OVALLINESTARTPERCENT * 2.0))) * 1000000.0) / OVALLINESHALF // not used as the floating point from the preprocessor doesnt seem to operate the same as in code
 // End Definitions
 
 // Structs
@@ -31,8 +44,8 @@ typedef struct {
 // End Structs
 
 // Prototypes
-void drawOval(void);
-void drawRectangle(void);
+void ADVSTEPPERS_drawOval(void);
+void ADVSTEPPERS_drawRectangle(void);
 // End Prototypes
 
 #endif

@@ -39,21 +39,28 @@
  *		then we should know every position on the document.
  *	-3/20/2022:
  *		Began rearranging functions and placing them in more understandable spaces to avoid cluttering this main file
+ *	- 4/1/2022:
+ *		Testing localization functions
+ *  - 4/6/2022:
+ *  	Created functions for finding expected X coordinate as steps.
+ *	- 4/9/2022:
+ *		Established basic process once USB information has been given (preset blackdots to simulate correct USB behavior.
+ *	- 4/10/2022:
+ *		Improved method of driving to mark ovals by hiding math calculations under stepper movement to next blackdot.
  *
  */
 
 // MAIN INCLUDE
+#include <modules/utils/conversion.h>
 #include "modules/mainInclude/mainInclude.h"
-#include "modules/utils/utils.h"
 #include <stdio.h>
 #include "fsl_debug_console.h"  // this gives access to PRINTF for debugging
 
-uint32_t getbottomleftxcoord(uint32_t measuredY, double scaleFactor) {
-	return (uint32_t) (measuredY * scaleFactor);
-}
-
-uint32_t getbottomrightycoord(uint32_t measuredX, double scaleFactor) {
-	return (uint32_t) (measuredX * scaleFactor);
+uint32_t getStepsXforCol(uint32_t col) { // 4mm spacing, 4mm square
+	return nanometersToSteps(col * 8000000); // from center of top left
+} // no +1 because top left is first col, wheras first row is one off
+uint32_t getStepsYforRow(uint32_t row) {
+	return nanometersToSteps((row + 1) * 5000000); // 3mm square, 2mm spacing per row
 }
 
 /*
@@ -69,29 +76,17 @@ int main(void) {
 	/* Init FSL debug console. */
 	BOARD_InitDebugConsole();
 #endif
-
+	status_t ok = kStatus_Success;
 	PRINTF("Hello World\n");
 	//USB_DeviceApplicationInit(); // done in BOARD_InitBootPeripherals()
-	// testingUSB
-
-
-	while (1) {
-		USB_DeviceTasks(); // nothing runs from this? is it needed? p sure not
-	}
-
-	//while (1);
 	// init
-	configure(); // from MainInclude. This sets the base for all function pointers
-	// end init
-	//STEPPERS_sleepMotor(stepperX_p);
-	//STEPPERS_sleepMotor(stepperY_p);
-	/**/
 
-	// give motors job w/ step param
-	//setupStepperPWM(&motorX, 20);
-	//setupStepperPWM(&motorY, 360); // causes semihost hardfault
-	//startStepperPWM(motorX.timer);
-	//startStepperPWM(motorY.timer);
+	ok = configure(); // from MainInclude. This sets the base for all function pointers
+	// end init
+	if (ok != kStatus_Success) {
+		PRINTF("\r\n failed to configure");
+		return 0;
+	}
 
 	// drive servo to default position
 	SERVO_setupPWM();
@@ -99,166 +94,166 @@ int main(void) {
 
 	SERVO_setPenMode(PENUP); // begin with pen high
 	delay20ms();
-	//drawOval();
 
-	//STEPPERS_setHome(stepperX_p);
-	//STEPPERS_setHome(stepperY_p);
-	//stepperX_p->position = 5000;
-	//stepperY_p->position = 5000;
-	//STEPPERS_sleepMotor(stepperX_p);
-	//STEPPERS_sleepMotor(stepperY_p);
-	//while(1) {
-	//	PRINTF("\r\n val: %d", (uint32_t) IRSENSOR_readAvgADC(1000));
-	//}
+//	for (uint8_t i = 0; i < 24; i++) {
+//		BLACKDOTS_setPoint(0, i); // mark all in first column
+//	}
+//
+//	for (uint8_t i = 0; i < 24; i++) {
+//		blackDotCoordinate_s dot = {};
+//		BLACKDOTS_getNext(&dot);
+//		PRINTF("\r\n next: (row: %d, col: %d)", dot.row, dot.col);
+//		BLACKDOTS_clearPoint(dot.col, dot.row);
+//	}
 
-
-	// Top Left Rect
-	// x: 5.95
-	// y: 12.05 from top
-
-	// Top Right Last Col (10mm from right side)
-	// x: 215.90 - (13.95 + 2) // 199.95mm
-	// y: 12.05
-
-	// 4mm white space on cols
-	// 4mm thick square on cols
-
-	// 3mm black quare on rows
-	// 3.5 mm white space on rows
-
-	// Bottom left
-	// x: 5.95
-	// y: 15.55 + (70 * 6.5) + 1.5 // 482.6 - (9.05 + 1.5) // 472.05
-
-	// scale factor on similar triangles = 472.05 / 199.95 = 2.36084021005
-	// take the triangle formed by the found locations and the point directly horizontal the top left rect
-	// and directly vertical the top right last col
-	// call it 1
-	// take the triangle fromed by the top left rect, bottom left rect (position unknown), and the point
-	// directly vertical the top left rect and directly horizontal the bottom left rect
-	// call it 2
-	//    /|c
-	//  k/ | y
-	// a/t_|b
-	//    x
-	// c is top left rect. a is position of reference element (top right last col or bottom left rect).
-	// b is the expected position, (there shouldn't be a change in one axis given perfect printing and alignment, but those errors produce the point c
-	// k is the known distance these points are seperated by
-	// x is the measured x component of the distance k
-	// y is the measured y component of the distance k (knowing these gives the angle t)
-
-	// x2 = x1 * scale factor (2.36084)
-	// y2 = y1 * scale factor (2.36084)
-	findHome();
-
-	findDocumentCorners();
-
-	STEPPERS_moveRelativeAccel(stepperX_p, -500);
-
-	STEPPERS_moveRelativeAccel(stepperX_p, 18000);
-	pollADC(stepperX_p, 2000);
-	sample_s right;
-	for (uint32_t i = 0; i < 100; i++) {
-		if (pastSamples[i].value < 3400) {
-			STEPPERS_moveBothToNoAccel(pastSamples[i].x, pastSamples[i].y);
-			right = pastSamples[i];
-			break;
+//	for (uint8_t x = 0; x < 24; x++) {
+//		for (uint8_t y = 1; y < 50; y++) {
+//			if ((x == 6 || x == 18) && y % 2 == 0) {
+//				BLACKDOTS_setPoint(x, y); // mark evens in col 6 and 18
+//			}
+//			else if ((x == 0 || x == 12) && y % 2 == 1) {
+//				BLACKDOTS_setPoint(x, y); // marks odds in col 0 and 12
+//			}
+//		}
+//	}
+	for (uint8_t y = 1; y < 50; y++) { // skip first on testing ballot
+		if (y % 2 == 0) continue;
+		for (uint8_t x = 0; x < 24; x++) {
+			if (x == 0 || x == 6 || x == 12 || x == 18)
+				BLACKDOTS_setPoint(x, y); // mark all in first column
 		}
-		//PRINTF("\r\n%d, %d", pastSamples[i].x, pastSamples[i].value);
 	}
 
+	SEVENSEG_setLegs_F(); // finding home
+	ok = findHome();
+	if (ok != kStatus_Success) {
+		PRINTF("Failed to Find Home");
+		SEVENSEG_displayErrorCode(0x7F); // 0x7F = failed to find home
+		return 0;
+	}
+	SEVENSEG_setLegs_D(); // finding document corners
+	ok = findDocumentCorners();
+	if (ok != kStatus_Success) {
+		STEPPERS_moveBothToNoAccel(5000, 3000); // reset for next run
+		SEVENSEG_displayErrorCode(0x7E); // 0x7E = failed to find document corners
+		STEPPERS_sleepMotor(stepperX_p);
+		STEPPERS_sleepMotor(stepperY_p);
+		return 0;
+	}
 
+	PRINTF("\r\n\r\n ready to find black dots");
 
-	STEPPERS_moveRelativeNoAccel(stepperX_p, -200);
-	pollADC(stepperY_p, -2000);
-	sample_s top;
-	for (uint32_t i = 0; i < 100; i++) {
-		if (pastSamples[i].value < 3400) {
-			STEPPERS_moveBothToNoAccel(pastSamples[i].x, pastSamples[i].y);
-			top = pastSamples[i];
-			break;
+	// printing dots
+	blackDotCoordinate_s dot = {};
+	uint32_t topLeftXDestination; uint32_t topLeftYDestination;
+	uint32_t topRightXDestination; uint32_t topRightYDestintation;
+	uint32_t bottomLeftXDestination; uint32_t bottomLeftYDestination;
+	float xBallotPercent; float yBallotPercent;
+	uint32_t xPos; uint32_t yPos;
+	bool marksComplete = false;
+	STEPPERS_setCurrentMode(PENMODE);
+
+	SEVENSEG_setLegs_C(); // finding first location
+	BLACKDOTS_getNext(&dot);
+	if (dot.row != 0xFF) {
+		topLeftXDestination = topLeft.x + getStepsXforCol(dot.col);
+		topLeftYDestination = topLeft.y + getStepsYforRow(dot.row); // similar result to trYd
+		topRightXDestination = topRight.x - getStepsXforCol(23 - dot.col); // 23 = max value col
+		topRightYDestintation = topRight.y + getStepsYforRow(dot.row); // similar result to tlYd
+		bottomLeftXDestination = bottomLeft.x + getStepsXforCol(dot.col) + 230; // similar result to tlXd
+		bottomLeftYDestination = (bottomLeft.y - getStepsYforRow(49 - dot.row)) + 1340; // 49 = max value row
+		xBallotPercent = (dot.col / (float) 24);
+		yBallotPercent = (dot.row / (float) 50);
+		xPos = (uint32_t) ((topLeftXDestination * (1.0f - xBallotPercent) + topRightXDestination * xBallotPercent)
+			* (1.0f - yBallotPercent)
+			) + bottomLeftXDestination * yBallotPercent;
+		yPos = (uint32_t) ((topLeftYDestination * (1.0f - xBallotPercent) + topRightYDestintation * xBallotPercent)
+			* (1.0f - yBallotPercent)
+			) + bottomLeftYDestination * yBallotPercent;
+		while(!marksComplete) {
+			PRINTF("\r\n xPos %d, yPos %d, xPos adjusted %d, yPos adjusted %d \r\n    topLeftXD %d, topLeftYD %d \r\n    topRightXD %d, topRightYD %d \r\n    bottomLeftXD %d, bottomLeftYD %d \r\n", xPos, yPos, xPos - PENIROFFSETX, yPos - PENIROFFSETY, topLeftXDestination, topLeftYDestination, topRightXDestination, topRightYDestintation, bottomLeftXDestination, bottomLeftYDestination);
+			STEPPERS_moveBothToAccelNoBlock(
+				//topLeftXDestination,
+				xPos - PENIROFFSETX,
+				yPos - PENIROFFSETY
+			); // drive but dont block and calculate next position
+			BLACKDOTS_clearPoint(dot.col, dot.row);
+			PRINTF("col: %d, row: %d\r\n", dot.col, dot.row);
+			BLACKDOTS_getNext(&dot);
+			if (dot.row == 0xFF) // job done
+				marksComplete = true; // will end at the end of this while loop, math is pointless when this is true
+			topLeftXDestination = topLeft.x + getStepsXforCol(dot.col);
+			topLeftYDestination = topLeft.y + getStepsYforRow(dot.row); // similar result to trYd
+			topRightXDestination = topRight.x - getStepsXforCol(23 - dot.col); // 23 = max value col
+			topRightYDestintation = topRight.y + getStepsYforRow(dot.row); // similar result to tlYd
+			bottomLeftXDestination = bottomLeft.x + getStepsXforCol(dot.col) + 220; // similar result to tlXd
+			bottomLeftYDestination = (bottomLeft.y - getStepsYforRow(49 - dot.row)) + 1340; // 49 = max value row
+			xBallotPercent = (dot.col / (float) 24);
+			yBallotPercent = (dot.row / (float) 50);
+			xPos = (uint32_t) ((topLeftXDestination * (1.0f - xBallotPercent) + topRightXDestination * xBallotPercent)
+				* (1.0f - yBallotPercent)
+				) + bottomLeftXDestination * yBallotPercent;
+			yPos = (uint32_t) ((topLeftYDestination * (1.0f - xBallotPercent) + topRightYDestintation * xBallotPercent)
+				* (1.0f - yBallotPercent)
+				) + bottomLeftYDestination * yBallotPercent;
+			while (stepperX_p->status.running || stepperY_p->status.running); // calculate next while driving, then mark
+			SEVENSEG_setLegs_B(); // marking oval
+			SERVO_setPenMode(PENDOWN);
+			delay20ms();
+			ADVSTEPPERS_drawOval();
+			SERVO_setPenMode(PENUP);
+			SEVENSEG_setLegs_C(); // driving to next position
+			delay20ms();
 		}
-		//PRINTF("\r\n%d, %d", pastSamples[i].x, pastSamples[i].value);
 	}
-
-	PRINTF("\r\n\r\n r.x: %d, r.y: %d, t.x: %d, t.y: %d", right.x, right.y, top.x, top.y);
-
-	point_s corner = { .x = top.x, .y = right.y };
-
-	STEPPERS_moveBothToNoAccel(corner.x - 1312, corner.y); // 15 mm offset on x
-
-	point_s rectangleCorners2[4];
-	status_t a2 = findRectangleCorners(rectangleCorners2, 4);
-	PRINTF("status: %c", a2 == kStatus_Fail ? 'F' : 'S');
-	if (a2 != kStatus_Fail) {
-		point_s center;
-		a2 = getCenterFromRectCorners(rectangleCorners2, 4, &center);
-		PRINTF("\r\n center.x: %d, center.y: %d, status: %c", center.x, center.y, a2 == kStatus_Fail ? 'F' : 'S');
-		STEPPERS_moveBothToNoAccel(center.x, center.y);
-
-		STEPPERS_moveBothRelativeNoAccel(2386, -3728); // from IR sensor mode to pen mode;
-		SERVO_setPenMode(PENDOWN);
-		delay20ms();
-		STEPPERS_moveRelativeNoAccel(stepperY_p, 1000);
-		STEPPERS_moveRelativeNoAccel(stepperY_p, -1000);
-		STEPPERS_moveRelativeNoAccel(stepperX_p, 500);
-		STEPPERS_moveRelativeNoAccel(stepperX_p, -500);
-		SERVO_setPenMode(PENUP);
-	}
-
-	//sample_s samples[100];
-
-	//pollADC(stepperX_p, 1000);
-	//for (uint32_t i = 0; i < 100; i++) {
-	//	PRINTF("\r\n %d, %d, %d", samples[i].x, samples[i].y, samples[i].value);
-	//}
-	/*
-	bool endOfLine = false;
-	while (!endOfLine) {
-		pollADC(stepperX_p, 2000);
-		uint8_t firstRise = findRiseStart(0); // presuming first peak is best
-		if (pastSamples[firstRise].value == -1 || pastSamples[firstRise].value < 20000) {
-			PRINTF("No peaks");
-			endOfLine = true;
-		}
-		uint8_t firstFall = findFallEnd(firstRise);
-		uint8_t firstPeak = findPeak(firstRise, firstFall);
-		uint8_t index = firstFall + 1;
-		uint8_t peakIndex = 255;
-		while (index < 100) {
-			uint8_t rise = findRiseStart(index);
-			uint8_t fall = findFallEnd(rise);
-			uint8_t peak = findPeak(rise, fall);
-			if (peak == 255 || fall == 255)
-				break;
-			if (pastSamples[firstPeak].value > pastSamples[peak].value + 1000 && peak < 90) {
-				STEPPERS_moveBothToNoAccel(pastSamples[peak].x, pastSamples[peak].y);
-				peakIndex = locateBetterCenter(stepperY_p, peak, peak + 10);
-				if (peakIndex == -1) {
-					PRINTF("\r\n no peak found");
-				}
-				PRINTF("\r\n new center found: %d, x: %d, y: %d", peakIndex, pastSamples[peakIndex].x, pastSamples[peakIndex].y);
-				break;
-			}
-			index = fall + 1;
-		}
-		if (peakIndex != -1)
-			STEPPERS_moveBothToNoAccel(pastSamples[peakIndex].x, pastSamples[peakIndex].y);
-	}
-
-	for (uint32_t i = 0; i < 100; i++) {
-		PRINTF("\r\n%d, %d", pastSamples[i].x, pastSamples[i].value);
-	}
-	*/
+	SEVENSEG_setLegs_A(); // moving to ready position
+	STEPPERS_switchMode(); // IRMODE
+	delay20ms();
+	STEPPERS_moveBothToAccel(6000, 3000); // reset for next run
+	SEVENSEG_setLegs_0(); // job complete
 
 	STEPPERS_sleepMotor(stepperX_p);
 	STEPPERS_sleepMotor(stepperY_p);
 
+	while(1);
 
-
-
-	/*while (1) {
-		PRINTF("\r\n adcValue: %lf", readAvgADC(1000));
-	}*/
 	return 0;
 }
+
+// Top Left Rect
+// x: 5.95
+// y: 12.05 from top
+
+// Top Right Last Col (10mm from right side)
+// x: 215.90 - (13.95 + 2) // 199.95mm
+// y: 12.05
+
+// 4mm white space on cols
+// 4mm thick square on cols
+
+// 3mm black quare on rows
+// 3.5 mm white space on rows
+
+// Bottom left
+// x: 5.95
+// y: 15.55 + (70 * 6.5) + 1.5 // 482.6 - (9.05 + 1.5) // 472.05
+
+// scale factor on similar triangles = 472.05 / 199.95 = 2.36084021005
+// take the triangle formed by the found locations and the point directly horizontal the top left rect
+// and directly vertical the top right last col
+// call it 1
+// take the triangle fromed by the top left rect, bottom left rect (position unknown), and the point
+// directly vertical the top left rect and directly horizontal the bottom left rect
+// call it 2
+//    /|c
+//  k/ | y
+// a/t_|b
+//    x
+// c is top left rect. a is position of reference element (top right last col or bottom left rect).
+// b is the expected position, (there shouldn't be a change in one axis given perfect printing and alignment, but those errors produce the point c
+// k is the known distance these points are seperated by
+// x is the measured x component of the distance k
+// y is the measured y component of the distance k (knowing these gives the angle t)
+
+// x2 = x1 * scale factor (2.36084)
+// y2 = y1 * scale factor (2.36084)

@@ -22,6 +22,7 @@
 // Includes
 #include <stdbool.h>
 #include "fsl_ctimer.h"
+#include <modules/utils/delays.h>
 // End Includes
 
 // Definitions
@@ -69,7 +70,6 @@ status_t SERVO_getPWMPeriodValue(
 status_t SERVO_updatePWMPulsePeriodValue(uint8_t dutyCyclePercent);
 void SERVO_updatePWMDutyCycle(uint8_t dutyCycle);
 void SERVO_initializePWM(void);
-void delay20ms(void);
 // End Prototypes
 
 #endif

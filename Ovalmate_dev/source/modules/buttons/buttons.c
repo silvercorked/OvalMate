@@ -23,6 +23,11 @@ void (*rightBumpCallback)(pint_pin_int_t, uint32_t);
 void (*leftBumpCallback)(pint_pin_int_t, uint32_t);
 void (*upBumpCallback)(pint_pin_int_t, uint32_t);
 void (*downBumpCallback)(pint_pin_int_t, uint32_t);
+pinInformation_s up = { .port = 0, .pin = 9 }; // demo green led port 1 pin 7
+pinInformation_s right = { .port = 1, .pin = 25 };
+pinInformation_s left = { .port = 1, .pin = 26 };
+pinInformation_s down = { .port = 1, .pin = 27 };
+gpio_pin_config_t bumpConfig = { .pinDirection = kGPIO_DigitalInput };
 // End Variables
 
 // Functions
@@ -35,6 +40,12 @@ void (*downBumpCallback)(pint_pin_int_t, uint32_t);
  * @return	- None
  */
 void BUTTONS_assignPinsToInterrupts() {
+
+	GPIO_PinInit(GPIO, up.port, up.pin, &bumpConfig);
+	GPIO_PinInit(GPIO, right.port, right.pin, &bumpConfig);
+	GPIO_PinInit(GPIO, left.port, left.pin, &bumpConfig);
+	GPIO_PinInit(GPIO, down.port, down.pin, &bumpConfig);
+
 	/* Connect trigger sources to PINT */
 	INPUTMUX_Init(INPUTMUX);
 	INPUTMUX_AttachSignal(INPUTMUX, kPINT_PinInt1, PINT_PIN_INT1_SRC); // right bump switch
@@ -84,9 +95,9 @@ void BUTTONS_assignPinsToInterrupts() {
  * 			- uint32_t pmatch_status		: I actually don't know what this is. Should probably print it out and try to figure it out.
  * @return	- None
  */
-void BUTTONS_buttonEmergencyCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
-{
+void BUTTONS_buttonEmergencyCallback(pint_pin_int_t pintr, uint32_t pmatch_status) {
 	PRINTF("\r\n\r\n emergency button hit");
+
 	if (emergencyBumpCallback != NULL)
 		emergencyBumpCallback(pintr, pmatch_status);
 }
@@ -99,11 +110,12 @@ void BUTTONS_buttonEmergencyCallback(pint_pin_int_t pintr, uint32_t pmatch_statu
  * 			- uint32_t pmatch_status		: I actually don't know what this is. Should probably print it out and try to figure it out.
  * @return	- None
  */
-void BUTTONS_bumpRightCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
-{
+void BUTTONS_bumpRightCallback(pint_pin_int_t pintr, uint32_t pmatch_status) {
 	PRINTF("\r\n\r\n right button hit");
-	if (rightBumpCallback != NULL)
+	if (rightBumpCallback != NULL && BUTTONS_debounceButton(&right)) {
+		PRINTF("button right is a valid trigger \r\n");
 		rightBumpCallback(pintr, pmatch_status);
+	}
 }
 
 /**
@@ -114,11 +126,12 @@ void BUTTONS_bumpRightCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
  * 			- uint32_t pmatch_status		: I actually don't know what this is. Should probably print it out and try to figure it out.
  * @return	- None
  */
-void BUTTONS_bumpLeftCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
-{
+void BUTTONS_bumpLeftCallback(pint_pin_int_t pintr, uint32_t pmatch_status) {
 	PRINTF("\r\n\r\n left button hit");
-	if (leftBumpCallback != NULL)
+	if (leftBumpCallback != NULL && BUTTONS_debounceButton(&left)) {
+		PRINTF("button left is a valid trigger \r\n");
 		leftBumpCallback(pintr, pmatch_status);
+	}
 }
 
 /**
@@ -129,11 +142,12 @@ void BUTTONS_bumpLeftCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
  * 			- uint32_t pmatch_status		: I actually don't know what this is. Should probably print it out and try to figure it out.
  * @return	- None
  */
-void BUTTONS_bumpUpCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
-{
+void BUTTONS_bumpUpCallback(pint_pin_int_t pintr, uint32_t pmatch_status) {
 	PRINTF("\r\n\r\n up button hit");
-	if (upBumpCallback != NULL)
+	if (upBumpCallback != NULL && BUTTONS_debounceButton(&up)) {
+		PRINTF("button up is a valid trigger \r\n");
 		upBumpCallback(pintr, pmatch_status);
+	}
 }
 
 /**
@@ -144,10 +158,20 @@ void BUTTONS_bumpUpCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
  * 			- uint32_t pmatch_status		: I actually don't know what this is. Should probably print it out and try to figure it out.
  * @return	- None
  */
-void BUTTONS_bumpDownCallback(pint_pin_int_t pintr, uint32_t pmatch_status)
-{
-	PRINTF("\r\n\r\n down button hit");
-	if (downBumpCallback != NULL)
+void BUTTONS_bumpDownCallback(pint_pin_int_t pintr, uint32_t pmatch_status) {
+	PRINTF("\r\n down button hit \r\n");
+	if (downBumpCallback != NULL && BUTTONS_debounceButton(&down)) {
+		PRINTF("button down is a valid trigger \r\n");
 		downBumpCallback(pintr, pmatch_status);
+	}
+}
+
+bool BUTTONS_debounceButton(pinInformation_s* pinInfo) {
+	bool r = GPIO_PinRead(GPIO, pinInfo->port, pinInfo->pin);
+	if (r) {
+		delay500us();
+		return GPIO_PinRead(GPIO, pinInfo->port, pinInfo->pin);
+	}
+	return r; // r guaranteed to be false
 }
 // End Functions

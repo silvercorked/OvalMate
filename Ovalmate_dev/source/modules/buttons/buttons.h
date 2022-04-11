@@ -23,7 +23,10 @@
 
 // Includes
 #include "fsl_pint.h"
+#include "fsl_gpio.h"
 #include "fsl_inputmux.h"
+#include <stdbool.h>
+#include <modules/utils/delays.h>
 // End Includes
 
 // Definitions
@@ -34,6 +37,16 @@
 #define PINT_PIN_INT0_SRC			kINPUTMUX_GpioPort0Pin0ToPintsel  // emergency
 // End Definitions
 
+// Structs
+#ifndef PININFORMATION_S
+#define PININFORMATION_S
+typedef struct {
+	uint8_t port;
+	uint8_t pin;
+} pinInformation_s;
+#endif
+// End Structs
+
 // Variables
 extern void (*emergencyBumpCallback)(pint_pin_int_t, uint32_t);
 extern void (*rightBumpCallback)(pint_pin_int_t, uint32_t);
@@ -43,12 +56,13 @@ extern void (*downBumpCallback)(pint_pin_int_t, uint32_t);
 // End Variables
 
 // Prototypes
-void BUTTONS_buttonEmergencyCallback(pint_pin_int_t pintr, uint32_t pmatch_status);
-void BUTTONS_bumpRightCallback(pint_pin_int_t pintr, uint32_t pmatch_status);
-void BUTTONS_bumpLeftCallback(pint_pin_int_t pintr, uint32_t pmatch_status);
-void BUTTONS_bumpUpCallback(pint_pin_int_t pintr, uint32_t pmatch_status);
-void BUTTONS_bumpDownCallback(pint_pin_int_t pintr, uint32_t pmatch_status);
+void BUTTONS_buttonEmergencyCallback(pint_pin_int_t, uint32_t);
+void BUTTONS_bumpRightCallback(pint_pin_int_t, uint32_t);
+void BUTTONS_bumpLeftCallback(pint_pin_int_t, uint32_t);
+void BUTTONS_bumpUpCallback(pint_pin_int_t, uint32_t);
+void BUTTONS_bumpDownCallback(pint_pin_int_t, uint32_t);
 void BUTTONS_assignPinsToInterrupts(void);
+bool BUTTONS_debounceButton(pinInformation_s*);
 // End Prototypes
 
 #endif

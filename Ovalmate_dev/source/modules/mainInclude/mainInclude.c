@@ -23,8 +23,6 @@
 #include "mainInclude.h"
 
 // Variables
-bool buttonCallback_stepperMotorX_stopped = false;
-bool buttonCallback_stepperMotorY_stopped = false;
 // End Variables
 
 status_t configure() {
@@ -51,64 +49,6 @@ status_t configure() {
 	//addMotorCallback(MOTORBOTH, stopMotorIfJobComplete);
 
 	return kStatus_Success;
-}
-
-void buttonCallback_stopMotors(pint_pin_int_t pintr, uint32_t pmatch_status) {
-	PRINTF("\r\nExecuting buttonCallback_stopMotors with params pintr = %d, pmatch_status = %d",
-		(uint32_t) pintr,
-		pmatch_status
-	);
-	STEPPERS_stopMotor(stepperX_p);
-	STEPPERS_stopMotor(stepperY_p);
-	buttonCallback_stepperMotorX_stopped = true;
-	buttonCallback_stepperMotorY_stopped = true;
-	//stopStepperPWM(MOTORX);
-	//stopStepperPWM(MOTORY);
-}
-
-void buttonCallback_stopRelaventMotor(pint_pin_int_t pintr, uint32_t pmatch_status) {
-	PRINTF("\r\nExecuting buttonCallback_stopRelaventMotors with params pintr = %d, pmatch_status = %d",
-		(uint32_t) pintr,
-		pmatch_status
-	);
-	// right bump switch (kPINT_PinInt1)
-	// left bump switch (kPINT_PinInt2)
-	// down bump switch (kPINT_PinInt3)
-	// up bump switch (kPINT_PinInt4)
-	// emergency bump switch (kPINT_PinInt0)
-	if (pintr == kPINT_PinInt1 || pintr == kPINT_PinInt2) {
-		STEPPERS_stopMotor(stepperX_p);
-		buttonCallback_stepperMotorX_stopped = true;
-	}
-	else if (pintr == kPINT_PinInt3 || pintr == kPINT_PinInt4) {
-		STEPPERS_stopMotor(stepperY_p);
-		buttonCallback_stepperMotorY_stopped = true;
-	}
-	else {
-		// emergency pintr or no button interrupt (ie this allows the pints on fault condition to use this still
-		STEPPERS_stopMotor(stepperX_p);
-		STEPPERS_stopMotor(stepperY_p);
-		buttonCallback_stepperMotorX_stopped = true;
-		buttonCallback_stepperMotorY_stopped = true;
-	}
-}
-
-void findHome() {
-	while (1) {
-		if (!buttonCallback_stepperMotorX_stopped)
-			STEPPERS_moveRelativeNoAccelNoBlock(stepperX_p, -10000);	// left interrupt expected
-		if (!buttonCallback_stepperMotorY_stopped)
-			STEPPERS_moveRelativeNoAccelNoBlock(stepperY_p, -10000);	// up interrupt expected
-		// distance isn't important, if we don't hit, it will run again
-		while (stepperX_p->status.running && stepperY_p->status.running);
-		if (buttonCallback_stepperMotorX_stopped && buttonCallback_stepperMotorY_stopped) {
-			STEPPERS_setHome(stepperX_p);
-			STEPPERS_setHome(stepperY_p);
-			break;
-		}
-		else
-			while (stepperX_p->status.running || stepperY_p->status.running);
-	}
 }
 
 //void motorCallback_scheduleNextJob(stepperMotor_t* motorP) {

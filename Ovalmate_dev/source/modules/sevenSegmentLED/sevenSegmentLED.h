@@ -45,7 +45,7 @@ typedef struct {
 #define SEVENSEG_setLegs_3() \
 	SEVENSEG_setLegs(true, true, true, true, false, false, true)
 #define SEVENSEG_setLegs_4() \
-	SEVENSEG_setLegs(false, true, true, false, false, true, true)
+	SEVENSEG_setLegs(true, true, true, false, false, true, true)
 #define SEVENSEG_setLegs_5() \
 	SEVENSEG_setLegs(true, false, true, true, false, true, true)
 #define SEVENSEG_setLegs_6() \

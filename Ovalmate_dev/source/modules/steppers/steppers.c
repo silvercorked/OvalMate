@@ -37,11 +37,16 @@
  *		Added sleepMotor, wakeMotor, moveBothTo (and associated macro functions), and moveBothRelative (and associated macro functions)
  *	- 3/19/2022:
  *		Added comments to all functions in preparation for Software Design Review
+ *	- 3/24/2022:
+ *		Added mode switching and mode tracking for drawing from IR centered point
+ *	- 3/29/2022:
+ *		Corrected return types of mode switching functions
  */
 
 #include "steppers.h"
 
 // Variables
+stepperMotorMode currentMode = IRMODE;
 pinInformation_s stepperX_pwmOut =		{ .port = 0, .pin = 2  };
 pinInformation_s stepperY_pwmOut =		{ .port = 0, .pin = 3  };
 
@@ -423,6 +428,24 @@ void STEPPERS_setHome(stepperMotor_s* motor_p) {
 	motor_p->position = 0;
 }
 
+stepperMotorMode STEPPERS_switchMode() {
+	if (currentMode == PENMODE) {
+		STEPPERS_moveBothRelativeAccel(PENIROFFSETX, PENIROFFSETY); // offset for pen
+		currentMode = IRMODE;
+	}
+	else { // IRMODE
+		STEPPERS_moveBothRelativeAccel(-PENIROFFSETX, -PENIROFFSETY);
+		currentMode = PENMODE;
+	}
+	return currentMode;
+}
+stepperMotorMode STEPPERS_getCurrentMode() {
+	return currentMode;
+}
+stepperMotorMode STEPPERS_setCurrentMode(stepperMotorMode mode) {
+	currentMode = mode;
+}
+
 /**
  * Callback for the X stepperMotor. This is called once per PULSE (ie twice per period). Developers should not be calling this function.
  * To set a custom function, set the stepperMotor_s*->matchCallback to a function of type void (*)(uint32_t).
@@ -536,8 +559,11 @@ void STEPPERS_generalTimerCallback(uint32_t flags, stepperMotor_s* motor_p) {
  * @return	- None
  */
 void STEPPERS_XFault(pint_pin_int_t pintr, uint32_t pmatch_status) {
-	PRINTF("\r\n motor fault on stepper X detected!!! stopping motor...");
-	STEPPERS_stopMotor(stepperX_p);
+	PRINTF("\r\n fault pin x raised");
+	if (debounceFault(&stepperX_fault)) {
+		PRINTF("\r\n motor fault on stepper X detected!!! stopping motor...");
+		STEPPERS_stopMotor(stepperX_p);
+	}
 }
 
 /**
@@ -549,8 +575,11 @@ void STEPPERS_XFault(pint_pin_int_t pintr, uint32_t pmatch_status) {
  * @return	- None
  */
 void STEPPERS_YFault(pint_pin_int_t pintr, uint32_t pmatch_status) {
-	PRINTF("\r\n motor fault on stepper Y detected!!! stopping motor...");
-	STEPPERS_stopMotor(stepperY_p);
+	PRINTF("\r\n fault pin y raised");
+	if (debounceFault(&stepperY_fault)) {
+		PRINTF("\r\n motor fault on stepper Y detected!!! stopping motor...");
+		STEPPERS_stopMotor(stepperY_p);
+	}
 }
 
 /**
@@ -671,14 +700,12 @@ bool STEPPERS_readHomePin(stepperMotor_s* motor_p) {
 	return STEPPERS_readInputPin(motor_p->pinInfo_arr_p[HOME]);
 }
 
-/**
- * Delay for 1 millisecond. This is exactly 1 period length of the slowest speed of the stepper motors.
- *
- * @params	- None
- * @return	- None
- */
-void delay1ms(void) {
-	for (uint32_t i = 0U; i < 15000U; ++i)	// 3 000 000 should be 20ms delay
-		__asm("NOP"); /* delay */
+bool debounceFault(pinInformation_s* pinInfo) {
+	bool r = GPIO_PinRead(GPIO, pinInfo->port, pinInfo->pin);
+	if (r) {
+		delay500us();
+		return GPIO_PinRead(GPIO, pinInfo->port, pinInfo->pin);
+	}
+	return r; // r guaranteed to be false
 }
 // End Functions
