@@ -1,0 +1,14 @@
+C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\lpcxpresso55s16semi_dev_hid_generic_bm\CMSIS/core_cm33.h:2127:22:__NVIC_EnableIRQ	16	static
+C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\lpcxpresso55s16semi_dev_hid_generic_bm\CMSIS/core_cm33.h:2218:22:__NVIC_ClearPendingIRQ	16	static
+C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\lpcxpresso55s16semi_dev_hid_generic_bm\CMSIS/core_cm33.h:2324:22:__NVIC_SetPriority	16	static
+C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\lpcxpresso55s16semi_dev_hid_generic_bm\drivers/fsl_clock.h:987:20:CLOCK_EnableClock	24	static
+C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\lpcxpresso55s16semi_dev_hid_generic_bm\drivers/fsl_clock.h:997:20:CLOCK_DisableClock	24	static
+C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\lpcxpresso55s16semi_dev_hid_generic_bm\drivers/fsl_common_arm.h:499:24:EnableIRQ	24	static
+C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\lpcxpresso55s16semi_dev_hid_generic_bm\drivers/fsl_power.h:385:20:POWER_DisablePD	16	static
+../source/hid_generic.c:85:6:USB0_IRQHandler	8	static
+../source/hid_generic.c:96:6:USB_DeviceClockInit	16	static
+../source/hid_generic.c:130:6:USB_DeviceIsrEnable	16	static
+../source/hid_generic.c:158:21:USB_DeviceHidGenericCallback	32	static
+../source/hid_generic.c:242:21:USB_DeviceCallback	40	static
+../source/hid_generic.c:449:13:USB_DeviceApplicationInit	8	static
+../source/hid_generic.c:487:5:main	8	static

@@ -8,3 +8,10 @@ OvalMate is a capstone project for ECEN 4990 at the University of Nebraska at Om
  - open the "LPC55S16_Project_main_dev" as a project. The main code folder is "sources."
  - Connect LPC55S16-EVK development board via USB through the "Link-2" port and click "Debug" in MCUExpresso.
 
+## Target Hardware Build
+ - Pull this repo.
+ - Copy clocks and pin assignments from this build into the target hardware (for instance, the LPC5512).
+ - Copy all files in "source" and place them in the "source" folder for the target hardware.
+ - Install needed packages
+ - Build and debug on target hardware.
+

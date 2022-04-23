@@ -1,0 +1,8 @@
+C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\drivers/fsl_gpio.h:172:24:GPIO_PinRead	24	static
+../source/modules/buttons/buttons.c:43:6:BUTTONS_assignPinsToInterrupts	8	static
+../source/modules/buttons/buttons.c:100:6:BUTTONS_buttonEmergencyCallback	16	static
+../source/modules/buttons/buttons.c:116:6:BUTTONS_bumpRightCallback	16	static
+../source/modules/buttons/buttons.c:132:6:BUTTONS_bumpLeftCallback	16	static
+../source/modules/buttons/buttons.c:148:6:BUTTONS_bumpUpCallback	16	static
+../source/modules/buttons/buttons.c:164:6:BUTTONS_bumpDownCallback	16	static
+../source/modules/buttons/buttons.c:172:6:BUTTONS_debounceButton	24	static

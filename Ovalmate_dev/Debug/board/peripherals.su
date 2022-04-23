@@ -1,0 +1,3 @@
+../board/peripherals.c:202:13:USB0_init	8	static
+../board/peripherals.c:209:6:BOARD_InitPeripherals	8	static
+../board/peripherals.c:218:6:BOARD_InitBootPeripherals	8	static
