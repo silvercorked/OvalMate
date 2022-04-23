@@ -19,6 +19,7 @@ source/modules/steppers/steppers.o source/modules/steppers/steppers.d: \
  C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\drivers/fsl_pint.h \
  C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\drivers/fsl_inputmux.h \
  C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\drivers/fsl_inputmux_connections.h \
+ C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\source/modules/utils/delays.h \
  C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\utilities/fsl_debug_console.h \
  C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\drivers/fsl_common.h \
  C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\component\serial_manager/fsl_component_serial_manager.h \
@@ -43,6 +44,7 @@ C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalma
 C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\drivers/fsl_pint.h:
 C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\drivers/fsl_inputmux.h:
 C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\drivers/fsl_inputmux_connections.h:
+C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\source/modules/utils/delays.h:
 C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\utilities/fsl_debug_console.h:
 C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\drivers/fsl_common.h:
 C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\Ovalmate_dev\component\serial_manager/fsl_component_serial_manager.h:

@@ -1,4 +1,2 @@
-../source/modules/mainInclude/mainInclude.c:30:10:configure	8	static
-../source/modules/mainInclude/mainInclude.c:56:6:buttonCallback_stopMotors	16	static
-../source/modules/mainInclude/mainInclude.c:69:6:buttonCallback_stopRelaventMotor	16	static
-../source/modules/mainInclude/mainInclude.c:96:6:findHome	8	static
+../source/modules/mainInclude/mainInclude.c:29:10:configure	8	static
+../source/modules/mainInclude/mainInclude.c:55:6:buttonCallback_stopAndQuit	16	static

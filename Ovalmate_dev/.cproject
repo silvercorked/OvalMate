@@ -137,6 +137,16 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/component/timer}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/component/pwm}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/component/lists}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/usb/device/class/hid}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/usb/output/source/device/class}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/usb/device/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/usb/device/source}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/usb/device/source/lpcip3511}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/usb/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/usb/device/class}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/usb/output/source/device}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/component/osa}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/source/generated}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/device}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/CMSIS}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/board}&quot;"/>
@@ -484,6 +494,16 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/component/timer}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/component/pwm}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/component/lists}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/usb/device/class/hid}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/usb/output/source/device/class}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/usb/device/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/usb/device/source}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/usb/device/source/lpcip3511}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/usb/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/usb/device/class}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/usb/output/source/device}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/component/osa}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/source/generated}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/device}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/CMSIS}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/board}&quot;"/>
@@ -719,7 +739,7 @@
 	<storageModule moduleId="com.nxp.mcuxpresso.core.datamodels">
 		<sdkName>SDK_2.x_LPCXpresso55S16</sdkName>
 		<sdkVersion>2.11.0</sdkVersion>
-		<sdkComponents>middleware.baremetal.LPC55S16;platform.drivers.power.LPC55S16;platform.drivers.flexcomm.LPC55S16;platform.drivers.flexcomm_usart.LPC55S16;platform.drivers.clock.LPC55S16;platform.drivers.lpc_iocon.LPC55S16;platform.drivers.common.LPC55S16;platform.drivers.flexcomm_i2c.LPC55S16;platform.drivers.lpc_gpio.LPC55S16;platform.drivers.reset.LPC55S16;platform.drivers.lpadc.LPC55S16;platform.drivers.pint.LPC55S16;platform.drivers.inputmux.LPC55S16;platform.drivers.inputmux_connections.LPC55S16;platform.drivers.ctimer.LPC55S16;component.serial_manager.LPC55S16;component.serial_manager_uart.LPC55S16;utility.debug_console.LPC55S16;component.usart_adapter.LPC55S16;component.ctimer_adapter.LPC55S16;component.pwm_ctimer_adapter.LPC55S16;component.lists.LPC55S16;device.LPC55S16_startup.LPC55S16;CMSIS_Include_core_cm.LPC55S16;device.LPC55S16_CMSIS.LPC55S16;device.LPC55S16_system.LPC55S16;project_template.lpcxpresso55s16.LPC55S16;platform.drivers.anactrl.LPC55S16;middleware.usb.device.hid.external.LPC55S16;middleware.usb.device.common_header.LPC55S16;middleware.usb.device_controller_ip3511fs.LPC55S16;middleware.usb.common_header.LPC55S16;middleware.usb.device.stack.external.LPC55S16;middleware.usb.device.controller.driver.LPC55S16;component.osa.LPC55S16;middleware.usb.device.ip3511fs_config_header.LPC55S16;</sdkComponents>
+		<sdkComponents>middleware.baremetal.LPC55S16;platform.drivers.power.LPC55S16;platform.drivers.flexcomm.LPC55S16;platform.drivers.flexcomm_usart.LPC55S16;platform.drivers.clock.LPC55S16;platform.drivers.lpc_iocon.LPC55S16;platform.drivers.common.LPC55S16;platform.drivers.flexcomm_i2c.LPC55S16;platform.drivers.lpc_gpio.LPC55S16;platform.drivers.reset.LPC55S16;platform.drivers.lpadc.LPC55S16;platform.drivers.pint.LPC55S16;platform.drivers.inputmux.LPC55S16;platform.drivers.inputmux_connections.LPC55S16;platform.drivers.ctimer.LPC55S16;component.serial_manager.LPC55S16;component.serial_manager_uart.LPC55S16;utility.debug_console.LPC55S16;component.usart_adapter.LPC55S16;component.ctimer_adapter.LPC55S16;component.pwm_ctimer_adapter.LPC55S16;component.lists.LPC55S16;device.LPC55S16_startup.LPC55S16;CMSIS_Include_core_cm.LPC55S16;device.LPC55S16_CMSIS.LPC55S16;device.LPC55S16_system.LPC55S16;project_template.lpcxpresso55s16.LPC55S16;platform.drivers.anactrl.LPC55S16;middleware.usb.device.hid.external.LPC55S16;middleware.usb.device.common_header.LPC55S16;middleware.usb.device_controller_ip3511fs.LPC55S16;middleware.usb.common_header.LPC55S16;middleware.usb.device.stack.external.LPC55S16;middleware.usb.device.controller.driver.LPC55S16;component.osa.LPC55S16;middleware.usb.device.ip3511fs_config_header.LPC55S16;platform.drivers.flexcomm_spi.LPC55S16;</sdkComponents>
 		<boardId>lpcxpresso55s16</boardId>
 		<package>LPC55S16JBD100</package>
 		<core>cm33</core>

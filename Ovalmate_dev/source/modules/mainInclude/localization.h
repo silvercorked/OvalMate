@@ -53,7 +53,6 @@ extern bool buttonCallback_stepperMotorY_stopped;
 
 // Prototypes
 status_t findDocumentCorners();
-status_t followBlackSquares(stepperMotor_s*);
 status_t findHome(void);
 status_t findRectangleCorners(point_s*, uint8_t);
 status_t findRectangleCorner(sample_s*, bool, bool, bool, bool, bool);

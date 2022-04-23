@@ -49,6 +49,7 @@ extern volatile uint32_t g_pulsePeriod;
 extern ctimer_config_t ctimer_config;
 extern uint32_t ctimer_srcClock_Hz;
 extern uint32_t ctimer_timerClock;
+extern bool servoMotorAllowedToDrive;
 // End Variables
 // End Extern Variables
 

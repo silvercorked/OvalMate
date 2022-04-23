@@ -14,6 +14,10 @@
 
 #include "usb_device_composite.h"
 
+#include <stdbool.h>
+#include <modules/blackDots/blackDots.h>
+#include <modules/sevenSegmentLED/sevenSegmentLED.h>
+
 #include <stdio.h>
 #include "fsl_debug_console.h"  // this gives access to PRINTF for debugging
 
@@ -33,13 +37,9 @@ typedef struct _usb_hid_generic_struct
  ******************************************************************************/
 
 static usb_status_t USB_DeviceHidGenericAction(void);
-
 usb_status_t USB_DeviceInterface0OvalmateCallback(class_handle_t handle, uint32_t event, void *param);
-
 usb_status_t USB_DeviceInterface0OvalmateSetConfiguration(class_handle_t handle, uint8_t configuration_idx);
-
 usb_status_t USB_DeviceInterface0OvalmateSetInterface(class_handle_t handle, uint8_t alternateSetting);
-
 usb_status_t USB_DeviceInterface0OvalmateInit(usb_device_composite_struct_t *deviceComposite);
 
 
@@ -68,8 +68,21 @@ static usb_status_t USB_DeviceHidGenericAction(void)
     {
         s_UsbDeviceHidGeneric.inBuffer[i] = s_UsbDeviceHidGeneric.outBuffer[i];
     }
-
-    PRINTF("\r\n got (%d, %d)", s_UsbDeviceHidGeneric.outBuffer[0], s_UsbDeviceHidGeneric.outBuffer[1]);
+    uint8_t x = s_UsbDeviceHidGeneric.outBuffer[0]; uint8_t y = s_UsbDeviceHidGeneric.outBuffer[1];
+    PRINTF("\r\n got (%d, %d)", x, y);
+   if (!jobReady) { // dont wanna modify while running
+	   if (x <= BLACKDOTS_MAXCOLS && y <= BLACKDOTS_MAXROWS) {
+		BLACKDOTS_setPoint(x, y);
+		PRINTF("\r\n got (%d, %d)", x, y);
+	  }
+	  else if (x == 127 && y == 127) {
+		jobReady = true;
+		PRINTF("\r\n got (%d, %d) USBJOB COMPLETE", x, y);
+	  }
+	  else {
+		PRINTF("\r\n got (%d, %d) doesn't fit", x, y);
+	  }
+   }
 
     USB_DeviceHidSend(s_UsbDeviceComposite->interface0OvalmateHandle, USB_INTERFACE_0_OVALMATE_SETTING_0_EP_1_INTERRUPT_IN,
         (uint8_t *)s_UsbDeviceHidGeneric.inBuffer,
@@ -91,7 +104,7 @@ static usb_status_t USB_DeviceHidGenericAction(void)
 usb_status_t USB_DeviceInterface0OvalmateCallback(class_handle_t handle, uint32_t event, void *param)
 {
     usb_status_t error = kStatus_USB_InvalidRequest;
-
+    PRINTF("got USB event, %d", event);
     switch (event)
     {
         case kUSB_DeviceHidEventSendResponse:

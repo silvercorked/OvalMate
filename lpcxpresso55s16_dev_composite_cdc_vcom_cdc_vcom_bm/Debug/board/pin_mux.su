@@ -1,0 +1,4 @@
+C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\lpcxpresso55s16_dev_composite_cdc_vcom_cdc_vcom_bm\drivers/fsl_clock.h:987:20:CLOCK_EnableClock	24	static
+C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\lpcxpresso55s16_dev_composite_cdc_vcom_cdc_vcom_bm\drivers/fsl_iocon.h:182:22:IOCON_PinMuxSet	24	static
+../board/pin_mux.c:36:6:BOARD_InitBootPins	8	static
+../board/pin_mux.c:64:6:BOARD_InitPins	24	static

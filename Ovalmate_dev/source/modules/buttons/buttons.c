@@ -23,10 +23,11 @@ void (*rightBumpCallback)(pint_pin_int_t, uint32_t);
 void (*leftBumpCallback)(pint_pin_int_t, uint32_t);
 void (*upBumpCallback)(pint_pin_int_t, uint32_t);
 void (*downBumpCallback)(pint_pin_int_t, uint32_t);
-pinInformation_s up = { .port = 0, .pin = 9 }; // demo green led port 1 pin 7
-pinInformation_s right = { .port = 1, .pin = 25 };
-pinInformation_s left = { .port = 1, .pin = 26 };
-pinInformation_s down = { .port = 1, .pin = 27 };
+pinInformation_s up =			{ .port = 0, .pin = 9  };
+pinInformation_s right =		{ .port = 1, .pin = 25 };
+pinInformation_s left =			{ .port = 1, .pin = 26 };
+pinInformation_s down =			{ .port = 1, .pin = 27 };
+pinInformation_s emergency =	{ .port = 0, .pin = 0  };
 gpio_pin_config_t bumpConfig = { .pinDirection = kGPIO_DigitalInput };
 // End Variables
 
@@ -45,6 +46,7 @@ void BUTTONS_assignPinsToInterrupts() {
 	GPIO_PinInit(GPIO, right.port, right.pin, &bumpConfig);
 	GPIO_PinInit(GPIO, left.port, left.pin, &bumpConfig);
 	GPIO_PinInit(GPIO, down.port, down.pin, &bumpConfig);
+	GPIO_PinInit(GPIO, emergency.port, emergency.pin, &bumpConfig);
 
 	/* Connect trigger sources to PINT */
 	INPUTMUX_Init(INPUTMUX);
@@ -95,11 +97,12 @@ void BUTTONS_assignPinsToInterrupts() {
  * 			- uint32_t pmatch_status		: I actually don't know what this is. Should probably print it out and try to figure it out.
  * @return	- None
  */
-void BUTTONS_buttonEmergencyCallback(pint_pin_int_t pintr, uint32_t pmatch_status) {
+void BUTTONS_buttonEmergencyCallback(pint_pin_int_t pintr, uint32_t pmatch_status) {;
 	PRINTF("\r\n\r\n emergency button hit");
-
-	if (emergencyBumpCallback != NULL)
+	if (emergencyBumpCallback != NULL && BUTTONS_debounceButton(&emergency)) {
+		PRINTF("\r\n button emergency is a valid trigger \r\n");
 		emergencyBumpCallback(pintr, pmatch_status);
+	}
 }
 
 /**
@@ -166,11 +169,17 @@ void BUTTONS_bumpDownCallback(pint_pin_int_t pintr, uint32_t pmatch_status) {
 	}
 }
 
-bool BUTTONS_debounceButton(pinInformation_s* pinInfo) {
-	bool r = GPIO_PinRead(GPIO, pinInfo->port, pinInfo->pin);
+/**
+ * Debounces button presses by waiting by reading them, waiting a short period, and reading them again.
+ *
+ * @params	- pinInformation_s*	pinInfo_p		: the pin receiving the press.
+ * @return	- bool								: true if press was real, false otherwise.
+ */
+bool BUTTONS_debounceButton(pinInformation_s* pinInfo_p) {
+	bool r = GPIO_PinRead(GPIO, pinInfo_p->port, pinInfo_p->pin);
 	if (r) {
 		delay500us();
-		return GPIO_PinRead(GPIO, pinInfo->port, pinInfo->pin);
+		return GPIO_PinRead(GPIO, pinInfo_p->port, pinInfo_p->pin);
 	}
 	return r; // r guaranteed to be false
 }

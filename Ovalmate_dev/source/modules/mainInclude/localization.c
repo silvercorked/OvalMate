@@ -41,13 +41,35 @@ point_s bottomLeft;
 bool buttonCallback_stepperMotorX_stopped = false;
 bool buttonCallback_stepperMotorY_stopped = false;
 
+/**
+ * The estimations of centers appears to be off but consistently off.
+ * Attempts to corrective sum for error produced in measure centers in the X direction.
+ * The value produced is the error correction for locating the right side of the rectangle.
+ *
+ * @params	- uint8_t x		: the column which is being found.
+ * @return	- int32_t		: the corrective sum.
+ */
 int32_t errorStepsFromLeft(uint8_t x) { // for fixing x error on rect readings
 	return nanometersToSteps(40319 * x + 2001180); // 0.0403194 * x + 2.00118
 }
+
+/**
+ * The estimations of centers appears to be off but consistently off.
+ * subtracts 2mm from errorStepsFromLeftDistance to allow compaarison with center estimates.
+ *
+ * @params	- uint8_t x		: the column which is being found.
+ * @return	- int32_t		: the corrective sum.
+ */
 int32_t correctiveSteps(uint8_t x) {
 	return nanometersToSteps(2000000) - errorStepsFromLeft(x);
 }
 
+/**
+ * Attempts to find the topLeft, topRight, and bottomLeft corner centers and store them in three global point structures.
+ *
+ * @params	- None
+ * @return	- status_t		: kStatus_Success if corners would found, kStatus_Fail otherwise.
+ */
 status_t findDocumentCorners() {
 	// presume findHome has been called and home set
 	STEPPERS_moveBothToNoAccel(0, 0);
@@ -61,76 +83,61 @@ status_t findDocumentCorners() {
 
 	PRINTF("backgroundSample val: %d", backgroundSample.value);
 	// move diagonal but stop when ADC reads angled bracket for lining up document
-	STEPPERS_moveRelativeNoAccelNoBlock(stepperX_p, 10000);
-	STEPPERS_moveRelativeNoAccelNoBlock(stepperY_p, 10000);
-
-	// wrapping issue
-	while (!aboveAlignmentBracket()) {
+	STEPPERS_moveBothRelativeNoAccelNoBlock(10000, 10000);
+	while (!aboveAlignmentBracket() && (stepperX_p->status.running || stepperY_p->status.running)) {
 		if (!(stepperX_p->status.running || stepperY_p->status.running)) {
 			PRINTF("failed to find bracket");
 			return kStatus_Fail;	// if motors stopped, fail
 		}
 	}
-	//PRINTF("currentSample val: %d", s);
-	// when we break out, reading new unique value
 	STEPPERS_stopMotor(stepperX_p);
 	STEPPERS_stopMotor(stepperY_p);
-
 	PRINTF("\r\n should be above angle bracket");
-
+	// drive down until we reach otherside of alignment bracket
 	STEPPERS_moveRelativeNoAccelNoBlock(stepperY_p, 10000);
-
-	while (aboveAlignmentBracket()) {
+	while (aboveAlignmentBracket() && stepperY_p->status.running) {
 		if (!stepperY_p->status.running) {
 			PRINTF("failed to drive past alignment bracket");
 			return kStatus_Fail;
 		}
-	}
-
-	while (!aboveWhite()) {
+	} // continue drive until we reach white paper
+	while (!aboveWhite() && stepperY_p->status.running) {
 		if (!stepperY_p->status.running) {
 			PRINTF("failed to find white under bracket");
 			return kStatus_Fail;
 		}
 	}
-
 	STEPPERS_stopMotor(stepperY_p);
-
 	PRINTF("\r\n should be above white");
-	// 0	// 1	// 4	// 5	// 15	// 24
-	// -100 // 600 // 2800 // 3600 // 10500 // 13200
-	STEPPERS_moveBothRelativeNoAccel(650, 580); // get closer to rectangle
-	// 450 // 550 // 600
-	//STEPPERS_moveRelativeNoAccel(stepperY_p, 400);
 
+	STEPPERS_moveBothRelativeNoAccel(650, 580); // get closer to rectangle (col 0, row -1)
+
+	// find rectangle center and mark
 	point_s rectangleCorners[4];
-	status_t a = findRectangleCorners(rectangleCorners, 4);
-	PRINTF("\r\n status: %c", a == kStatus_Fail ? 'F' : 'S');
-	if (a != kStatus_Fail) {
-		a = getCenterFromRectCorners(rectangleCorners, 4, &topLeft);
-		PRINTF("\r\n center.x: %d, center.y: %d, status: %c", topLeft.x, topLeft.y, a == kStatus_Fail ? 'F' : 'S');
+	status_t status = findRectangleCorners(rectangleCorners, 4);
+	PRINTF("\r\n status: %c", status == kStatus_Fail ? 'F' : 'S');
+	if (status == kStatus_Fail)
+		return status;
+	status = getCenterFromRectCorners(rectangleCorners, 4, &topLeft);
+	if (status == kStatus_Fail)
+		return status;
+	PRINTF("\r\n center.x: %d, center.y: %d, status: %c", topLeft.x, topLeft.y, status == kStatus_Fail ? 'F' : 'S');
+	PRINTF("\r\n corrected center.x: %d, center.y: %d,", topLeft.x + errorInX0, topLeft.y);
+	STEPPERS_moveBothToNoAccel(topLeft.x + errorInX0, topLeft.y);
+	STEPPERS_switchMode(); // PENMODE
+	SERVO_setPenMode(PENDOWN);
+	delay20ms();
+	STEPPERS_moveRelativeNoAccel(stepperY_p, 500);
+	STEPPERS_moveRelativeNoAccel(stepperY_p, -500);
+	STEPPERS_moveRelativeNoAccel(stepperX_p, 500);
+	STEPPERS_moveRelativeNoAccel(stepperX_p, -500);
+	SERVO_setPenMode(PENUP);
+	delay20ms();
+	STEPPERS_switchMode(); // IRMODE
+	delay20ms();
 
-		PRINTF("\r\n corrected center.x: %d, center.y: %d,", topLeft.x + errorInX0, topLeft.y);
-		STEPPERS_moveBothToNoAccel(topLeft.x + errorInX0, topLeft.y);
-
-		STEPPERS_switchMode(); // PENMODE
-		SERVO_setPenMode(PENDOWN);
-		delay20ms();
-		STEPPERS_moveRelativeNoAccel(stepperY_p, 500);
-		STEPPERS_moveRelativeNoAccel(stepperY_p, -500);
-		STEPPERS_moveRelativeNoAccel(stepperX_p, 500);
-		STEPPERS_moveRelativeNoAccel(stepperX_p, -500);
-		SERVO_setPenMode(PENUP);
-		delay20ms();
-		STEPPERS_switchMode(); // IRMODE
-	}
-
-	STEPPERS_moveBothToNoAccel(topLeft.x, topLeft.y - 300);
-
-	//STEPPERS_moveRelativeAccel(stepperX_p, -500);
-	//STEPPERS_moveRelativeAccel(stepperY_p, -500);
-
-	STEPPERS_moveRelativeAccel(stepperX_p, 17000);
+	// move above found center and drive to other side of ballot
+	STEPPERS_moveBothRelativeAccel(17000, -300);
 
 	uint32_t totalX = 2000;
 	sample_s right = { .x = 0, .y = 0, .value = 0xFFFF };
@@ -142,14 +149,16 @@ status_t findDocumentCorners() {
 				right = pastSamples[i];
 				break;
 			}
-			//PRINTF("\r\n%d, %d", pastSamples[i].x, pastSamples[i].value);
 		}
 		if (right.value != 0xFFFF || totalX <= 0) {
 			break;
 		}
 		totalX -= 200;
 	}
-
+	if (right.value == 0xFFFF) {// right not set
+		PRINTF("\r\n right sample not set");
+		return kStatus_Fail;
+	}
 
 	uint32_t totalY = 2000;
 	sample_s top = { .x = 0, .y = 0, .value = 0xFFFF };
@@ -162,45 +171,46 @@ status_t findDocumentCorners() {
 				top = pastSamples[i];
 				break;
 			}
-			//PRINTF("\r\n%d, %d", pastSamples[i].x, pastSamples[i].value);
 		}
 		if (top.value != 0xFFFF || totalY <= 0) {
 			break;
 		}
 		totalY -= 200;
 	}
-
-
-	PRINTF("\r\n\r\n r.x: %d, r.y: %d, t.x: %d, t.y: %d", right.x, right.y, top.x, top.y);
-
-	point_s corner = { .x = top.x, .y = right.y };
-	//1312
-	STEPPERS_moveBothToNoAccel(corner.x - 1312, corner.y + 100); // 15 mm offset on x // getting closer on y
-
-	point_s rectangleCorners2[4];
-	status_t a2 = findRectangleCorners(rectangleCorners2, 4);
-	PRINTF("status: %c", a2 == kStatus_Fail ? 'F' : 'S');
-	if (a2 != kStatus_Fail) {
-		a2 = getCenterFromRectCorners(rectangleCorners2, 4, &topRight);
-		PRINTF("\r\n center.x: %d, center.y: %d, status: %c", topRight.x, topRight.y, a2 == kStatus_Fail ? 'F' : 'S');
-		PRINTF("\r\n corrected center.x: %d, center.y: %d,", topRight.x + errorInX24, topRight.y);
-		// correct for error in x on readings
-		topRight.x = topRight.x + errorInX24;
-
-		STEPPERS_moveBothToNoAccel(topRight.x, topRight.y);
-		STEPPERS_switchMode(); // PENMODE
-		SERVO_setPenMode(PENDOWN);
-		delay20ms();
-		STEPPERS_moveRelativeNoAccel(stepperY_p, 500);
-		STEPPERS_moveRelativeNoAccel(stepperY_p, -500);
-		STEPPERS_moveRelativeNoAccel(stepperX_p, 500);
-		STEPPERS_moveRelativeNoAccel(stepperX_p, -500);
-		SERVO_setPenMode(PENUP);
-		delay20ms();
-		STEPPERS_switchMode(); // IRMODE
+	if (top.value == 0xFFFF) {// top not set
+		PRINTF("\r\n top sample not set");
+		return kStatus_Fail;
 	}
+	PRINTF("\r\n\r\n r.x: %d, r.y: %d, t.x: %d, t.y: %d", right.x, right.y, top.x, top.y);
+	point_s corner = { .x = top.x, .y = right.y };
+
+	// based on corner location, drive to second black rectangle (col 23, row -1)
+	STEPPERS_moveBothToNoAccel(corner.x - 1212, corner.y + 100); // 15 mm offset on x // getting closer on y
+	point_s rectangleCorners2[4];
+	status = findRectangleCorners(rectangleCorners2, 4);
+	PRINTF("status: %c", status == kStatus_Fail ? 'F' : 'S');
+	if (status == kStatus_Fail)
+		return status;
+	status = getCenterFromRectCorners(rectangleCorners2, 4, &topRight);
+	if (status == kStatus_Fail)
+		return status;
+	PRINTF("\r\n center.x: %d, center.y: %d, status: %c", topRight.x, topRight.y, status == kStatus_Fail ? 'F' : 'S');
+	PRINTF("\r\n corrected center.x: %d, center.y: %d,", topRight.x + errorInX24, topRight.y);
+	topRight.x = topRight.x + errorInX24;
+	STEPPERS_moveBothToNoAccel(topRight.x, topRight.y);
+	STEPPERS_switchMode(); // PENMODE
+	SERVO_setPenMode(PENDOWN);
 	delay20ms();
-	//STEPPERS_moveBothRelativeAccelNoBlock(-10000, 10000);
+	STEPPERS_moveRelativeNoAccel(stepperY_p, 500);
+	STEPPERS_moveRelativeNoAccel(stepperY_p, -500);
+	STEPPERS_moveRelativeNoAccel(stepperX_p, 500);
+	STEPPERS_moveRelativeNoAccel(stepperX_p, -500);
+	SERVO_setPenMode(PENUP);
+	delay20ms();
+	STEPPERS_switchMode(); // IRMODE
+	delay20ms();
+
+	// calculate location of bottom left (col 0, row 50
 	uint32_t diffX = (topRight.x - topLeft.x);
 	int32_t diffY = -(topRight.y - topLeft.y);
 	int32_t xOffsetExpected = (int32_t) (diffY * SCALEFACTOR);
@@ -208,68 +218,48 @@ status_t findDocumentCorners() {
 	int32_t yOffsetExpected = (int32_t) (diffX * SCALEFACTOR);
 	bottomLeft.y = yOffsetExpected + topLeft.y;
 	PRINTF("\r\n X: %d, Y: %d", bottomLeft.x, bottomLeft.y);
-	/*while (stepperX_p->status.running || stepperY_p->status.running);
-	STEPPERS_moveBothToNoAccel(bottomLeft.x, bottomLeft.y);
-	STEPPERS_switchMode(); // PENMODE
-	SERVO_setPenMode(PENDOWN);
-	delay20ms();
-	STEPPERS_moveRelativeNoAccel(stepperY_p, 500);
-	STEPPERS_moveRelativeNoAccel(stepperY_p, -500);
-	STEPPERS_moveRelativeNoAccel(stepperX_p, 500);
-	STEPPERS_moveRelativeNoAccel(stepperX_p, -500);
-	SERVO_setPenMode(PENUP);
-	delay20ms();
-	delay20ms();
-
-	STEPPERS_switchMode(); // IRMODE
-	STEPPERS_moveBothToNoAccel(topLeft.x, bottomLeft.y);
-	STEPPERS_switchMode(); // PENMODE
-	SERVO_setPenMode(PENDOWN);
-	delay20ms();
-	STEPPERS_moveRelativeNoAccel(stepperY_p, 500);
-	STEPPERS_moveRelativeNoAccel(stepperY_p, -500);
-	STEPPERS_moveRelativeNoAccel(stepperX_p, 500);
-	STEPPERS_moveRelativeNoAccel(stepperX_p, -500);
-	// if dont find black dot in corner, fail
-	SERVO_setPenMode(PENUP);
-	delay20ms();
-	STEPPERS_switchMode(); // IRMODE
-	*/
-	STEPPERS_moveBothToAccel(10000, 4000); // clear dangerous points and prepare for finding ovals
 
 	return kStatus_Success;
 
-}
-
-status_t followBlackSquares(stepperMotor_s* majorAxis) {
-	pollADC(stepperX_p, 100);
-	// TODO
-
-	return kStatus_Success;
-}
-
-status_t findHome() {
-	while (1) {
-		if (!buttonCallback_stepperMotorX_stopped)
-			STEPPERS_moveRelativeNoAccelNoBlock(stepperX_p, -10000);	// left interrupt expected
-		if (!buttonCallback_stepperMotorY_stopped)
-			STEPPERS_moveRelativeNoAccelNoBlock(stepperY_p, -10000);	// up interrupt expected
-		// distance isn't important, if we don't hit, it will run again
-		while (stepperX_p->status.running && stepperY_p->status.running);
-		if (buttonCallback_stepperMotorX_stopped && buttonCallback_stepperMotorY_stopped) {
-			// can add something here to check that the buttons are depressed (tho might need to setup pin interrupts as gpio to read)
-			STEPPERS_setHome(stepperX_p);
-			STEPPERS_setHome(stepperY_p);
-			break;
-		}
-		else
-			while (stepperX_p->status.running || stepperY_p->status.running);
-	}
-	return kStatus_Success;
 }
 
 /**
- * Attempts to find 4 points of a rectangle using the ADC
+ * Tries to find the Home position (top left) in the plotter space by moving in a
+ * diagonal. The plotter does not know where it is when this function is running,
+ * so it will not avoid any obstacles. It must be positioned properly before power up.
+ *
+ * @params	- None
+ * @return	- status_t		: kStatus_Success if the plotter hits the top left corner, kStatus_Fail if motors are inoperable.
+ */
+status_t findHome() {
+	status_t status1 = kStatus_Success;
+	status_t status2 = kStatus_Success;
+	while (1) {
+		if (!buttonCallback_stepperMotorX_stopped)
+			status1 = STEPPERS_moveRelativeNoAccelNoBlock(stepperX_p, -10000);	// left interrupt expected
+		if (!buttonCallback_stepperMotorY_stopped)
+			status2 = STEPPERS_moveRelativeNoAccelNoBlock(stepperY_p, -10000);	// up interrupt expected
+		if (status1 == kStatus_Fail || status2 == kStatus_Fail) return kStatus_Fail;
+		while (stepperX_p->status.running && stepperY_p->status.running);
+		if (buttonCallback_stepperMotorX_stopped && buttonCallback_stepperMotorY_stopped) {
+			STEPPERS_setHome(stepperX_p);
+			STEPPERS_setHome(stepperY_p);
+			return kStatus_Success;
+		}
+		else {
+			while (stepperX_p->status.running && stepperY_p->status.running);
+		}
+	}
+}
+
+/**
+ * Tries to find the Home position (top left) in the plotter space by moving in a
+ * diagonal. The plotter does not know where it is when this function is running,
+ * so it will not avoid any obstacles. It must be positioned properly before power up.
+ *
+ * @params	- point_s[]	rectPoints		: an array of 4 point_s that represent the corners of the rectangle in question.
+ * @params	- uint8_t	size			: the size of the array (if it isn't 4, this always returns kStatus_Fail).
+ * @return	- status_t					: kStatus_Success if the rectangle's center was found, kStatus_Fail otherwise.
  */
 status_t findRectangleCorners(point_s rectPoints[], uint8_t size) {
 	if (size != 4) {
@@ -311,6 +301,17 @@ status_t findRectangleCorners(point_s rectPoints[], uint8_t size) {
 	return kStatus_Success;
 }
 
+/**
+ * Tries to find one corner of a rectangle. The corner it attempts to find depends on the booleans passed in.
+ *
+ * @params	- sample_s*	corner_p		: an empty sample to be filled by this function.
+ * @params	- bool		slim			: true if the rectangle being measured is expected to be slim (2x3mm), otherwise (4x3mm)
+ * @params	- bool		upRight			: true if the desired corner is the top right corner of the rectangle
+ * @params	- bool		downRight		: true if the desired corner is the bottom right corner of the rectangle
+ * @params	- bool		downLeft		: true if the desired corner is the bottom left corner of the rectangle
+ * @params	- bool		upLeft			: true if the desired corner is the top left corner of the rectangle
+ * @return	- status_t		: kStatus_Success if the corner was found, kStatus_Fail otherwise.
+ */
 status_t findRectangleCorner(sample_s* corner_p, bool slim, bool upRight, bool downRight, bool downLeft, bool upLeft) {
 	bool startFound = false;
 	sample_s start;
@@ -379,6 +380,14 @@ status_t findRectangleCorner(sample_s* corner_p, bool slim, bool upRight, bool d
 	return startFound ? kStatus_Success : kStatus_Fail;
 }
 
+/**
+ * Attempt to calculate the center of the rectangle.
+ *
+ * @params	- point_s[]	points_arr		: an array of 4 point_s that represent the corners of the rectangle in question.
+ * @params	- uint8_t	size			: the size of the array (if it isn't 4, this always returns kStatus_Fail).
+ * @params	- point_s*	center			: an empty center to be filled by this function.
+ * @return	- status_t					: kStatus_Success if the rectangle's center was found, kStatus_Fail otherwise.
+ */
 status_t getCenterFromRectCorners(const point_s points_arr[], uint8_t size, point_s* center) {
 	if (size != 4) {
 		return kStatus_Fail; // failure. the rect points will be used to set the points in the array. If it isn't the right size, we can't use it
@@ -403,10 +412,26 @@ status_t getCenterFromRectCorners(const point_s points_arr[], uint8_t size, poin
 	return kStatus_Success;
 }
 
+/**
+ * Polls the ADC while moving a distance. Utilizes and overwrites the entirety of the pastSamples array.
+ *
+ * @params	- stepperMotor_s*	motor_p	: the motor to drive while polling.
+ * @params	- int32_t			steps	: the number of steps to move over the course of gathering 100 samples.
+ * @return	- None
+ */
 void pollADC(stepperMotor_s* motor_p, int32_t steps) {
 	pollADCRange(motor_p, steps, 0, 100);
 }
 
+/**
+ * Polls the ADC while moving a distance. Utilizes and overwites specified indexes of the pastSamples array.
+ *
+ * @params	- stepperMotor_s*	motor_p	: the motor to drive while polling.
+ * @params	- int32_t			steps	: the number of steps to move over the course of gathering 100 samples.
+ * @params	- uint8_t			start	: the start index to store ADC values.
+ * @params	- uint8_t			end		: the end index to store ADC values.
+ * @return	- None
+ */
 void pollADCRange(stepperMotor_s* motor_p, int32_t steps, uint8_t start, uint8_t end) {
 	if (start >= end || start >= 100 || end > 100)
 		return; // fail, don't run.
@@ -422,6 +447,15 @@ void pollADCRange(stepperMotor_s* motor_p, int32_t steps, uint8_t start, uint8_t
 	}
 }
 
+/**
+ * !!CURRENTLY UNUSED!!
+ * Attempts to find a better center point by polling for a peak using the ADC around.
+ *
+ * @params	- stepperMotor_s*	motor_p	: the motor to drive while polling.
+ * @params	- uint8_t			start	: the start index to store ADC values.
+ * @params	- uint8_t			end		: the end index to store ADC values.
+ * @return	- uint8_t					: the index of the peak sample.
+ */
 uint8_t locateBetterCenter(stepperMotor_s* motor_p, uint8_t start, uint8_t end) {
 	uint8_t index = -1;
 	uint8_t mid = (end - start) / 2;
@@ -435,6 +469,14 @@ uint8_t locateBetterCenter(stepperMotor_s* motor_p, uint8_t start, uint8_t end) 
 	return findPeak(start, end); // return index of high point to allow caller to recenter on peak
 }
 
+/**
+ * !!CURRENTLY UNUSED!!
+ * Attempts to find a peak within the pastSamples array.
+ *
+ * @params	- uint8_t			start	: the start index to store ADC values.
+ * @params	- uint8_t			end		: the end index to store ADC values.
+ * @return	- uint8_t					: the index of the peak sample.
+ */
 uint8_t findPeak(uint8_t start, uint8_t end) {
 	uint8_t index = -1;
 	uint16_t max = 0;
@@ -449,6 +491,13 @@ uint8_t findPeak(uint8_t start, uint8_t end) {
 	return index;
 }
 
+/**
+ * !!CURRENTLY UNUSED!!
+ * Attempts to find the beginning of a rise in the pastSamples array.
+ *
+ * @params	- uint8_t			start	: the start index to store ADC values.
+ * @return	- uint8_t					: the index of the start of the rise.
+ */
 uint8_t findRiseStart(uint8_t start) {
 	uint8_t index = -1;
 	if (start > 100)
@@ -462,6 +511,13 @@ uint8_t findRiseStart(uint8_t start) {
 	return index;
 }
 
+/**
+ * !!CURRENTLY UNUSED!!
+ * Attempts to find the end of a fall in the pastSamples array.
+ *
+ * @params	- uint8_t			start	: the start index to store ADC values.
+ * @return	- uint8_t					: the index of the end of the fall.
+ */
 uint8_t findFallEnd(uint8_t start) {
 	uint8_t index = -1;
 	if (start > 100)
@@ -474,25 +530,74 @@ uint8_t findFallEnd(uint8_t start) {
 	}
 	return index;
 }
+
+/**
+ * Polls and checks if the plotter head is currently above the alignment brackets (or IR-based equivalent).
+ *
+ * @params	- None
+ * @return	- bool		: true if above an alignment bracket (or IR equivalent). False otherwise.
+ */
 bool aboveAlignmentBracket() {
 	return isAlignmentBracket((uint32_t) IRSENSOR_readAvgADC(1000));
 }
+
+/**
+ * Polls and checks if the plotter head is currently above something black (or IR-based equivalent).
+ *
+ * @params	- None
+ * @return	- bool		: true if above something black (or IR equivalent). False otherwise.
+ */
 bool aboveBlack() {
 	return isBlack((uint32_t) IRSENSOR_readAvgADC(1000));
 }
+
+/**
+ * Polls and checks if the plotter head is currently above something white (or IR-based equivalent).
+ *
+ * @params	- None
+ * @return	- bool		: true if above something white (or IR equivalent). False otherwise.
+ */
 bool aboveWhite() {
 	return isWhite((uint32_t) IRSENSOR_readAvgADC(1000));
 }
+
+/**
+ * Checks if the given IR adc reading indicates an alignment bracket.
+ *
+ * @params	- None
+ * @return	- bool		: true if adcVal > threshold. False otherwise.
+ */
 bool isAlignmentBracket(uint32_t adcVal) {
 	return adcVal > 50000;
 }
+
+/**
+ * Checks if the given IR adc reading indicates something black.
+ *
+ * @params	- None
+ * @return	- bool		: true if adcVal > threshold. False otherwise.
+ */
 bool isBlack(uint32_t adcVal) {
 	return adcVal > ISBLACKTHRESHOLD;
 }
+
+/**
+ * Checks if the given IR adc reading indicates something white.
+ *
+ * @params	- None
+ * @return	- bool		: true if adcVal < thresholdUpper && adcval > thresholdLower. False otherwise.
+ */
 bool isWhite(uint32_t adcVal) {
 	return adcVal > ISWHITELOWERTHRESHOLD && adcVal < ISWHITEUPPERTHRESHOLD;
 }
 
+/**
+ * buttonCallback function that stops both motors and indicates they both have been stopped by button callbacks.
+ *
+ * @params	- pint_pin_int_t pintr			: an identifier for which pin interrupt is triggering this function call. (always kPINT_PinInt1)
+ * 			- uint32_t pmatch_status		: I actually don't know what this is. Should probably print it out and try to figure it out.
+ * @return	- None
+ */
 void buttonCallback_stopMotors(pint_pin_int_t pintr, uint32_t pmatch_status) {
 	PRINTF("\r\nExecuting buttonCallback_stopMotors with params pintr = %d, pmatch_status = %d",
 		(uint32_t) pintr,
@@ -506,6 +611,13 @@ void buttonCallback_stopMotors(pint_pin_int_t pintr, uint32_t pmatch_status) {
 	//stopStepperPWM(MOTORY);
 }
 
+/**
+ * buttonCallback function that stops motors that affect movement towards or away from the button pressed.
+ *
+ * @params	- pint_pin_int_t pintr			: an identifier for which pin interrupt is triggering this function call. (always kPINT_PinInt1)
+ * 			- uint32_t pmatch_status		: I actually don't know what this is. Should probably print it out and try to figure it out.
+ * @return	- None
+ */
 void buttonCallback_stopRelaventMotor(pint_pin_int_t pintr, uint32_t pmatch_status) {
 	PRINTF("\r\nExecuting buttonCallback_stopRelaventMotors with params pintr = %d, pmatch_status = %d",
 		(uint32_t) pintr,

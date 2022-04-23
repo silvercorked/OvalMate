@@ -23,8 +23,16 @@
 #include "mainInclude.h"
 
 // Variables
+bool buttonCallback_quitProgram = false;
 // End Variables
 
+/**
+ * This function initializes all components needed to operate the Oval-Mate (SEVENSEG, BUTTONS, IRSENSOR, STEPPERS, and SERVO)
+ * and also sets initial buttonCallback behavior.
+ *
+ * @params	- None
+ * @return	- status_t		: always returns kStatus_Success.
+ */
 status_t configure() {
 
 	/* Initialize PINT */
@@ -38,43 +46,33 @@ status_t configure() {
 	STEPPERS_initializeMotors();
 	SERVO_initializePWM();
 
-	emergencyBumpCallback = buttonCallback_stopRelaventMotor;
+	emergencyBumpCallback = buttonCallback_stopAndQuit;
 	rightBumpCallback = buttonCallback_stopRelaventMotor;
 	leftBumpCallback = buttonCallback_stopRelaventMotor;
 	upBumpCallback = buttonCallback_stopRelaventMotor;
 	downBumpCallback = buttonCallback_stopRelaventMotor;
 
-	//initializeSteppers();
-
-	//addMotorCallback(MOTORBOTH, stopMotorIfJobComplete);
-
 	return kStatus_Success;
 }
 
-//void motorCallback_scheduleNextJob(stepperMotor_t* motorP) {
-//	PRINTF("\r\nExecuting motorCallback_scheduleNextJob with params motor = %c, nextJobSteps = %d",
-		//motorToWhichMotor(*motorP),
-		//motorCallback_scheduleNextJob_steps
-//	);
-//	motorCallback_printCurrSteps(motorP);
-	//if (motorStopped && motorCallback_scheduleNextJob_steps != 0) {
-	//	setupStepperPWM(&motor, motorCallback_scheduleNextJob_steps);
-	//	startStepperPWM(motor.timer);
-	//	motorCallback_scheduleNextJob_steps--;
-	//	if (motorCallback_scheduleNextJob_steps < 10)
-	//		stopStepperPWM(motor.timer);
-	//}
-//}
-//
-//void motorCallback_printCurrSteps(stepperMotor_t* motor) {
-//	PRINTF("\r\ncurr steps: %d, goalSteps: %d", motor->currentJob.currSteps, motor->currentJob.goalSteps);
-//}
-//
-//void stopMotorIfJobComplete(stepperMotor_t* motor) {
-//	motor->netSteps += motor->direction == 0 ? 1 : -1;
-//	motor->currentJob.currSteps++;
-//	if (motor->currentJob.currSteps == motor->currentJob.goalSteps)
-//		stopStepperPWM(getWhich(motor));
-//}
-//
-//
+/**
+ * buttonCallback function that stops the plotter until it is powered off. Currently reserves this functionality for the emergency button.
+ *
+ * @params	- pint_pin_int_t pintr			: an identifier for which pin interrupt is triggering this function call. (always kPINT_PinInt1)
+ * 			- uint32_t pmatch_status		: I actually don't know what this is. Should probably print it out and try to figure it out.
+ * @return	- None
+ */
+void buttonCallback_stopAndQuit(pint_pin_int_t pintr, uint32_t pmatch_status) {
+	PRINTF("\r\nExecuting buttonCallback_stopRelaventMotors with params pintr = %d, pmatch_status = %d",
+		(uint32_t) pintr,
+		pmatch_status
+	);
+	if (pintr == kPINT_PinInt0) {
+		STEPPERS_stopMotor(stepperX_p);
+		STEPPERS_stopMotor(stepperY_p);
+		SERVO_stopPWM();
+		buttonCallback_quitProgram = true;
+		stepperMotorsAllowedToDrive = false;
+		servoMotorAllowedToDrive = false;
+	}
+}

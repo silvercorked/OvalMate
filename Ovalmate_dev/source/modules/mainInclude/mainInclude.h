@@ -22,6 +22,7 @@
 
 // Core Includes
 #include <stdio.h>
+#include <stdbool.h>
 #include "fsl_debug_console.h"  // this gives access to PRINTF for debugging
 #include "board.h"
 #include "peripherals.h"
@@ -44,15 +45,13 @@
 
 // all variables used will start with the function callback's name in which they are used
 // Variables
+extern bool buttonCallback_quitProgram;
 // End Variables
 
 // all functions will start with the void pointer they are meant to be assigned to.
 // Prototypes
 status_t configure(void);
-//void motorCallback_scheduleNextJob(stepperMotor_t*);		// motorCallbacks are of this form
-//void motorCallback_printCurrSteps(stepperMotor_t*);
-//void stopMotorIfJobComplete(stepperMotor_t*);
-//void driveStepperPWM(whichMotor, uint32_t, uint32_t, bool);
+void buttonCallback_stopAndQuit(pint_pin_int_t, uint32_t);
 // End Prototypes
 
 #endif

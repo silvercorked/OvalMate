@@ -116,6 +116,7 @@ stepperMotor_s stepperY = {
 };
 stepperMotor_s* stepperX_p = &stepperX;
 stepperMotor_s* stepperY_p = &stepperY;
+bool stepperMotorsAllowedToDrive = true;
 // End Variables
 
 // Functions
@@ -230,6 +231,8 @@ void STEPPERS_initializeMotors() {
  * @return	- status_t					: always kStatus_Success
  */
 status_t STEPPERS_setupMotor(stepperMotor_s* motor_p, uint32_t steps, bool accel) {
+	if (!stepperMotorsAllowedToDrive)
+		return kStatus_Fail;
 	motor_p->matchConfig.enableCounterReset = true;					// reload timer when on match
 	motor_p->matchConfig.enableCounterStop  = false;					// don't stop timer on match
 	if (motor_p == stepperX_p)										// these are the same currently, but might as well check
@@ -243,8 +246,8 @@ status_t STEPPERS_setupMotor(stepperMotor_s* motor_p, uint32_t steps, bool accel
 	CTIMER_RegisterCallBack(motor_p->timer_p, &(motor_p->matchCallback), kCTIMER_SingleCallback);
 	CTIMER_SetupMatch(motor_p->timer_p, motor_p->output, &(motor_p->matchConfig));
 
-	STEPPERS_setMotorStepsPerPhase(motor_p->phaseSteps_p, steps, accel);	// presets all info about journey
-	return kStatus_Success;
+	status_t status = STEPPERS_setMotorStepsPerPhase(motor_p->phaseSteps_p, steps, accel);	// presets all info about journey
+	return status;
 }
 
 /**
@@ -255,9 +258,11 @@ status_t STEPPERS_setupMotor(stepperMotor_s* motor_p, uint32_t steps, bool accel
  * 			- bool accel				: true -> this trip can be sped up with acceleration, false -> this trip will not use acceleration.
  * @return	- None
  */
-void STEPPERS_driveSteps(stepperMotor_s* motor_p, uint32_t steps, bool accel) { // doesn't set direciton. moves in current direction
-	STEPPERS_setupMotor(motor_p, steps, accel);
+status_t STEPPERS_driveSteps(stepperMotor_s* motor_p, uint32_t steps, bool accel) { // doesn't set direciton. moves in current direction
+	if (STEPPERS_setupMotor(motor_p, steps, accel) == kStatus_Fail)
+		return kStatus_Fail;
 	STEPPERS_startMotor(motor_p);
+	return kStatus_Success;
 }
 
 /**
@@ -279,10 +284,10 @@ status_t STEPPERS_moveRelative(stepperMotor_s* motor_p, int32_t steps, bool acce
 		motor_p->direction = false;	// if negative, dir = false
 	}
 	STEPPERS_writeDirectionPin(motor_p, motor_p->direction);
-	STEPPERS_driveSteps(motor_p, (uint32_t) steps, accel);
-	if (block)
+	status_t status = STEPPERS_driveSteps(motor_p, (uint32_t) steps, accel);
+	if (block && status == kStatus_Success)
 		while (motor_p->status.running); // block until motor done
-	return kStatus_Success;
+	return status;
 }
 
 /**
@@ -330,11 +335,16 @@ status_t STEPPERS_moveBothRelative(int32_t stepsX, int32_t stepsY, bool accel, b
 		}
 		STEPPERS_writeDirectionPin(stepperX_p, stepperX_p->direction);
 		STEPPERS_writeDirectionPin(stepperY_p, stepperY_p->direction);
-		STEPPERS_driveSteps(stepperX_p, (uint32_t) stepsX, accel);
-		STEPPERS_driveSteps(stepperY_p, (uint32_t) stepsY, accel);
-		if (block)
+		status_t status1 = STEPPERS_driveSteps(stepperX_p, (uint32_t) stepsX, accel);
+		status_t status2 = STEPPERS_driveSteps(stepperY_p, (uint32_t) stepsY, accel);
+		if (block && status1 == kStatus_Success && status2 == kStatus_Success)
 			while (stepperX_p->status.running || stepperY_p->status.running); // block until motor done
-		return kStatus_Success;
+		return status1 == status2
+			? status1
+			: (status1 == kStatus_Success
+				? status2
+				: status1
+			);
 	}
 }
 

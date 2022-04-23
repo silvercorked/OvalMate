@@ -46,6 +46,7 @@ typedef struct {
 // Prototypes
 void ADVSTEPPERS_drawOval(void);
 void ADVSTEPPERS_drawRectangle(void);
+status_t ADVSTEPPERS_moveRelative1KHz(stepperMotor_s*, int32_t);
 // End Prototypes
 
 #endif

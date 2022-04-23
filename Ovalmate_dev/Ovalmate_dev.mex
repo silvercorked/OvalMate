@@ -874,7 +874,7 @@
             <file path="source/generated/usb_device_config.h" update_enabled="true"/>
             <file path="source/generated/usb_device_descriptor.c" update_enabled="true"/>
             <file path="source/generated/usb_device_descriptor.h" update_enabled="true"/>
-            <file path="source/usb_device_interface_0_ovalmate.c" update_enabled="true"/>
+            <file path="source/usb_device_interface_0_ovalmate.c" update_enabled="false"/>
          </generated_project_files>
          <peripherals_profile>
             <processor_version>11.0.2</processor_version>

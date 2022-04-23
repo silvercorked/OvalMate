@@ -28,8 +28,14 @@ typedef struct {
 } blackDotCoordinate_s;
 // End Structs
 
+// Definitions
+#define BLACKDOTS_MAXROWS		50 // absolute max here is memory dependent
+#define BLACKDOTS_MAXCOLS		24 // absolute max here is 32
+// End Definitions
+
 // Extern Variables
-extern volatile uint32_t points[50];
+extern volatile uint32_t points[BLACKDOTS_MAXROWS];
+extern volatile bool jobReady;
 // End Extern Variables
 
 // Prototypes

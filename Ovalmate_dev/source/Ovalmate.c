@@ -46,7 +46,7 @@
  *	- 4/9/2022:
  *		Established basic process once USB information has been given (preset blackdots to simulate correct USB behavior.
  *	- 4/10/2022:
- *		Improved method of driving to mark ovals by hiding math calculations under stepper movement to next blackdot.
+ *		Improved method of driving to mark ovals by hiding math behind motor movement
  *
  */
 
@@ -95,125 +95,113 @@ int main(void) {
 	SERVO_setPenMode(PENUP); // begin with pen high
 	delay20ms();
 
-//	for (uint8_t i = 0; i < 24; i++) {
-//		BLACKDOTS_setPoint(0, i); // mark all in first column
-//	}
-//
-//	for (uint8_t i = 0; i < 24; i++) {
-//		blackDotCoordinate_s dot = {};
-//		BLACKDOTS_getNext(&dot);
-//		PRINTF("\r\n next: (row: %d, col: %d)", dot.row, dot.col);
-//		BLACKDOTS_clearPoint(dot.col, dot.row);
-//	}
 
-//	for (uint8_t x = 0; x < 24; x++) {
-//		for (uint8_t y = 1; y < 50; y++) {
-//			if ((x == 6 || x == 18) && y % 2 == 0) {
-//				BLACKDOTS_setPoint(x, y); // mark evens in col 6 and 18
-//			}
-//			else if ((x == 0 || x == 12) && y % 2 == 1) {
-//				BLACKDOTS_setPoint(x, y); // marks odds in col 0 and 12
-//			}
-//		}
-//	}
-	for (uint8_t y = 1; y < 50; y++) { // skip first on testing ballot
+
+	/*for (uint8_t y = 1; y < 50; y++) { // skip first on testing ballot
 		if (y % 2 == 0) continue;
 		for (uint8_t x = 0; x < 24; x++) {
 			if (x == 0 || x == 6 || x == 12 || x == 18)
 				BLACKDOTS_setPoint(x, y); // mark all in first column
 		}
-	}
-
-	SEVENSEG_setLegs_F(); // finding home
-	ok = findHome();
-	if (ok != kStatus_Success) {
-		PRINTF("Failed to Find Home");
-		SEVENSEG_displayErrorCode(0x7F); // 0x7F = failed to find home
-		return 0;
-	}
-	SEVENSEG_setLegs_D(); // finding document corners
-	ok = findDocumentCorners();
-	if (ok != kStatus_Success) {
-		STEPPERS_moveBothToNoAccel(5000, 3000); // reset for next run
-		SEVENSEG_displayErrorCode(0x7E); // 0x7E = failed to find document corners
+	}*/
+	while (1) {
 		STEPPERS_sleepMotor(stepperX_p);
 		STEPPERS_sleepMotor(stepperY_p);
-		return 0;
-	}
+		if (jobReady) {
+			STEPPERS_wakeMotor(stepperX_p);
+			STEPPERS_wakeMotor(stepperY_p);
+			delay20ms();
 
-	PRINTF("\r\n\r\n ready to find black dots");
+			SEVENSEG_setLegs_F(); // finding home
+			ok = findHome();
+			if (ok != kStatus_Success) {
+				PRINTF("Failed to Find Home");
+				SEVENSEG_displayErrorCode(0x7F); // 0x7F = failed to find home
+				return 0;
+			}
+			SEVENSEG_setLegs_D(); // finding document corners
+			ok = findDocumentCorners();
+			if (ok != kStatus_Success) {
+				STEPPERS_moveBothToNoAccel(5000, 3000); // reset for next run
+				SEVENSEG_displayErrorCode(0x7E); // 0x7E = failed to find document corners
+				STEPPERS_sleepMotor(stepperX_p);
+				STEPPERS_sleepMotor(stepperY_p);
+				return 0;
+			}
 
-	// printing dots
-	blackDotCoordinate_s dot = {};
-	uint32_t topLeftXDestination; uint32_t topLeftYDestination;
-	uint32_t topRightXDestination; uint32_t topRightYDestintation;
-	uint32_t bottomLeftXDestination; uint32_t bottomLeftYDestination;
-	float xBallotPercent; float yBallotPercent;
-	uint32_t xPos; uint32_t yPos;
-	bool marksComplete = false;
-	STEPPERS_setCurrentMode(PENMODE);
+			PRINTF("\r\n\r\n ready to find black dots");
 
-	SEVENSEG_setLegs_C(); // finding first location
-	BLACKDOTS_getNext(&dot);
-	if (dot.row != 0xFF) {
-		topLeftXDestination = topLeft.x + getStepsXforCol(dot.col);
-		topLeftYDestination = topLeft.y + getStepsYforRow(dot.row); // similar result to trYd
-		topRightXDestination = topRight.x - getStepsXforCol(23 - dot.col); // 23 = max value col
-		topRightYDestintation = topRight.y + getStepsYforRow(dot.row); // similar result to tlYd
-		bottomLeftXDestination = bottomLeft.x + getStepsXforCol(dot.col) + 230; // similar result to tlXd
-		bottomLeftYDestination = (bottomLeft.y - getStepsYforRow(49 - dot.row)) + 1340; // 49 = max value row
-		xBallotPercent = (dot.col / (float) 24);
-		yBallotPercent = (dot.row / (float) 50);
-		xPos = (uint32_t) ((topLeftXDestination * (1.0f - xBallotPercent) + topRightXDestination * xBallotPercent)
-			* (1.0f - yBallotPercent)
-			) + bottomLeftXDestination * yBallotPercent;
-		yPos = (uint32_t) ((topLeftYDestination * (1.0f - xBallotPercent) + topRightYDestintation * xBallotPercent)
-			* (1.0f - yBallotPercent)
-			) + bottomLeftYDestination * yBallotPercent;
-		while(!marksComplete) {
-			PRINTF("\r\n xPos %d, yPos %d, xPos adjusted %d, yPos adjusted %d \r\n    topLeftXD %d, topLeftYD %d \r\n    topRightXD %d, topRightYD %d \r\n    bottomLeftXD %d, bottomLeftYD %d \r\n", xPos, yPos, xPos - PENIROFFSETX, yPos - PENIROFFSETY, topLeftXDestination, topLeftYDestination, topRightXDestination, topRightYDestintation, bottomLeftXDestination, bottomLeftYDestination);
-			STEPPERS_moveBothToAccelNoBlock(
-				//topLeftXDestination,
-				xPos - PENIROFFSETX,
-				yPos - PENIROFFSETY
-			); // drive but dont block and calculate next position
-			BLACKDOTS_clearPoint(dot.col, dot.row);
-			PRINTF("col: %d, row: %d\r\n", dot.col, dot.row);
+			// printing dots
+			blackDotCoordinate_s dot = {};
+			uint32_t topLeftXDestination; uint32_t topLeftYDestination;
+			uint32_t topRightXDestination; uint32_t topRightYDestintation;
+			uint32_t bottomLeftXDestination; uint32_t bottomLeftYDestination;
+			float xBallotPercent; float yBallotPercent;
+			uint32_t xPos; uint32_t yPos;
+			bool marksComplete = false;
+			STEPPERS_setCurrentMode(PENMODE);
+
+			SEVENSEG_setLegs_C(); // finding first location
 			BLACKDOTS_getNext(&dot);
-			if (dot.row == 0xFF) // job done
-				marksComplete = true; // will end at the end of this while loop, math is pointless when this is true
-			topLeftXDestination = topLeft.x + getStepsXforCol(dot.col);
-			topLeftYDestination = topLeft.y + getStepsYforRow(dot.row); // similar result to trYd
-			topRightXDestination = topRight.x - getStepsXforCol(23 - dot.col); // 23 = max value col
-			topRightYDestintation = topRight.y + getStepsYforRow(dot.row); // similar result to tlYd
-			bottomLeftXDestination = bottomLeft.x + getStepsXforCol(dot.col) + 220; // similar result to tlXd
-			bottomLeftYDestination = (bottomLeft.y - getStepsYforRow(49 - dot.row)) + 1340; // 49 = max value row
-			xBallotPercent = (dot.col / (float) 24);
-			yBallotPercent = (dot.row / (float) 50);
-			xPos = (uint32_t) ((topLeftXDestination * (1.0f - xBallotPercent) + topRightXDestination * xBallotPercent)
-				* (1.0f - yBallotPercent)
-				) + bottomLeftXDestination * yBallotPercent;
-			yPos = (uint32_t) ((topLeftYDestination * (1.0f - xBallotPercent) + topRightYDestintation * xBallotPercent)
-				* (1.0f - yBallotPercent)
-				) + bottomLeftYDestination * yBallotPercent;
-			while (stepperX_p->status.running || stepperY_p->status.running); // calculate next while driving, then mark
-			SEVENSEG_setLegs_B(); // marking oval
-			SERVO_setPenMode(PENDOWN);
+			if (dot.row != 0xFF) {
+				topLeftXDestination = topLeft.x + getStepsXforCol(dot.col);
+				topLeftYDestination = topLeft.y + getStepsYforRow(dot.row); // similar result to trYd
+				topRightXDestination = topRight.x - getStepsXforCol(23 - dot.col); // 23 = max value col
+				topRightYDestintation = topRight.y + getStepsYforRow(dot.row); // similar result to tlYd
+				bottomLeftXDestination = bottomLeft.x + getStepsXforCol(dot.col) + 240; // similar result to tlXd
+				bottomLeftYDestination = (bottomLeft.y - getStepsYforRow(49 - dot.row)) + 1345; // 49 = max value row
+				xBallotPercent = (dot.col / (float) 24);
+				yBallotPercent = (dot.row / (float) 50);
+				xPos = (uint32_t) ((topLeftXDestination * (1.0f - xBallotPercent) + topRightXDestination * xBallotPercent)
+					* (1.0f - yBallotPercent)
+					) + bottomLeftXDestination * yBallotPercent;
+				yPos = (uint32_t) ((topLeftYDestination * (1.0f - xBallotPercent) + topRightYDestintation * xBallotPercent)
+					* (1.0f - yBallotPercent)
+					) + bottomLeftYDestination * yBallotPercent;
+				while(!marksComplete) {
+					PRINTF("\r\n xPos %d, yPos %d, xPos adjusted %d, yPos adjusted %d \r\n    topLeftXD %d, topLeftYD %d \r\n    topRightXD %d, topRightYD %d \r\n    bottomLeftXD %d, bottomLeftYD %d \r\n", xPos, yPos, xPos - PENIROFFSETX, yPos - PENIROFFSETY, topLeftXDestination, topLeftYDestination, topRightXDestination, topRightYDestintation, bottomLeftXDestination, bottomLeftYDestination);
+					STEPPERS_moveBothToAccelNoBlock(
+						//topLeftXDestination,
+						xPos - PENIROFFSETX,
+						yPos - PENIROFFSETY
+					); // drive but dont block and calculate next position
+					BLACKDOTS_clearPoint(dot.col, dot.row);
+					PRINTF("col: %d, row: %d\r\n", dot.col, dot.row);
+					BLACKDOTS_getNext(&dot);
+					if (dot.row == 0xFF) // job done
+						marksComplete = true; // will end at the end of this while loop, math is pointless when this is true
+					topLeftXDestination = topLeft.x + getStepsXforCol(dot.col);
+					topLeftYDestination = topLeft.y + getStepsYforRow(dot.row); // similar result to trYd
+					topRightXDestination = topRight.x - getStepsXforCol(23 - dot.col); // 23 = max value col
+					topRightYDestintation = topRight.y + getStepsYforRow(dot.row); // similar result to tlYd
+					bottomLeftXDestination = bottomLeft.x + getStepsXforCol(dot.col) + 220; // similar result to tlXd
+					bottomLeftYDestination = (bottomLeft.y - getStepsYforRow(49 - dot.row)) + 1340; // 49 = max value row
+					xBallotPercent = (dot.col / (float) 24);
+					yBallotPercent = (dot.row / (float) 50);
+					xPos = (uint32_t) ((topLeftXDestination * (1.0f - xBallotPercent) + topRightXDestination * xBallotPercent)
+						* (1.0f - yBallotPercent)
+						) + bottomLeftXDestination * yBallotPercent;
+					yPos = (uint32_t) ((topLeftYDestination * (1.0f - xBallotPercent) + topRightYDestintation * xBallotPercent)
+						* (1.0f - yBallotPercent)
+						) + bottomLeftYDestination * yBallotPercent;
+					while (stepperX_p->status.running || stepperY_p->status.running); // calculate next while driving, then mark
+					SEVENSEG_setLegs_B(); // marking oval
+					SERVO_setPenMode(PENDOWN);
+					delay20ms();
+					ADVSTEPPERS_drawOval();
+					SERVO_setPenMode(PENUP);
+					SEVENSEG_setLegs_C(); // driving to next position
+					delay20ms();
+				}
+			}
+			SEVENSEG_setLegs_A(); // moving to ready position
+			STEPPERS_switchMode(); // IRMODE
 			delay20ms();
-			ADVSTEPPERS_drawOval();
-			SERVO_setPenMode(PENUP);
-			SEVENSEG_setLegs_C(); // driving to next position
-			delay20ms();
+			STEPPERS_moveBothToAccel(6000, 3000); // reset for next run
+			SEVENSEG_setLegs_0(); // job complete
+			jobReady = false;
 		}
 	}
-	SEVENSEG_setLegs_A(); // moving to ready position
-	STEPPERS_switchMode(); // IRMODE
-	delay20ms();
-	STEPPERS_moveBothToAccel(6000, 3000); // reset for next run
-	SEVENSEG_setLegs_0(); // job complete
-
-	STEPPERS_sleepMotor(stepperX_p);
-	STEPPERS_sleepMotor(stepperY_p);
 
 	while(1);
 

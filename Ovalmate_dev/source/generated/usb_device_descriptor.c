@@ -129,7 +129,7 @@ uint8_t g_UsbDeviceInterface0OvalmateReportDescriptor[] = {
     0x15U, 0x00U,  /* Logical Minimum (0) */ 
     0x25U, 0x7FU,  /* Logical Maximum (127) */ 
     0x75U, 0x08U,  /* Report Size (8U) */ 
-    0x95U, 0x01U,  /* Report Count (1U) */ 
+    0x95U, 0x08U,  /* Report Count (8U) */ 
     0x91U, 0x02U,  /* Output(Data, Variable, Absolute) */ 
     0xC0U,  /* End collection, */ 
 };

@@ -23,6 +23,7 @@ volatile uint32_t g_pulsePeriod = 0U;
 ctimer_config_t ctimer_config;
 uint32_t ctimer_srcClock_Hz;
 uint32_t ctimer_timerClock;
+bool servoMotorAllowedToDrive = true;
 // End Variables
 
 // Functions
@@ -64,6 +65,7 @@ void SERVO_setupPWM() {
  * @return	- None
  */
 void SERVO_updatePWMDutyCycle(uint8_t dutyCycle) {
+	if (!servoMotorAllowedToDrive) return;
 	SERVO_updatePWMPulsePeriodValue(dutyCycle);
 	CTIMER_UpdatePwmPulsePeriod(CTIMER, CTIMER_MAT_OUT, g_pulsePeriod);
 }
@@ -75,6 +77,7 @@ void SERVO_updatePWMDutyCycle(uint8_t dutyCycle) {
  * @return	- None
  */
 void SERVO_startPWM() {
+	if (!servoMotorAllowedToDrive) return;
     CTIMER_StartTimer(CTIMER);
 }
 

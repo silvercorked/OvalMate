@@ -55,10 +55,10 @@
 // CLOCK_GetCTimerClkFreq(0U) should get CTIMER0's clock freq, but reports PLL0 is outputting 0Hz
 // manually setting clock freq of 12MHz
 
-#define MAXSTEPPERFREQ			4000U
-#define STARTSTEPPERFREQ		1000U
-#define MAXSTEPPERSTEPS0		(CTIMER0_CLK_FREQ / (MAXSTEPPERFREQ * 2))	//  4000 steps
-#define STARTSTEPPERSTEPS0		(CTIMER0_CLK_FREQ / (STARTSTEPPERFREQ * 2))	// 12000 steps
+#define MAXSTEPPERFREQ			10000U
+#define STARTSTEPPERFREQ		2600U
+#define MAXSTEPPERSTEPS0		(CTIMER0_CLK_FREQ / (MAXSTEPPERFREQ * 2))
+#define STARTSTEPPERSTEPS0		(CTIMER0_CLK_FREQ / (STARTSTEPPERFREQ * 2))
 #define MAXSTEPPERSTEPS1		(CTIMER1_CLK_FREQ / (MAXSTEPPERFREQ * 2))
 #define STARTSTEPPERSTEPS1		(CTIMER1_CLK_FREQ / (STARTSTEPPERFREQ * 2))
 #define DIFFSTARTTOMAX0			STARTSTEPPERSTEPS0 - MAXSTEPPERSTEPS0
@@ -141,6 +141,7 @@ typedef struct {
 // Extern Variables
 extern stepperMotor_s* stepperX_p;
 extern stepperMotor_s* stepperY_p;
+extern bool stepperMotorsAllowedToDrive;
 // End Extern Variables
 
 // Macro Functions
@@ -189,11 +190,14 @@ void STEPPERS_initializePins(void);					// setup stepper motor output pins as GP
 void STEPPERS_initializeMotors(void);					// must be called once before any ctimer interactions
 
 status_t STEPPERS_setupMotor(stepperMotor_s*, uint32_t, bool);					// steps
-void STEPPERS_driveSteps(stepperMotor_s*, uint32_t, bool);
+status_t STEPPERS_driveSteps(stepperMotor_s*, uint32_t, bool);
 status_t STEPPERS_moveRelative(stepperMotor_s*, int32_t, bool, bool);
 status_t STEPPERS_moveTo(stepperMotor_s*, uint32_t, bool, bool);
 status_t STEPPERS_moveBothRelative(int32_t, int32_t, bool, bool);
 status_t STEPPERS_moveBothTo(uint32_t, uint32_t, bool, bool);
+//status_t STEPPERS_moveAtSpeed(stepperMotor_s*, int32_t, uint32_t);
+
+//uint32_t STEPPERS_getMatchValueFromSpeed(uint32_t);
 
 void STEPPERS_startMotor(stepperMotor_s*);
 void STEPPERS_stopMotor(stepperMotor_s*);

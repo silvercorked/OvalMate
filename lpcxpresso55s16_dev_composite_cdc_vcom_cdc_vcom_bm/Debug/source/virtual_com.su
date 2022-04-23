@@ -1,0 +1,4 @@
+../source/virtual_com.c:92:14:USB_DeviceCdcVcomCallback	56	static
+../source/virtual_com.c:336:6:USB_DeviceCdcVcomTask	40	static
+../source/virtual_com.c:387:14:USB_DeviceCdcVcomSetConfigure	16	static
+../source/virtual_com.c:435:14:USB_DeviceCdcVcomInit	24	static
