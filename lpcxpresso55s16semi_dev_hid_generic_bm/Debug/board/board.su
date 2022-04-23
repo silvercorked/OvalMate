@@ -1,2 +1,0 @@
-C:\Users\awiss\Documents\MCUXpressoIDE_11.5.0_7232\workspace\LCP55S16-evk\lpcxpresso55s16semi_dev_hid_generic_bm\utilities/fsl_debug_console.h:154:24:DbgConsole_Init	24	static
-../board/board.c:24:6:BOARD_InitDebugConsole	16	static
